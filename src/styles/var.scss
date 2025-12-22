@@ -1,0 +1,48 @@
+/**
+ * 校园惠 (Campus-Hui) 全局设计系统变量
+ * 规范：学术感、年轻化、易维护
+ */
+
+// --- 1. 品牌核心色 (Brand Colors) ---
+$campusColor: #005bac;      // 主色：学术蓝
+$campusColorLight: #e6eff7; // 主色极浅：激活态/背景
+$campusColorHover: #00498a; // 主色悬停：比主色深，用于反馈
+
+$warnColor: #ff8c00;        // 辅助色：能量橙
+$succColor: #1dc779;        // 成功色：清新绿
+$priceColor: #e62117;       // 价格/错误色：胭脂红
+$helpColor: #337ab7;        // 链接色：信息蓝
+
+// 别名兼容
+$sucColor: $succColor;
+
+// --- 2. 中性色规范 (Neutral Colors) ---
+$white: #ffffff;
+$black: #000000;
+
+$textColor: #333333;        // 标题与主要内容
+$subTextColor: #666666;     // 次要描述
+$insTextColor: #999999;     // 辅助/占位文字
+
+$bgColor: #f1f3f7;          // 页面底色
+$borderColor: #e4e7ed;      // 标准边框
+$lineColor: #f2f2f2;        // 细分割线
+
+// --- 3. 布局与尺寸规范 (Layout & Sizing) ---
+$borderRadius: 10px;        // 全局大圆角
+$borderRadiusSmall: 6px;    // 小组件圆角
+
+$containerWidth: 1240px;    // 版心宽度 (PC端)
+
+// --- 4. 交互反馈 (Interactions) ---
+$cardShadow: 0 4px 20px rgba(0, 91, 172, 0.08);       // 基础卡片阴影
+$cardShadowHover: 0 10px 35px rgba(0, 91, 172, 0.22); // 悬浮增强阴影
+
+$transitionDuration: 0.3s;  // 统一过渡时长
+
+// --- 5. 层级管理 (Z-index) ---
+$zIndexBack: -1;
+$zIndexBase: 1;
+$zIndexNav: 100;
+$zIndexFixed: 1000;
+$zIndexModal: 2000;

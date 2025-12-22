@@ -1,0 +1,73 @@
+/**
+ * 校园惠 (Campus-Hui) 主题配置文件
+ * 功能：基于 SCSS 变量覆盖实现 Element Plus 全局 UI 统一定制
+ */
+
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'primary': (
+      'base': #005bac,    // 主色：学术蓝
+      'light-3': #4d8cc4,
+      'light-5': #7fb0d6,
+      'light-7': #b3cee5,
+      'light-8': #ccdff0,
+      'light-9': #e6eff7,
+      'dark-2': #00498a,
+    ),
+    'success': (
+      'base': #1dc779,
+    ),
+    'warning': (
+      'base': #ff8c00,    // 活力橙
+    ),
+    'danger': (
+      'base': #e62117,    // 胭脂红
+    ),
+    'error': (
+      'base': #e62117,
+    ),
+    'info': (
+      'base': #909399,
+    ),
+  ),
+
+  // 圆角规范定制
+  $border-radius: (
+    'base': 10px,
+    'small': 6px,
+    'round': 24px,
+    'circle': 50%,
+  ),
+
+  // 动画过渡时间定制
+  $transition-duration: (
+    'all': 0.3s,
+    'fade': 0.3s,
+    'md-fade': 0.3s,
+  ),
+
+  // 字体字号规范
+  $font-size: (
+    'base': 14px,
+    'large': 16px,
+    'small': 12px,
+  )
+);
+
+/* 运行时 CSS 变量覆盖 */
+:root {
+  // 用于计算半透明色的 RGB 原色值
+  --el-color-primary-rgb: 0, 91, 172;
+
+  // 交互反馈增强
+  --el-button-hover-box-shadow: 0 4px 12px rgba(0, 91, 172, 0.15);
+
+  // 页面背景底色
+  --el-bg-color-page: #f7f9fc;
+}
+
+/* 组件样式细节修正 */
+.el-button--primary {
+  --el-button-text-color: #ffffff;
+  font-weight: 500;
+}

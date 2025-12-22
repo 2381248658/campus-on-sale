@@ -1,0 +1,232 @@
+<script setup>
+import { useCartStore } from '@/stores/cartStore'
+const cartStore = useCartStore()
+</script>
+
+<template>
+  <div class="cart">
+    <a class="curr" href="javascript:;">
+      <i class="iconfont icon-cart" @click="$router.push('/cartlist')"></i>
+      <em v-if="cartStore.allCount > 0">{{ cartStore.allCount }}</em>
+    </a>
+
+    <div class="layer">
+      <div class="list">
+        <div class="item" v-for="i in cartStore.cartList" :key="i.skuId">
+          <RouterLink :to="`/detail/${i.id}`">
+            <img v-img-lazy="i.picture" alt="校园好物" onerror="this.src='https://picsum.photos/80/80?random=default'" />
+            <div class="center">
+              <p class="name ellipsis-2">
+                {{ i.name }}
+              </p>
+              <p class="attr ellipsis" v-if="i.attrsText">{{ i.attrsText }}</p>
+            </div>
+            <div class="right">
+              <p class="price">&yen;{{ Number(i.nowPrice || i.price || 0).toFixed(2) }}</p>
+              <p class="count">x{{ i.count }}</p>
+            </div>
+          </RouterLink>
+          <i class="iconfont icon-shanchu2" @click="cartStore.delCart(i.skuId)"></i>
+        </div>
+
+        <div v-if="cartStore.cartList.length === 0" style="text-align: center; padding-top: 100px; color: #999;">
+          购物车还是空的哦~
+        </div>
+      </div>
+
+      <div class="foot">
+        <div class="total">
+          <p>共 {{ cartStore.allCount }} 件商品</p>
+          <p>&yen; {{ (Number(cartStore.allPrice) || 0).toFixed(2) }}</p>
+        </div>
+        <el-button size="large" type="primary" @click="$router.push('/cartlist')" :disabled="cartStore.allCount === 0">
+          去购物车结算
+        </el-button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.cart {
+  width: 50px;
+  position: relative;
+  z-index: 600;
+
+  .curr {
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    position: relative;
+    display: block;
+
+    .icon-cart {
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    em {
+      font-style: normal;
+      position: absolute;
+      right: 0;
+      top: 0;
+      padding: 1px 6px;
+      line-height: 1;
+      background: $helpColor;
+      color: #fff;
+      font-size: 12px;
+      border-radius: 10px;
+      font-family: Arial;
+    }
+  }
+
+  &:hover {
+    .layer {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .layer {
+    opacity: 0;
+    transition: all 0.4s 0.2s;
+    transform: translateY(-200px) scale(1, 0);
+    width: 400px;
+    height: 400px;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    box-shadow: $cardShadow;
+    background: #fff;
+    border-radius: 4px;
+    padding-top: 10px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      right: 14px;
+      top: -10px;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      transform: scale(0.6, 1) rotate(45deg);
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .foot {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 70px;
+      width: 100%;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      background: #f8f8f8;
+      align-items: center;
+
+      .total {
+        padding-left: 10px;
+        color: #999;
+
+        p {
+          &:last-child {
+            font-size: 18px;
+            color: $priceColor;
+          }
+        }
+      }
+    }
+  }
+
+  .list {
+    height: 310px;
+    overflow: auto;
+    padding: 0 10px;
+
+    &::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f8f8f8;
+      border-radius: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #eee;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #ccc;
+    }
+
+    .item {
+      border-bottom: 1px solid #f5f5f5;
+      padding: 10px 0;
+      position: relative;
+
+      i {
+        position: absolute;
+        bottom: 38px;
+        right: 0;
+        opacity: 0;
+        color: #666;
+        transition: all 0.5s;
+      }
+
+      &:hover {
+        i {
+          opacity: 1;
+          cursor: pointer;
+        }
+      }
+
+      a {
+        display: flex;
+        align-items: center;
+
+        img {
+          height: 80px;
+          width: 80px;
+          object-fit: cover;
+        }
+
+        .center {
+          padding: 0 10px;
+          width: 200px;
+
+          .name {
+            font-size: 16px;
+            color: #333;
+          }
+
+          .attr {
+            color: #999;
+            padding-top: 5px;
+          }
+        }
+
+        .right {
+          width: 100px;
+          padding-right: 20px;
+          text-align: center;
+
+          .price {
+            font-size: 16px;
+            color: $priceColor;
+          }
+
+          .count {
+            color: #999;
+            margin-top: 5px;
+            font-size: 16px;
+          }
+        }
+      }
+    }
+  }
+}
+</style>
