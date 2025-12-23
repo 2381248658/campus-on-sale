@@ -6,6 +6,7 @@
 [![Pinia](https://img.shields.io/badge/Pinia-3.0.4-F7C52A?style=for-the-badge&logo=pinia)](https://pinia.vuejs.org/)
 
 一个基于 Vue 3 + Vite 构建的现代化校园二手交易电商平台，采用前沿的前端技术栈和最佳工程化实践，致力于为校园用户提供优质的二手物品交易体验。
+现已使用apifox模拟接口进行简单部署http://121.43.248.176/
 
 ## 🚀 项目概述
 
