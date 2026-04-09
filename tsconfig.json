@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": false,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    "allowJs": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "exclude": ["node_modules", "dist"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

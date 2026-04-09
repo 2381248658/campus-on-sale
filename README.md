@@ -125,7 +125,7 @@ app.directive('img-lazy', {
       })
     })
     observer.observe(el)
-  }
+  },
 })
 ```
 
@@ -192,7 +192,7 @@ httpInstance.interceptors.response.use(
   (error) => {
     ElMessage.error(error.response?.data?.message || '网络异常')
     return Promise.reject(error)
-  }
+  },
 )
 ```
 
@@ -364,6 +364,6 @@ CMD ["npm", "run", "preview"]
 - [ ] 实现校园圈子社区
 - [ ] 添加 AI 智能推荐
 - [ ] 开发小程序版本
-⭐ 如果这个项目对你有帮助，请给它一个 star！
+      ⭐ 如果这个项目对你有帮助，请给它一个 star！
 
 **最后更新时间**: 2025年1月
