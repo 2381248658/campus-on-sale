@@ -8,16 +8,33 @@ import {
   mergeCartAPI,
   updateNewCartAPI,
   batchUpdateCartAPI,
-} from '@/apis/carts.js'
+} from '@/apis/carts' // 注意：如果是TS环境，去掉.js后缀
+
+// 1. 定义购物车商品类型
+export interface CartItem {
+  id?: string
+  skuId: string
+  name?: string
+  picture?: string
+  price?: string | number
+  nowPrice?: string | number
+  count: number
+  selected: boolean
+  attrsText?: string
+  stock?: number
+  isEffective?: boolean
+}
 
 export const useCartStore = defineStore(
   'cart',
   () => {
     const userStore = useUserStore()
     const isLogin = computed(() => !!userStore.userInfo?.token)
-    const cartList = ref([])
 
-    // --- 计算属性 (增加容错) ---
+    // 明确标注为 CartItem 数组，这样下方的 reduce 就不再需要 any
+    const cartList = ref<CartItem[]>([])
+
+    // --- 计算属性 (由于定义了 CartItem，现在 c 会自动识别属性) ---
     const allCount = computed(() => cartList.value.reduce((a, c) => a + (Number(c.count) || 0), 0))
     const allPrice = computed(() =>
       cartList.value.reduce(
@@ -47,8 +64,10 @@ export const useCartStore = defineStore(
     // 1. 刷新列表
     const updateCartList = async () => {
       if (!isLogin.value) return
+      // 现在 res 的类型直接就是 CartItem[]
       const res = await findNewCartListAPI()
-      cartList.value = res.result || res
+      // 直接赋值即可，不再需要判断 res.result，因为拦截器已经处理过了
+      cartList.value = res
     }
 
     // 2. 合并购物车
@@ -65,7 +84,7 @@ export const useCartStore = defineStore(
     }
 
     // 3. 添加购物车
-    const addCart = async (goods) => {
+    const addCart = async (goods: CartItem) => {
       if (isLogin.value) {
         await insertCartAPI({ skuId: goods.skuId, count: goods.count })
         await updateCartList()
@@ -81,7 +100,7 @@ export const useCartStore = defineStore(
     }
 
     // 4. 删除购物车
-    const delCart = async (skuId) => {
+    const delCart = async (skuId: string) => {
       if (isLogin.value) {
         await delCartAPI([skuId])
         await updateCartList()
@@ -91,7 +110,10 @@ export const useCartStore = defineStore(
     }
 
     // 5. 更新单项状态 (单选/改数量)
-    const updateCartItem = async (skuId, { selected, count }) => {
+    const updateCartItem = async (
+      skuId: string,
+      { selected, count }: { selected?: boolean; count?: number },
+    ) => {
       const item = cartList.value.find((i) => i.skuId === skuId)
       if (!item) return
 
@@ -110,7 +132,7 @@ export const useCartStore = defineStore(
     }
 
     // 6. 全选
-    const allCheck = async (selected) => {
+    const allCheck = async (selected: boolean) => {
       if (isLogin.value) {
         await batchUpdateCartAPI({ selected, ids: cartList.value.map((i) => i.skuId) })
         await updateCartList()
@@ -119,18 +141,15 @@ export const useCartStore = defineStore(
       }
     }
 
-    // 7. 🚀 新增：精准清除选中商品 (用于支付成功后)
+    // 7. 🚀 新增：精准清除选中商品
     const clearSelectedCart = async () => {
       if (isLogin.value) {
-        // 找到所有选中的 skuId
         const selectedIds = cartList.value.filter((item) => item.selected).map((item) => item.skuId)
-
         if (selectedIds.length > 0) {
-          await delCartAPI(selectedIds) // 批量删除
-          await updateCartList() // 同步后端列表
+          await delCartAPI(selectedIds)
+          await updateCartList()
         }
       } else {
-        // 未登录：直接本地过滤
         cartList.value = cartList.value.filter((item) => !item.selected)
       }
     }
