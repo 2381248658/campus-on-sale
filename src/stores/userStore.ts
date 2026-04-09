@@ -1,16 +1,30 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { loginAPI } from '@/apis/user'
+import { loginAPI, type LoginParams } from '@/apis/user' // 引入 LoginParams
 import { useCartStore } from './cartStore'
+
+// 4.1 定义用户信息类型
+export interface UserInfo {
+  id?: string
+  account?: string
+  mobile?: string
+  token?: string
+  avatar?: string
+  nickname?: string
+  // 根据接口实际返回补充字段...
+}
 
 export const useUserStore = defineStore(
   'user',
   () => {
-    const userInfo = ref({})
+    // 使用类型声明 UserInfo
+    const userInfo = ref<UserInfo>({})
 
     // 登录并同步购物车数据
-    const getUserInfo = async ({ account, password }) => {
+    // 🚀 修正：使用 LoginParams 替换 any
+    const getUserInfo = async ({ account, password }: LoginParams) => {
       const res = await loginAPI({ account, password })
+      // 🚀 此时 res 已经是 UserInfo 类型，赋值不再报错
       userInfo.value = res
 
       const cartStore = useCartStore()
