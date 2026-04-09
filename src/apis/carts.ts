@@ -2,6 +2,31 @@
 import httpInstance from '@/utils/http'
 import type { CartItem } from '@/stores/cartStore'
 
+/**
+ * 合并购物车单项类型
+ */
+export interface MergeCartItem {
+  skuId: string
+  selected: boolean
+  count: number
+}
+
+/**
+ * 批量更新购物车参数
+ */
+export interface BatchUpdateParams {
+  selected: boolean
+  ids: string[]
+}
+
+/**
+ * 更新购物车项参数
+ */
+export interface UpdateCartItemParams {
+  selected?: boolean
+  count?: number
+}
+
 // 加入购物车
 export const insertCartAPI = ({ skuId, count }: { skuId: string; count: number }) => {
   return httpInstance({
@@ -15,9 +40,9 @@ export const insertCartAPI = ({ skuId, count }: { skuId: string; count: number }
 }
 
 // 获取购物车列表
+// 🚀 修正：使用 <unknown, CartItem[]> 因为拦截器类型推断问题
 export const findNewCartListAPI = () => {
-  // <any, CartItem[]> 告诉 TS：拦截器返回的 result 是 CartItem 数组
-  return httpInstance<any, CartItem[]>({
+  return httpInstance<unknown, CartItem[]>({
     url: 'member/cart',
   })
 }
@@ -34,7 +59,7 @@ export const delCartAPI = (ids: string[]) => {
 }
 
 // 合并购物车
-export const mergeCartAPI = (data: { skuId: string; selected: boolean; count: number }[]) => {
+export const mergeCartAPI = (data: MergeCartItem[]) => {
   return httpInstance({
     url: '/member/cart/merge',
     method: 'POST',
@@ -43,10 +68,7 @@ export const mergeCartAPI = (data: { skuId: string; selected: boolean; count: nu
 }
 
 // 单选更新登录购物车
-export const updateNewCartAPI = (
-  skuId: string,
-  { selected, count }: { selected?: boolean; count?: number },
-) => {
+export const updateNewCartAPI = (skuId: string, { selected, count }: UpdateCartItemParams) => {
   return httpInstance({
     url: `member/cart/${skuId}`,
     method: 'PUT',
@@ -58,7 +80,7 @@ export const updateNewCartAPI = (
 }
 
 // 全选更新购物车
-export const batchUpdateCartAPI = (data: { selected: boolean; ids: string[] }) => {
+export const batchUpdateCartAPI = (data: BatchUpdateParams) => {
   return httpInstance({
     url: 'member/cart/selected',
     method: 'PUT',

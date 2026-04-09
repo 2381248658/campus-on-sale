@@ -1,51 +1,76 @@
 import httpInstance from '@/utils/http'
 
 /**
- * 3.1 定义数据模型 (Interface)
- * 这些模型决定了你在组件里写代码时有没有自动补全
+ * 3.1 定义数据模型
  */
 
 // 轮播图数据项
 export interface BannerItem {
   id: string
   imgUrl: string
-  hrefUrl: string
-  type: string
 }
 
-// 校园商品数据项 (根据你项目实际返回结构补充)
+// 校园商品/学长推荐数据项
 export interface GoodsItem {
   id: string
   name: string
   desc: string
-  price: string
+  price: number
   picture: string
 }
 
+// 人气推荐数据项 (根据文档: id, title, alt, picture)
+export interface HotItem {
+  id: string
+  title: string
+  alt: string
+  picture: string
+}
+
+// 首页产品板块 (根据文档: id, name, picture, goods列表)
+export interface GoodsModule {
+  id: string
+  name: string
+  picture: string
+  goods: GoodsItem[]
+}
+
+// 获取轮播图参数
+export interface BannerParams {
+  distributionsite?: string
+}
+
 /**
- * 3.2 改造 API 函数
+ * 3.2 改造 API 函数 - 彻底移除 any
  */
 
 // 1.1 获取首页/商品页轮播图
-// <any, BannerItem[]> 第一个泛型是参数类型，第二个是 response.data.result 的类型
-export function getBannerAPI(params: { distributionsite?: string } = {}) {
+export function getBannerAPI(params: BannerParams = {}) {
   const { distributionsite = '1' } = params
-  return httpInstance.get<any, BannerItem[]>('/recommend/banner', {
+  // 🚀 修正：使用 <unknown, BannerItem[]> 因为拦截器类型推断问题
+  return httpInstance<unknown, BannerItem[]>({
+    url: '/recommend/banner',
     params: { distributionsite },
   })
 }
 
-// 1.2 获取校园特惠
+// 1.2 获取学长推荐 (对应文档 /recommend/fresh)
 export function findNewAPI() {
-  return httpInstance.get<any, GoodsItem[]>('/recommend/fresh')
+  return httpInstance<unknown, GoodsItem[]>({
+    url: '/recommend/fresh',
+  })
 }
 
-// 1.3 获取人气推荐
+// 1.3 获取人气推荐 (对应文档 /recommend/hot)
 export const findHotAPI = () => {
-  return httpInstance.get<any, any[]>('/recommend/hot')
+  return httpInstance<unknown, HotItem[]>({
+    url: '/recommend/hot',
+  })
 }
 
-// 1.4 获取所有校园商品模块
+// 1.4 获取所有校园商品模块 (对应文档 /campus/goods/all)
 export const getGoodsAPI = () => {
-  return httpInstance.get<any, any>('/campus/goods/all')
+  return httpInstance<unknown, GoodsModule[]>({
+    url: '/campus/goods/all',
+  })
 }
