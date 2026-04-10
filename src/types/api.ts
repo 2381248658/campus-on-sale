@@ -215,6 +215,7 @@ export interface CartItem {
   name: string
   picture: string
   price: number
+  nowPrice?: number // 当前价格（可能有优惠）
   count: number
   selected: boolean
   stock: number
@@ -241,6 +242,7 @@ export interface DeleteCartParams {
 // 全选参数
 export interface SelectAllParams {
   selected: boolean
+  ids?: string[]
 }
 
 // 合并购物车参数（本地购物车项）
