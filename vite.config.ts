@@ -16,8 +16,8 @@ export default defineConfig({
       mockPath: 'mock',
       // localEnabled: true,
       // prodEnabled: false,//生产环境通常关闭（除非没有真实后端且需展示 Demo）
-      watchFiles: true,
-      logger: true,
+      // watchFiles: true,
+      // logger: true,
     }),
     AutoImport({
       resolvers: [ElementPlusResolver()],
