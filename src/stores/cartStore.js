@@ -8,67 +8,36 @@ import {
   mergeCartAPI,
   updateNewCartAPI,
   batchUpdateCartAPI,
-} from '@/apis/carts'
-
-/**
- * 🚀 新增：API返回的原始购物车项类型
- * 严格对齐后端接口返回的字段
- */
-export interface CartItemAPI {
-  id: string
-  skuId: string
-  name: string
-  picture: string
-  price: number
-  count: number
-  selected: boolean
-  stock?: number
-  attrsText?: string
-}
-
-/**
- * 前端使用的购物车项类型（包含本地计算字段）
- * 🚀 修正：继承API类型并扩展前端字段
- */
-export interface CartItem extends CartItemAPI {
-  nowPrice?: number // 前端计算的现价（促销价）
-  isEffective?: boolean // 前端判断的商品有效性（库存>0等）
-}
+} from '@/apis/carts.js'
 
 export const useCartStore = defineStore(
   'cart',
   () => {
     const userStore = useUserStore()
     const isLogin = computed(() => !!userStore.userInfo?.token)
+    const cartList = ref([])
 
-    // 明确标注为 CartItem 数组
-    const cartList = ref<CartItem[]>([])
-
-    // --- 计算属性 ---
+    // --- 计算属性 (增加容错) ---
     const allCount = computed(() => cartList.value.reduce((a, c) => a + (Number(c.count) || 0), 0))
-
     const allPrice = computed(() =>
       cartList.value.reduce(
-        (a, c) => a + Number(c.nowPrice ?? c.price ?? 0) * (Number(c.count) || 0),
+        (a, c) => a + Number(c.nowPrice || c.price || 0) * (Number(c.count) || 0),
         0,
       ),
     )
-
     const selectedCount = computed(() =>
       cartList.value
         .filter((item) => item.selected)
         .reduce((a, c) => a + (Number(c.count) || 0), 0),
     )
-
     const selectedPrice = computed(() =>
       cartList.value
         .filter((item) => item.selected)
         .reduce((a, c) => {
-          const price = Number(c.nowPrice ?? c.price ?? 0)
+          const price = Number(c.nowPrice || c.price || 0)
           return a + price * (Number(c.count) || 0)
         }, 0),
     )
-
     const isAll = computed(
       () => cartList.value.length > 0 && cartList.value.every((item) => item.selected),
     )
@@ -78,15 +47,8 @@ export const useCartStore = defineStore(
     // 1. 刷新列表
     const updateCartList = async () => {
       if (!isLogin.value) return
-      try {
-        // 🚀 修正：res 是 AxiosResponse，需要 .data 获取实际数据
-        // 或者如果拦截器确实返回了 result，则使用 res as CartItem[]
-        const res = await findNewCartListAPI()
-        cartList.value = (res as any).data ?? res
-      } catch (error) {
-        console.error('获取购物车列表失败:', error)
-        throw error
-      }
+      const res = await findNewCartListAPI()
+      cartList.value = res.result || res
     }
 
     // 2. 合并购物车
@@ -103,7 +65,7 @@ export const useCartStore = defineStore(
     }
 
     // 3. 添加购物车
-    const addCart = async (goods: CartItem) => {
+    const addCart = async (goods) => {
       if (isLogin.value) {
         await insertCartAPI({ skuId: goods.skuId, count: goods.count })
         await updateCartList()
@@ -113,13 +75,13 @@ export const useCartStore = defineStore(
           item.count += goods.count
         } else {
           // 确保所有添加到购物车的商品都有明确的selected初始值（默认选中）
-          cartList.value.push({ ...goods, selected: goods.selected ?? true })
+          cartList.value.push({ ...goods, selected: true })
         }
       }
     }
 
     // 4. 删除购物车
-    const delCart = async (skuId: string) => {
+    const delCart = async (skuId) => {
       if (isLogin.value) {
         await delCartAPI([skuId])
         await updateCartList()
@@ -129,10 +91,7 @@ export const useCartStore = defineStore(
     }
 
     // 5. 更新单项状态 (单选/改数量)
-    const updateCartItem = async (
-      skuId: string,
-      { selected, count }: { selected?: boolean; count?: number },
-    ) => {
+    const updateCartItem = async (skuId, { selected, count }) => {
       const item = cartList.value.find((i) => i.skuId === skuId)
       if (!item) return
 
@@ -151,7 +110,7 @@ export const useCartStore = defineStore(
     }
 
     // 6. 全选
-    const allCheck = async (selected: boolean) => {
+    const allCheck = async (selected) => {
       if (isLogin.value) {
         await batchUpdateCartAPI({ selected, ids: cartList.value.map((i) => i.skuId) })
         await updateCartList()
@@ -160,15 +119,18 @@ export const useCartStore = defineStore(
       }
     }
 
-    // 7. 精准清除选中商品
+    // 7. 🚀 新增：精准清除选中商品 (用于支付成功后)
     const clearSelectedCart = async () => {
       if (isLogin.value) {
+        // 找到所有选中的 skuId
         const selectedIds = cartList.value.filter((item) => item.selected).map((item) => item.skuId)
+
         if (selectedIds.length > 0) {
-          await delCartAPI(selectedIds)
-          await updateCartList()
+          await delCartAPI(selectedIds) // 批量删除
+          await updateCartList() // 同步后端列表
         }
       } else {
+        // 未登录：直接本地过滤
         cartList.value = cartList.value.filter((item) => !item.selected)
       }
     }
