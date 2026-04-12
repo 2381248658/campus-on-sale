@@ -1,5 +1,6 @@
-<script setup>
-import { useCategoryStore } from '@/stores/categoryStore';
+<script setup lang="ts">
+import { useCategoryStore } from '@/stores/categoryStore'
+
 const categoryStore = useCategoryStore()
 </script>
 
@@ -37,7 +38,7 @@ const categoryStore = useCategoryStore()
   </div>
 </template>
 
-<style scoped lang='scss'>
+<style scoped lang="scss">
 .home-category {
   width: 180px;
   height: 500px;
@@ -52,38 +53,38 @@ const categoryStore = useCategoryStore()
     padding: 8px 0;
 
     li {
-          flex: 1;
-          padding-left: 16px;
-          display: flex;
-          align-items: center;
+      flex: 1;
+      padding-left: 16px;
+      display: flex;
+      align-items: center;
 
-          &:hover {
-            background: $campusColor;
-          }
+      &:hover {
+        background: $campusColor;
+      }
 
-          .category-item {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            margin-right: 4px;
+      .category-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-right: 4px;
 
-            a {
-              color: #fff;
-              font-size: 14px;
-              margin-right: 12px;
-            }
+        a {
+          color: #fff;
+          font-size: 14px;
+          margin-right: 12px;
+        }
 
-            .subtitle {
-              color: rgba(255, 255, 255, 0.7);
-              font-size: 11px;
-            }
-          }
+        .subtitle {
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 11px;
+        }
+      }
 
-          a {
-            margin-right: 4px;
-            color: #fff;
-            font-size: 14px;
-          }
+      a {
+        margin-right: 4px;
+        color: #fff;
+        font-size: 14px;
+      }
 
       .layer {
         width: 990px;

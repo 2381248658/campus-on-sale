@@ -1,20 +1,32 @@
-<script setup>
+<script setup lang="ts">
 import HomePanel from './HomePanel.vue'
-import { getGoodsAPI } from '@/apis/homeAPI';
-import { onMounted, ref } from 'vue';
-import GoodsItem from './GoodsItem.vue';
+import { getGoodsAPI } from '@/apis/homeAPI'
+import { onMounted, ref } from 'vue'
+import GoodsItem from './GoodsItem.vue'
+import type { HomeProduct } from '@/types/api'
 
-const goodsList = ref([])
+// ============================================
+// State
+// ============================================
 
-const getGoods = async () => {
+const goodsList = ref<HomeProduct[]>([])
+
+// ============================================
+// Methods
+// ============================================
+
+const getGoods = async (): Promise<void> => {
   try {
     const res = await getGoodsAPI()
     goodsList.value = res || []
-
   } catch (err) {
     console.error('获取校园业务板块失败', err)
   }
 }
+
+// ============================================
+// Lifecycle
+// ============================================
 
 onMounted(() => {
   getGoods()
@@ -42,7 +54,7 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped lang='scss'>
+<style scoped lang="scss">
 .home-product {
   background: #f7f9fc;
   margin-top: 0;

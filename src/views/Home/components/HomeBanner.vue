@@ -1,10 +1,11 @@
-<script setup>
-import { getBannerAPI } from '@/apis/homeAPI';
-import { onMounted, ref } from 'vue';
+<script setup lang="ts">
+import { getBannerAPI } from '@/apis/homeAPI'
+import { onMounted, ref } from 'vue'
+import type { Banner } from '@/types/api'
 
-const bannerList = ref([])
+const bannerList = ref<Banner[]>([])
 
-const getBanner = async () => {
+const getBanner = async (): Promise<void> => {
   try {
     const res = await getBannerAPI()
     bannerList.value = res || []
@@ -13,6 +14,10 @@ const getBanner = async () => {
   }
 }
 
+// ============================================
+// Lifecycle
+// ============================================
+
 onMounted(() => getBanner())
 </script>
 
@@ -20,7 +25,7 @@ onMounted(() => getBanner())
   <div class="home-banner">
     <el-carousel height="500px">
       <el-carousel-item v-for="item in bannerList" :key="item.id">
-        <img :src="item.imgUrl" alt="">
+        <img :src="item.imgUrl" alt="" />
       </el-carousel-item>
     </el-carousel>
   </div>

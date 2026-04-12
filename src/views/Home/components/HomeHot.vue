@@ -1,10 +1,20 @@
-<script setup>
-import { onMounted, ref } from 'vue';
-import HomePanel from './HomePanel.vue';
-import { findHotAPI } from '@/apis/homeAPI';
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import HomePanel from './HomePanel.vue'
+import { findHotAPI } from '@/apis/homeAPI'
+import type { HotRecommend } from '@/types/api'
 
-const hotList = ref([])
-const getFindHot = async () => {
+// ============================================
+// State
+// ============================================
+
+const hotList = ref<HotRecommend[]>([])
+
+// ============================================
+// Methods
+// ============================================
+
+const getFindHot = async (): Promise<void> => {
   // 逻辑防抖
   if (hotList.value.length > 0) return
 
@@ -17,6 +27,10 @@ const getFindHot = async () => {
   }
 }
 
+// ============================================
+// Lifecycle
+// ============================================
+
 onMounted(() => getFindHot())
 </script>
 
@@ -26,7 +40,7 @@ onMounted(() => getFindHot())
       <li v-for="item in hotList" :key="item.id">
         <RouterLink :to="`/detail/${item.id}`">
           <img v-img-lazy="item.picture" :alt="item.alt" />
-          <p class="name">{{ item.title || item.name }}</p>
+          <p class="name">{{ item.title }}</p>
           <p class="desc">{{ item.alt }}</p>
         </RouterLink>
       </li>
@@ -34,7 +48,7 @@ onMounted(() => getFindHot())
   </HomePanel>
 </template>
 
-<style scoped lang='scss'>
+<style scoped lang="scss">
 .goods-list {
   display: flex;
   justify-content: space-between;
@@ -47,7 +61,7 @@ onMounted(() => getFindHot())
     height: 406px;
     background: #fff;
     border: 1px solid #f2f5f8;
-    transition: all .5s;
+    transition: all 0.5s;
     border-radius: $borderRadius;
     overflow: hidden;
 

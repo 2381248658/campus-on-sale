@@ -1,16 +1,19 @@
-<script setup>
+<script setup lang="ts">
+// ============================================
+// Props 类型定义
+// ============================================
+
+interface Props {
+  /** 主标题 */
+  title?: string
+  /** 副标题 */
+  subTitle?: string
+}
+
 // 定义属性，并为校园化重构设置更符合业务的默认值
-defineProps({
-  // 主标题
-  title: {
-    type: String,
-    default: '学长推荐'
-  },
-  // 副标题
-  subTitle: {
-    type: String,
-    default: '学长亲测 避坑指南'
-  }
+withDefaults(defineProps<Props>(), {
+  title: '学长推荐',
+  subTitle: '学长亲测 避坑指南',
 })
 </script>
 
@@ -33,7 +36,7 @@ defineProps({
   </div>
 </template>
 
-<style scoped lang='scss'>
+<style scoped lang="scss">
 .home-panel {
   background-color: #fff;
   margin-bottom: 20px;
@@ -55,7 +58,7 @@ defineProps({
       padding-left: 15px;
 
       &::before {
-        content: "";
+        content: '';
         position: absolute;
         left: 0;
         top: 5px;

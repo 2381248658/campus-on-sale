@@ -1,10 +1,16 @@
-<script setup>
-defineProps({
-  good: {
-    type: Object,
-    required: true
-  }
-})
+<script setup lang="ts">
+import type { CategoryGoods } from '@/types/api'
+
+// ============================================
+// Props 类型定义
+// ============================================
+
+interface Props {
+  /** 商品数据 */
+  good: CategoryGoods
+}
+
+defineProps<Props>()
 </script>
 
 <template>
@@ -15,9 +21,7 @@ defineProps({
     <div class="info-box">
       <p class="name ellipsis">{{ good.name }}</p>
       <p class="desc ellipsis">{{ good.desc }}</p>
-      <p class="price">
-        <span class="unit">&yen;</span>{{ good.price }}
-      </p>
+      <p class="price"><span class="unit">&yen;</span>{{ good.price }}</p>
     </div>
   </RouterLink>
 </template>

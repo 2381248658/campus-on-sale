@@ -1,11 +1,20 @@
-<script setup>
-import { onMounted, ref } from 'vue';
-import HomePanel from './HomePanel.vue';
-import { findNewAPI } from '@/apis/homeAPI';
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import HomePanel from './HomePanel.vue'
+import { findNewAPI } from '@/apis/homeAPI'
+import type { FreshGoods } from '@/types/api'
 
-const newList = ref([])
+// ============================================
+// State
+// ============================================
 
-const getFindNew = async () => {
+const newList = ref<FreshGoods[]>([])
+
+// ============================================
+// Methods
+// ============================================
+
+const getFindNew = async (): Promise<void> => {
   // 逻辑防抖：如果已经有数据了，不要重复请求，防止闪烁
   if (newList.value.length > 0) return
 
@@ -16,6 +25,10 @@ const getFindNew = async () => {
     console.error('获取新鲜好物失败', err)
   }
 }
+
+// ============================================
+// Lifecycle
+// ============================================
 
 onMounted(() => getFindNew())
 </script>
@@ -34,11 +47,11 @@ onMounted(() => getFindNew())
   </HomePanel>
 </template>
 
-<style scoped lang='scss'>
+<style scoped lang="scss">
 .goods-list {
   display: flex;
   justify-content: space-between;
-  //锁定高度。
+  // 锁定高度
   height: 406px;
   min-height: 406px;
   background-color: transparent;
@@ -47,7 +60,7 @@ onMounted(() => getFindNew())
     width: 306px;
     height: 406px;
     background: #f4f8fb;
-    transition: all .5s;
+    transition: all 0.5s;
     border-radius: $borderRadius;
     overflow: hidden;
 

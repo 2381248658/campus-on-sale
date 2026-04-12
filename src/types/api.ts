@@ -83,6 +83,12 @@ export interface CategoryHead {
   name: string
   subtitle: string
   goods: CategoryGoods[]
+  children?: Array<{
+    id: string
+    name: string
+    picture?: string
+    goods?: CategoryGoods[]
+  }>
 }
 
 // 首页产品板块
