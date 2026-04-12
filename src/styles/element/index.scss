@@ -6,7 +6,8 @@
 @forward 'element-plus/theme-chalk/src/common/var.scss' with (
   $colors: (
     'primary': (
-      'base': #005bac,    // 主色：学术蓝
+      'base': #005bac,
+      // 主色：学术蓝
       'light-3': #4d8cc4,
       'light-5': #7fb0d6,
       'light-7': #b3cee5,
@@ -18,10 +19,12 @@
       'base': #1dc779,
     ),
     'warning': (
-      'base': #ff8c00,    // 活力橙
+      'base': #ff8c00,
+      // 活力橙
     ),
     'danger': (
-      'base': #e62117,    // 胭脂红
+      'base': #e62117,
+      // 胭脂红
     ),
     'error': (
       'base': #e62117,
@@ -33,25 +36,25 @@
 
   // 圆角规范定制
   $border-radius: (
-    'base': 10px,
-    'small': 6px,
-    'round': 24px,
-    'circle': 50%,
-  ),
+      'base': 10px,
+      'small': 6px,
+      'round': 24px,
+      'circle': 50%,
+    ),
 
   // 动画过渡时间定制
   $transition-duration: (
-    'all': 0.3s,
-    'fade': 0.3s,
-    'md-fade': 0.3s,
-  ),
+      'all': 0.3s,
+      'fade': 0.3s,
+      'md-fade': 0.3s,
+    ),
 
   // 字体字号规范
   $font-size: (
-    'base': 14px,
-    'large': 16px,
-    'small': 12px,
-  )
+      'base': 14px,
+      'large': 16px,
+      'small': 12px,
+    )
 );
 
 /* 运行时 CSS 变量覆盖 */
