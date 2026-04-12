@@ -1,14 +1,12 @@
-<script setup>
-import { useCategoryStore } from '@/stores/categoryStore';
-import HeaderCart from './HeaderCart.vue';
+<script setup lang="ts">
+import { useCategoryStore } from '@/stores/categoryStore'
+import HeaderCart from './HeaderCart.vue'
 
 const categoryStore = useCategoryStore()
-
-
 </script>
 
 <template>
-  <header class='app-header'>
+  <header class="app-header">
     <div class="container">
       <h1 class="logo">
         <RouterLink to="/"></RouterLink>
@@ -27,7 +25,7 @@ const categoryStore = useCategoryStore()
 
       <div class="search">
         <i class="iconfont icon-sousuo"></i>
-        <input type="text" placeholder="搜学长推荐 / 二手教材">
+        <input type="text" placeholder="搜学长推荐 / 二手教材" />
       </div>
 
       <HeaderCart />
@@ -35,7 +33,7 @@ const categoryStore = useCategoryStore()
   </header>
 </template>
 
-<style scoped lang='scss'>
+<style scoped lang="scss">
 .app-header {
   background: #fff;
   border-bottom: 1px solid #f2f2f2;

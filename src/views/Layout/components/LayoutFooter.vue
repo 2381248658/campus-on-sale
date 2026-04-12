@@ -71,8 +71,8 @@
   </footer>
 </template>
 
-<style scoped lang='scss'>
-@use "sass:color";
+<style scoped lang="scss">
+@use 'sass:color';
 
 .app_footer {
   overflow: hidden;

@@ -1,5 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { useCartStore } from '@/stores/cartStore'
+
 const cartStore = useCartStore()
 </script>
 
@@ -14,7 +15,11 @@ const cartStore = useCartStore()
       <div class="list">
         <div class="item" v-for="i in cartStore.cartList" :key="i.skuId">
           <RouterLink :to="`/detail/${i.id}`">
-            <img v-img-lazy="i.picture" alt="校园好物" onerror="this.src='https://picsum.photos/80/80?random=default'" />
+            <img
+              v-img-lazy="i.picture"
+              alt="校园好物"
+              onerror="this.src='https://picsum.photos/80/80?random=default'"
+            />
             <div class="center">
               <p class="name ellipsis-2">
                 {{ i.name }}
@@ -29,7 +34,10 @@ const cartStore = useCartStore()
           <i class="iconfont icon-shanchu2" @click="cartStore.delCart(i.skuId)"></i>
         </div>
 
-        <div v-if="cartStore.cartList.length === 0" style="text-align: center; padding-top: 100px; color: #999;">
+        <div
+          v-if="cartStore.cartList.length === 0"
+          style="text-align: center; padding-top: 100px; color: #999"
+        >
           购物车还是空的哦~
         </div>
       </div>
@@ -39,7 +47,12 @@ const cartStore = useCartStore()
           <p>共 {{ cartStore.allCount }} 件商品</p>
           <p>&yen; {{ (Number(cartStore.allPrice) || 0).toFixed(2) }}</p>
         </div>
-        <el-button size="large" type="primary" @click="$router.push('/cartlist')" :disabled="cartStore.allCount === 0">
+        <el-button
+          size="large"
+          type="primary"
+          @click="$router.push('/cartlist')"
+          :disabled="cartStore.allCount === 0"
+        >
           去购物车结算
         </el-button>
       </div>
@@ -102,7 +115,7 @@ const cartStore = useCartStore()
     padding-top: 10px;
 
     &::before {
-      content: "";
+      content: '';
       position: absolute;
       right: 14px;
       top: -10px;

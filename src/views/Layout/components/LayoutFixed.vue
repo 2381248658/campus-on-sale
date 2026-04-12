@@ -1,12 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { useCategoryStore } from '@/stores/categoryStore'
 import { ref, onMounted, onUnmounted } from 'vue'
 
-const showStick = ref(false)
+// ============================================
+// State
+// ============================================
+
+const showStick = ref<boolean>(false)
 const offsetTop = 80
-const handleScroll = () => {
+
+// ============================================
+// Methods
+// ============================================
+
+const handleScroll = (): void => {
   showStick.value = window.scrollY >= offsetTop
 }
+
+// ============================================
+// Lifecycle
+// ============================================
 
 onMounted(() => {
   handleScroll()
@@ -18,34 +31,9 @@ onUnmounted(() => {
 })
 
 const categoryStore = useCategoryStore()
-
 </script>
 
-<template>
-  <div class="app-header-sticky" :class="{ show: showStick }">
-    <div class="container">
-      <RouterLink class="logo" to="/"></RouterLink>
-
-      <ul class="app-header-nav">
-        <li class="home">
-          <RouterLink to="/">首页</RouterLink>
-        </li>
-        <li v-for="item in categoryStore.categoryList" :key="item.id">
-          <RouterLink active-class="active" :to="`/category/${item.id}`">
-            {{ item.name }}
-          </RouterLink>
-        </li>
-      </ul>
-
-      <div class="right">
-        <RouterLink to="/">学长推荐</RouterLink>
-        <RouterLink to="/">校园专题</RouterLink>
-      </div>
-    </div>
-  </div>
-</template>
-
-<style scoped lang='scss'>
+<style scoped lang="scss">
 .app-header-sticky {
   width: 100%;
   height: 80px;
