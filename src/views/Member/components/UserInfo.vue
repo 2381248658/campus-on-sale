@@ -1,14 +1,15 @@
-<script setup>
-import { useUserStore } from '@/stores/userStore';
-import { getLikeListAPI } from '@/apis/user';
-import GoodsItem from '@/views/Home/components/GoodsItem.vue';
-import { onMounted, ref } from 'vue';
+<script setup lang="ts">
+import { useUserStore } from '@/stores/userStore'
+import { getLikeListAPI } from '@/apis/user'
+import GoodsItem from '@/views/Home/components/GoodsItem.vue'
+import { onMounted, ref } from 'vue'
+import type { CategoryGoods } from '@/types/api'
 
 const userStore = useUserStore()
 
-const likeList = ref([])
+const likeList = ref<CategoryGoods[]>([])
 
-const getLikeList = async () => {
+const getLikeList = async (): Promise<void> => {
   try {
     const res = await getLikeListAPI({ limit: 4 })
     likeList.value = res || []
@@ -25,7 +26,11 @@ onMounted(() => getLikeList())
     <div class="user-meta">
       <div class="avatar">
         <img
-          :src="userStore.userInfo?.avatar || 'http://yjy-xiaotuxian-dev.oss-cn-beijing.aliyuncs.com/uploads/avatar_1.png'" />
+          :src="
+            userStore.userInfo?.avatar ||
+            'http://yjy-xiaotuxian-dev.oss-cn-beijing.aliyuncs.com/uploads/avatar_1.png'
+          "
+        />
       </div>
       <h4>{{ userStore.userInfo?.account || '尊贵的校园用户' }}</h4>
     </div>

@@ -1,16 +1,18 @@
-<script setup>
-import { getCategoryFilterAPI, getSubCategoryAPI } from '@/apis/category';
-import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
-import GoodsItem from '../Home/components/GoodsItem.vue';
+<script setup lang="ts">
+import { getCategoryFilterAPI, getSubCategoryAPI } from '@/apis/category'
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import GoodsItem from '../Home/components/GoodsItem.vue'
+import type { SubCategoryFilter, CategoryGoods, PaginatedResult } from '@/types/api'
 
-const filterData = ref({})
+// 筛选数据类型
+const filterData = ref<SubCategoryFilter>({} as SubCategoryFilter)
 const route = useRoute()
 
 // 1. 获取校园分类数据
-const getCategoryData = async () => {
+const getCategoryData = async (): Promise<void> => {
   try {
-    const res = await getCategoryFilterAPI(route.params.id)
+    const res = await getCategoryFilterAPI(route.params.id as string)
     filterData.value = res
   } catch (err) {
     console.error('获取校园二级分类数据失败', err)
@@ -20,37 +22,46 @@ const getCategoryData = async () => {
 onMounted(() => getCategoryData())
 
 // 2. 获取校内商品列表
-const goodList = ref([])
-const reqData = ref({
-  categoryId: route.params.id,
+const goodList = ref<CategoryGoods[]>([])
+
+// 请求参数类型
+interface ReqData {
+  categoryId: string
+  page: number
+  pageSize: number
+  sortField: 'publishTime' | 'orderNum' | 'evaluateNum'
+}
+
+const reqData = ref<ReqData>({
+  categoryId: route.params.id as string,
   page: 1,
   pageSize: 20,
-  sortField: 'publishTime'
+  sortField: 'publishTime',
 })
 
-const getGoodList = async () => {
+const getGoodList = async (): Promise<void> => {
   try {
     const res = await getSubCategoryAPI(reqData.value)
     goodList.value = res.items || []
   } catch (err) {
-    console.error("校内商品数据请求失败", err)
+    console.error('校内商品数据请求失败', err)
   }
 }
 
 onMounted(() => getGoodList())
 
 // 3. 排序切换（最新/热度/评价）
-const tabChange = () => {
+const tabChange = (): void => {
   reqData.value.page = 1
   disabled.value = false
   getGoodList()
 }
 
 // 4. 无限加载逻辑
-const disabled = ref(false)
-const loading = ref(false)
+const disabled = ref<boolean>(false)
+const loading = ref<boolean>(false)
 
-const load = async () => {
+const load = async (): Promise<void> => {
   if (loading.value) return
   loading.value = true
 
@@ -64,7 +75,7 @@ const load = async () => {
       disabled.value = true
     }
   } catch (err) {
-    console.error("加载更多好物失败", err)
+    console.error('加载更多好物失败', err)
   } finally {
     loading.value = false
   }

@@ -1,26 +1,33 @@
-<script setup>
-import { ref } from 'vue';
-
+<script setup lang="ts">
+import { ref } from 'vue'
 import 'element-plus/theme-chalk/el-message.css'
-import { ElMessage } from 'element-plus';
-import router from '@/router';
-import { useUserStore } from '@/stores/userStore';
+import { ElMessage } from 'element-plus'
+import type { FormInstance, FormRules } from 'element-plus'
+import router from '@/router'
+import { useUserStore } from '@/stores/userStore'
+import type { LoginParams } from '@/types/api'
 
 const userStore = useUserStore()
-const formRef = ref(null)
-const form = ref({
+const formRef = ref<FormInstance>()
+
+// 登录表单数据
+interface LoginForm {
+  account: string
+  password: string
+  agree: boolean
+}
+
+const form = ref<LoginForm>({
   account: '',
   password: '',
-  agree: false
+  agree: false,
 })
 
-const rules = {
-  account: [
-    { required: true, message: '学号不能为空', trigger: 'blur' }
-  ],
+const rules: FormRules<LoginForm> = {
+  account: [{ required: true, message: '学号不能为空', trigger: 'blur' }],
   password: [
     { required: true, message: '密码不能为空', trigger: 'blur' },
-    { min: 6, max: 14, message: '密码应该在6~14位之间', trigger: 'blur' }
+    { min: 6, max: 14, message: '密码应该在6~14位之间', trigger: 'blur' },
   ],
   agree: [
     {
@@ -30,14 +37,14 @@ const rules = {
         } else {
           callback(new Error('请勾选用户协议'))
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 }
 
 const doLogin = () => {
   const { account, password } = form.value
-  formRef.value.validate(async (valid) => {
+  formRef.value?.validate(async (valid) => {
     if (valid) {
       try {
         // 这里的调用会发送 POST /login
@@ -45,9 +52,9 @@ const doLogin = () => {
         await userStore.getUserInfo({ account, password })
         ElMessage({ type: 'success', message: '登录成功' })
         router.replace({ path: '/' })
-      } catch(err) {
+      } catch (err) {
         // 捕获 Mock 返回的 400/500 等错误
-        console.log('登录出错啦',err);
+        console.log('登录出错啦', err)
       }
     }
   })
@@ -76,7 +83,14 @@ const doLogin = () => {
           </nav>
           <div class="account-box">
             <div class="form">
-              <el-form ref="formRef" :model="form" :rules="rules" label-position="right" label-width="100px" status-icon>
+              <el-form
+                ref="formRef"
+                :model="form"
+                :rules="rules"
+                label-position="right"
+                label-width="100px"
+                status-icon
+              >
                 <el-form-item label="学号" prop="account">
                   <el-input v-model="form.account" type="text" placeholder="请输入学号" />
                 </el-form-item>
@@ -113,8 +127,8 @@ const doLogin = () => {
   </div>
 </template>
 
-<style scoped lang='scss'>
-@use "sass:color";
+<style scoped lang="scss">
+@use 'sass:color';
 
 .login-header {
   background: rgba(255, 255, 255, 0.95);
@@ -144,7 +158,7 @@ const doLogin = () => {
       height: 120px;
       width: 100%;
       text-indent: -9999px;
-      background: url("@/assets/images/logo.png") no-repeat center 20px / contain;
+      background: url('@/assets/images/logo.png') no-repeat center 20px / contain;
       transition: all 0.3s ease;
     }
   }
@@ -280,7 +294,7 @@ const doLogin = () => {
         transform: translateY(-2px);
       }
 
-      ~a {
+      ~ a {
         border-left: 1px solid #e5e7eb;
       }
     }
@@ -300,7 +314,7 @@ const doLogin = () => {
         padding: 0 8px;
         font-size: 13px;
 
-        ~a {
+        ~ a {
           border-left: 1px solid #eee;
         }
       }
@@ -434,7 +448,11 @@ const doLogin = () => {
 }
 
 .subBtn {
-  background: linear-gradient(135deg, $campusColor 0%, color.adjust($campusColor, $lightness: 10%) 100%);
+  background: linear-gradient(
+    135deg,
+    $campusColor 0%,
+    color.adjust($campusColor, $lightness: 10%) 100%
+  );
   width: 100%;
   height: 65px; /* 50px * 1.3 */
   font-size: 20.8px; /* 16px * 1.3 */
@@ -446,7 +464,11 @@ const doLogin = () => {
   box-shadow: 0 5.2px 15.6px rgba($campusColor, 0.3); /* 4px * 1.3, 12px * 1.3 */
 
   &:hover {
-    background: linear-gradient(135deg, color.adjust($campusColor, $lightness: -5%) 0%, $campusColor 100%);
+    background: linear-gradient(
+      135deg,
+      color.adjust($campusColor, $lightness: -5%) 0%,
+      $campusColor 100%
+    );
     box-shadow: 0 7.8px 20.8px rgba($campusColor, 0.4); /* 6px * 1.3, 16px * 1.3 */
     transform: translateY(-1.3px); /* -1px * 1.3 */
   }

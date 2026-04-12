@@ -1,7 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 
-const tabTypes = [
+interface TabType {
+  name: string;
+  label: string;
+  state: number;
+}
+
+const tabTypes: TabType[] = [
   { name: "all", label: "全部订单", state: 0 },
   { name: "unpay", label: "待付款", state: 1 },
   { name: "deliver", label: "待发货", state: 2 },
@@ -12,7 +18,7 @@ const tabTypes = [
 ]
 
 // 2. 状态管理（清空逻辑，仅保留占位状态）
-const activeName = ref(0)
+const activeName = ref<number>(0)
 
 /* 接口已暂时禁用（开发中）
   import { getUserOrderAPI } from '@/apis/order';
@@ -20,7 +26,7 @@ const activeName = ref(0)
 */
 
 // 3. 模拟切换逻辑（不触发请求）
-const tabChange = (name) => {
+const tabChange = (name: number): void => {
   activeName.value = name
   // console.log('当前切换至状态：', name, '（数据接口开发中）')
 }

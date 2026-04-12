@@ -1,14 +1,11 @@
-<script setup>
-import { ref, watch } from 'vue';
-import { useMouseInElement } from '@vueuse/core';
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useMouseInElement } from '@vueuse/core'
 
 // props适配主图列表
-defineProps({
-  imageList: {
-    type: Array,
-    default: () => []
-  }
-})
+const props = defineProps<{
+  imageList: string[]
+}>()
 
 // 图片列表
 // const imageList = [
@@ -23,29 +20,29 @@ defineProps({
 // 2.实现放大镜功能
 // 3.渲染数据
 // 1.
-const activeIndex = ref(0)
-const SwitchImageSize = (i) => {
+const activeIndex = ref<number>(0)
+const SwitchImageSize = (i: number): void => {
   activeIndex.value = i
 }
 // 2.
 // 安装库 vueuse 使用里面的函数useMouseInElement
 //大图容器
-const target = ref(null)
+const target = ref<HTMLElement | null>(null)
 // 获取鼠标相对位置
 const { elementX, elementY, isOutside } = useMouseInElement(target)
 // 浮块位置
-const left = ref(0)
-const top = ref(0)
+const left = ref<number>(0)
+const top = ref<number>(0)
 // 放大镜大图背景位置
-const positionX = ref(0)
-const positionY = ref(0)
+const positionX = ref<number>(0)
+const positionY = ref<number>(0)
 
 // 容器和浮块尺寸（可调整）
-const containerWidth = 400
-const containerHeight = 400
-const layerWidth = 200
-const layerHeight = 200
-const zoom = 2 // 放大倍数
+const containerWidth: number = 400
+const containerHeight: number = 400
+const layerWidth: number = 200
+const layerHeight: number = 200
+const zoom: number = 2 // 放大倍数
 
 // 监听鼠标变化,计算浮块位置和大图偏移
 watch([elementX, elementY, isOutside], () => {
@@ -63,9 +60,7 @@ watch([elementX, elementY, isOutside], () => {
   positionX.value = -left.value * zoom
   positionY.value = -top.value * zoom
 })
-
 </script>
-
 
 <template>
   <div class="goods-image">
@@ -77,20 +72,28 @@ watch([elementX, elementY, isOutside], () => {
     </div>
     <!-- 小图列表 -->
     <ul class="small">
-      <li v-for="(img, i) in imageList" :key="i" @mouseenter="SwitchImageSize(i)"
-        :class="{ active: i === activeIndex }">
+      <li
+        v-for="(img, i) in imageList"
+        :key="i"
+        @mouseenter="SwitchImageSize(i)"
+        :class="{ active: i === activeIndex }"
+      >
         <img :src="img" alt="" />
       </li>
     </ul>
     <!-- 放大镜大图 -->
-    <div class="large" :style="[
-      {
-        backgroundImage: `url(${imageList[activeIndex]})`,
-        backgroundPositionX: positionX + `px`,
-        backgroundPositionY: positionY + `px`,
-        backgroundSize: containerWidth * zoom + 'px ' + containerHeight * zoom + 'px'
-      },
-    ]" v-show="!isOutside"></div>
+    <div
+      class="large"
+      :style="[
+        {
+          backgroundImage: `url(${imageList[activeIndex]})`,
+          backgroundPositionX: positionX + `px`,
+          backgroundPositionY: positionY + `px`,
+          backgroundSize: containerWidth * zoom + 'px ' + containerHeight * zoom + 'px',
+        },
+      ]"
+      v-show="!isOutside"
+    ></div>
   </div>
 </template>
 

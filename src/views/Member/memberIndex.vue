@@ -1,5 +1,4 @@
-<script setup>
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="container">
@@ -22,7 +21,7 @@
 </template>
 
 <style scoped lang="scss">
-@use "sass:color";
+@use 'sass:color';
 
 .container {
   display: flex;
