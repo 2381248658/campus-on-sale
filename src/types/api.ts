@@ -203,6 +203,16 @@ export interface GoodsDetail {
     id: string
     name: string
   }>
+  // ========== 新增字段 ==========
+  desc?: string
+  inventory?: number
+  salesCount?: number | string
+  commentCount?: number | string
+  collectCount?: number | string
+  brand?: {
+    name: string
+  }
+  // =============================
 }
 
 // 热销榜单查询参数
@@ -214,18 +224,18 @@ export interface HotGoodsParams {
 // 购物车模块
 // ============================================
 
-// 购物车商品（根据你的业务补充完整字段）
+// 购物车商品
 export interface CartItem {
   id: string
   skuId: string
   name: string
   picture: string
   price: number
-  nowPrice?: number // 当前价格（可能有优惠）
+  nowPrice?: number
   count: number
   selected: boolean
   stock: number
-  attrsText: string // 规格属性文本，如"颜色:黑色 尺码:XL"
+  attrsText: string
 }
 
 // 添加到购物车参数
@@ -251,7 +261,7 @@ export interface SelectAllParams {
   ids?: string[]
 }
 
-// 合并购物车参数（本地购物车项）
+// 合并购物车参数
 export interface MergeCartItem {
   skuId: string
   selected: boolean
@@ -275,7 +285,7 @@ export interface Address {
   fullLocation: string
 }
 
-// 订单商品
+// 订单商品（补充 skuId）
 export interface OrderGoods {
   id: string
   name: string
@@ -285,6 +295,7 @@ export interface OrderGoods {
   attrsText: string
   totalPrice: number
   totalPayPrice: number
+  skuId: string
 }
 
 // 订单汇总
@@ -303,9 +314,21 @@ export interface CheckoutInfo {
   summary: OrderSummary
 }
 
-// 创建订单参数
+// 创建订单参数（补充实际使用字段）
 export interface CreateOrderParams {
-  deliveryAddress: Address
+  deliveryTimeType?: number
+  payType?: number
+  payChannel?: number
+  buyerMessage?: string
+  goods: Array<{
+    skuId: string
+    count: number
+  }>
+  addressId?: string
+  address?: string
+  receiver?: string
+  contact?: string
+  deliveryAddress?: Address
 }
 
 // 创建订单结果

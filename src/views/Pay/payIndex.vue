@@ -1,60 +1,59 @@
-<script setup>
-import { getOrderAPI } from '@/apis/pay';
-import { onMounted, ref, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { ElMessage, ElMessageBox, ElLoading } from 'element-plus';
-import { useCartStore } from '@/stores/cartStore';
+<script setup lang="ts">
+import { getOrderAPI } from '@/apis/pay'
+import { onMounted, ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
+import { useCartStore } from '@/stores/cartStore'
+import type { OrderDetail } from '@/types/api'
 
 const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
-const payInfo = ref({})
+const payInfo = ref<OrderDetail>({} as OrderDetail)
 // 获取支付方式，1为在线支付，2为货到付款
-const payType = ref(parseInt(route.query.payType) || 1)
+const payType = ref<number>(parseInt(route.query.payType as string) || 1)
 // 根据支付方式计算按钮文本
-const payButtonText = computed(() => {
-  return payType.value === 1 ? '立即确认支付' : '确认订单'})
+const payButtonText = computed<string>(() => {
+  return payType.value === 1 ? '立即确认支付' : '确认订单'
+})
 
-const getOrder = async () => {
+const getOrder = async (): Promise<void> => {
   try {
-    const res = await getOrderAPI(route.query.id)
+    const res = await getOrderAPI(route.query.id as string)
 
-    payInfo.value = res.data?.result || res.result || res
+    payInfo.value = (res as any).data?.result || (res as any).result || res
   } catch (err) {
-    console.log('支付页基础数据获取失败', err);
+    console.log('支付页基础数据获取失败', err)
   }
 }
 
 onMounted(() => getOrder())
 
-
-const handleConfirmPay = () => {
+const handleConfirmPay = (): void => {
   if (!payInfo.value.payMoney) return
 
   // 根据支付方式显示不同的确认信息
-  const confirmMessage = payType.value === 1
-    ? `确认支付金额 ¥${payInfo.value.payMoney?.toFixed(2)} 吗？`
-    : `确认提交订单，订单金额 ¥${payInfo.value.payMoney?.toFixed(2)} 吗？`
+  const confirmMessage =
+    payType.value === 1
+      ? `确认支付金额 ¥${payInfo.value.payMoney?.toFixed(2)} 吗？`
+      : `确认提交订单，订单金额 ¥${payInfo.value.payMoney?.toFixed(2)} 吗？`
   const confirmTitle = payType.value === 1 ? '校园结算确认' : '订单提交确认'
   const confirmButtonText = payType.value === 1 ? '确认支付' : '确认提交'
 
-  ElMessageBox.confirm(
-    confirmMessage,
-    confirmTitle,
-    {
-      confirmButtonText: confirmButtonText,
-      cancelButtonText: '取消',
-      type: 'success',
-    }
-  ).then(() => {
-    // 增加一个简单的加载反馈，提升真实感
-    const loading = ElLoading.service({
-      lock: true,
-      text: payType.value === 1 ? '正在处理结算并同步购物车...' : '正在提交订单...',
-      background: 'rgba(255, 255, 255, 0.7)',
-    })
+  ElMessageBox.confirm(confirmMessage, confirmTitle, {
+    confirmButtonText: confirmButtonText,
+    cancelButtonText: '取消',
+    type: 'success',
+  })
+    .then(() => {
+      // 增加一个简单的加载反馈，提升真实感
+      const loading = ElLoading.service({
+        lock: true,
+        text: payType.value === 1 ? '正在处理结算并同步购物车...' : '正在提交订单...',
+        background: 'rgba(255, 255, 255, 0.7)',
+      })
 
-    // 模拟支付处理延迟
+      // 模拟支付处理延迟
       setTimeout(async () => {
         // 无论支付方式如何，都清理购物车中选中的商品
         try {
@@ -72,7 +71,7 @@ const handleConfirmPay = () => {
           ElMessage({
             type: 'success',
             message: '支付成功！祝您生活愉快',
-            duration: 1500
+            duration: 1500,
           })
 
           // 延迟跳转回首页
@@ -84,7 +83,7 @@ const handleConfirmPay = () => {
           ElMessage({
             type: 'success',
             message: '订单已提交，请准备收货付款',
-            duration: 1500
+            duration: 1500,
           })
 
           // 延迟跳转到订单列表页
@@ -93,9 +92,10 @@ const handleConfirmPay = () => {
           }, 1000)
         }
       }, 1200)
-  }).catch(() => {
-    // 用户取消支付不执行任何操作
-  })
+    })
+    .catch(() => {
+      // 用户取消支付不执行任何操作
+    })
 }
 </script>
 
@@ -127,8 +127,8 @@ const handleConfirmPay = () => {
         </div>
       </div>
 
-      <div v-else style="padding: 100px; text-align: center; background: #fff; margin-top: 20px;">
-        <p style="color: #999;">正在加载订单结算信息...</p>
+      <div v-else style="padding: 100px; text-align: center; background: #fff; margin-top: 20px">
+        <p style="color: #999">正在加载订单结算信息...</p>
       </div>
     </div>
   </div>

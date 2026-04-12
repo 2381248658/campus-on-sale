@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 /**
  * CategoryIndex.vue - 校园惠一级分类详情页
  * 核心逻辑：
@@ -8,6 +8,7 @@
 import GoodsItem from '../Home/components/GoodsItem.vue'
 import { useBanner } from './composables/useBanner'
 import { useCategory } from './composables/useCategory'
+import type { Banner, ChildCategory } from '@/types/api'
 
 // 轮播图业务逻辑
 const { bannerList } = useBanner()
@@ -28,7 +29,7 @@ const { categoryData } = useCategory()
       <div class="home-banner">
         <el-carousel height="500px">
           <el-carousel-item v-for="item in bannerList" :key="item.id">
-            <img :src="item.imgUrl" alt="活动 Banner">
+            <img :src="item.imgUrl" alt="活动 Banner" />
           </el-carousel-item>
         </el-carousel>
       </div>
@@ -108,7 +109,7 @@ const { categoryData } = useCategory()
           text-align: center;
           display: block;
           font-size: 16px;
-          transition: all .3s;
+          transition: all 0.3s;
 
           img {
             width: 100px;

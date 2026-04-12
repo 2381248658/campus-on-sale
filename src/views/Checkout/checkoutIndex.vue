@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 /**
  * CheckoutIndex.vue - 校园惠订单结算页
  * 功能：校内代收点选择、动态运费计算、订单创建与多平台数据兼容
@@ -8,47 +8,56 @@ import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Iphone } from '@element-plus/icons-vue'
+import type { CheckoutInfo, OrderGoods, CreateOrderResult } from '@/types/api'
 
 const router = useRouter()
-const checkInfo = ref({})
+const checkInfo = ref<CheckoutInfo>({} as CheckoutInfo)
 
 // --- 1. 校园配送设置与表单校验 ---
 const campusLocations = [
-  '一号宿舍楼代收点', '二号宿舍楼代收点', '三号宿舍楼代收点',
-  '四号宿舍楼代收点', '五号宿舍楼代收点', '六号宿舍楼代收点'
+  '一号宿舍楼代收点',
+  '二号宿舍楼代收点',
+  '三号宿舍楼代收点',
+  '四号宿舍楼代收点',
+  '五号宿舍楼代收点',
+  '六号宿舍楼代收点',
 ]
-const curLocation = ref('一号宿舍楼代收点')
-const receiverName = ref('')
-const receiverContact = ref('')
+const curLocation = ref<string>('一号宿舍楼代收点')
+const receiverName = ref<string>('')
+const receiverContact = ref<string>('')
 
 // 响应式表单验证：姓名非空且手机号符合 11 位正则
-const isFormValid = computed(() => {
+const isFormValid = computed<boolean>(() => {
   const nameValid = receiverName.value.trim().length > 0
   const phoneValid = /^1[3-9]\d{9}$/.test(receiverContact.value)
   return nameValid && phoneValid
 })
 
 // --- 2. 配送时间配置 ---
-const deliveryList = [
+interface DeliveryItem {
+  id: number
+  text: string
+}
+const deliveryList: DeliveryItem[] = [
   { id: 1, text: '不限送货时间：周一至周日' },
   { id: 2, text: '工作日送货：周一至周五' },
-  { id: 3, text: '双休日、假日送货：周六至周日' }
+  { id: 3, text: '双休日、假日送货：周六至周日' },
 ]
-const curDeliveryTime = ref(1)
+const curDeliveryTime = ref<number>(1)
 
 // --- 3. 支付方式与费用计算逻辑 ---
-const curPayType = ref(1) // 1: 在线支付, 2: 货到付款
+const curPayType = ref<number>(1) // 1: 在线支付, 2: 货到付款
 
 /**
  * 动态运费逻辑：若选择货到付款，则在基础运费上增加 5 元手续费
  */
-const totalPostFee = computed(() => {
+const totalPostFee = computed<number>(() => {
   const basePostFee = checkInfo.value.summary?.postFee || 0
   return curPayType.value === 2 ? basePostFee + 5 : basePostFee
 })
 
 // 最终应付总额计算
-const totalPayPrice = computed(() => {
+const totalPayPrice = computed<number>(() => {
   const totalPrice = checkInfo.value.summary?.totalPrice || 0
   return totalPrice + totalPostFee.value
 })
@@ -56,11 +65,11 @@ const totalPayPrice = computed(() => {
 /**
  * 获取结算页面初始数据
  */
-const getCheckoutInfo = async () => {
+const getCheckoutInfo = async (): Promise<void> => {
   try {
     const res = await getCheckoutInfoAPI()
     // 兼容拦截器剥离 data 层后的不同响应结构
-    checkInfo.value = res.result || res
+    checkInfo.value = (res as any).result || res
   } catch (err) {
     console.error('获取结算信息失败', err)
   }
@@ -71,9 +80,10 @@ onMounted(() => getCheckoutInfo())
 /**
  * 订单创建逻辑
  */
-const createOrder = async () => {
+const createOrder = async (): Promise<void> => {
   if (!isFormValid.value) {
-    return ElMessage.warning('请检查联系人信息及手机号格式')
+    ElMessage.warning('请检查联系人信息及手机号格式')
+    return
   }
 
   try {
@@ -82,21 +92,21 @@ const createOrder = async () => {
       payType: curPayType.value,
       payChannel: 1,
       buyerMessage: `代收点：${curLocation.value}；备注：校园配送`,
-      goods: checkInfo.value.goods.map((item) => ({
+      goods: checkInfo.value.goods.map((item: OrderGoods) => ({
         skuId: item.skuId,
-        count: item.count
+        count: item.count,
       })),
-      addressId: "campus_default",
+      addressId: 'campus_default',
       address: curLocation.value,
       receiver: receiverName.value,
-      contact: receiverContact.value
+      contact: receiverContact.value,
     })
 
     /**
      * 数据脱壳兼容：安全获取订单 ID
-     * 适配 res.data.result.id, res.result.id, 或 res.id 结构
+     * 适配 res.data?.result?.id, res.result?.id, 或 res.id 结构
      */
-    const orderId = res.data?.result?.id || res.result?.id || res.id
+    const orderId = (res as any).data?.result?.id || (res as any).result?.id || (res as any).id
 
     if (!orderId) {
       throw new Error('订单 ID 获取失败')
@@ -107,7 +117,7 @@ const createOrder = async () => {
     // 跳转支付中心，携带订单 ID 与支付方式标识
     router.push({
       path: '/pay',
-      query: { id: orderId, payType: curPayType.value }
+      query: { id: orderId, payType: curPayType.value.toString() },
     })
   } catch (err) {
     console.error('创建订单失败', err)
@@ -133,12 +143,22 @@ const createOrder = async () => {
             <div class="user-form-card">
               <div class="input-item">
                 <span class="input-label">收货人姓名</span>
-                <el-input v-model="receiverName" placeholder="请输入姓名" :prefix-icon="User" clearable />
+                <el-input
+                  v-model="receiverName"
+                  placeholder="请输入姓名"
+                  :prefix-icon="User"
+                  clearable
+                />
               </div>
               <div class="input-item">
                 <span class="input-label">联系手机号</span>
-                <el-input v-model="receiverContact" placeholder="请输入11位手机号" :prefix-icon="Iphone" maxlength="11"
-                  clearable />
+                <el-input
+                  v-model="receiverContact"
+                  placeholder="请输入11位手机号"
+                  :prefix-icon="Iphone"
+                  maxlength="11"
+                  clearable
+                />
               </div>
             </div>
           </div>
@@ -160,7 +180,7 @@ const createOrder = async () => {
               <tr v-for="i in checkInfo.goods" :key="i.skuId">
                 <td>
                   <a href="javascript:;" class="info">
-                    <img v-img-lazy="i.picture" alt="">
+                    <img v-img-lazy="i.picture" alt="" />
                     <div class="right">
                       <p class="name ellipsis">{{ i.name }}</p>
                       <p class="attr ellipsis">{{ i.attrsText }}</p>
@@ -178,16 +198,25 @@ const createOrder = async () => {
 
         <h3 class="box-title">配送时间</h3>
         <div class="box-body">
-          <a class="my-btn" v-for="item in deliveryList" :key="item.id" :class="{ active: curDeliveryTime === item.id }"
-            @click="curDeliveryTime = item.id">
+          <a
+            class="my-btn"
+            v-for="item in deliveryList"
+            :key="item.id"
+            :class="{ active: curDeliveryTime === item.id }"
+            @click="curDeliveryTime = item.id"
+          >
             {{ item.text }}
           </a>
         </div>
 
         <h3 class="box-title">支付方式</h3>
         <div class="box-body">
-          <a class="my-btn" :class="{ active: curPayType === 1 }" @click="curPayType = 1">在线支付</a>
-          <a class="my-btn" :class="{ active: curPayType === 2 }" @click="curPayType = 2">货到付款</a>
+          <a class="my-btn" :class="{ active: curPayType === 1 }" @click="curPayType = 1"
+            >在线支付</a
+          >
+          <a class="my-btn" :class="{ active: curPayType === 2 }" @click="curPayType = 2"
+            >货到付款</a
+          >
         </div>
 
         <h3 class="box-title">金额明细</h3>
@@ -218,7 +247,13 @@ const createOrder = async () => {
 
         <div class="submit">
           <p v-if="!isFormValid" class="validate-tip">请完善上方联系人及手机号信息</p>
-          <el-button type="primary" size="large" class="submit-btn" :disabled="!isFormValid" @click="createOrder">
+          <el-button
+            type="primary"
+            size="large"
+            class="submit-btn"
+            :disabled="!isFormValid"
+            @click="createOrder"
+          >
             {{ curPayType === 1 ? '提交订单并支付' : '确认订单并货到付款' }}
           </el-button>
         </div>
@@ -228,7 +263,7 @@ const createOrder = async () => {
 </template>
 
 <style scoped lang="scss">
-@use "sass:color";
+@use 'sass:color';
 
 .campus-pay-checkout-page {
   margin-top: 20px;

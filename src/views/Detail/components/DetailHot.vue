@@ -1,21 +1,19 @@
-<script setup>
-import { fetchHotGoodsAPI } from '@/apis/detail';
-import { useRoute } from 'vue-router';
-import { computed, onMounted, ref } from 'vue';
+<script setup lang="ts">
+import { fetchHotGoodsAPI } from '@/apis/detail'
+import { useRoute } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import type { CategoryGoods } from '@/types/api'
 
 // 定义组件接收的 props
-const props = defineProps({
-  hotType: {
-    type: Number,
-    default: 1
-  }
-})
+const props = defineProps<{
+  hotType: number
+}>()
 
-const goodList = ref([])
+const goodList = ref<CategoryGoods[]>([])
 const route = useRoute()
 
 // 1. 校园语义化标题映射
-const TYPEMAP = {
+const TYPEMAP: Record<number, string> = {
   1: '校园 24h 热搜',
   2: '本校周榜好物',
 }
@@ -25,14 +23,14 @@ const title = computed(() => TYPEMAP[props.hotType])
 const getHotList = async () => {
   try {
     const res = await fetchHotGoodsAPI({
-      id: route.params.id,
-      type: props.hotType
+      id: route.params.id as string,
+      type: props.hotType,
     })
 
-    if (res && res.result) {
-      goodList.value = res.result
-    } else if (res && res.data && res.data.result) {
-      goodList.value = res.data.result
+    if (res && (res as any).result) {
+      goodList.value = (res as any).result
+    } else if (res && (res as any).data && (res as any).data.result) {
+      goodList.value = (res as any).data.result
     } else {
       goodList.value = res || []
     }
@@ -47,7 +45,12 @@ onMounted(() => getHotList())
 <template>
   <div class="goods-hot">
     <h3>{{ title }}</h3>
-    <RouterLink :to="`/detail/${item.id}`" class="goods-item" v-for="item in goodList" :key="item.id">
+    <RouterLink
+      :to="`/detail/${item.id}`"
+      class="goods-item"
+      v-for="item in goodList"
+      :key="item.id"
+    >
       <img v-img-lazy="item.picture" alt="校园好物" />
       <p class="name ellipsis">{{ item.name }}</p>
       <p class="desc ellipsis">{{ item.desc }}</p>

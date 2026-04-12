@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { getDetail } from '@/apis/detail'
 import { onMounted, ref } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
@@ -6,15 +6,16 @@ import DetailHot from './components/DetailHot.vue'
 import ViewIndex from '@/components/imageView/ViewIndex.vue'
 import { ElMessage } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore'
+import type { GoodsDetail } from '@/types/api'
 
 const cartStore = useCartStore()
-const goods = ref({})
+const goods = ref<GoodsDetail>({} as GoodsDetail)
 const route = useRoute()
 
 // 1. 获取校园商品详细信息
-const getGoods = async (id = route.params.id) => {
+const getGoods = async (id: string | string[] = route.params.id) => {
   try {
-    const res = await getDetail(id)
+    const res = await getDetail(id as string)
 
     goods.value = res
     // console.log('当前商品详情:', goods.value)
@@ -31,38 +32,44 @@ onBeforeRouteUpdate((to) => {
 })
 
 // 2. 数量与规格处理
-const count = ref(1)
-let skuObj = {} // 存储当前选中的 SKU 信息
+const count = ref<number>(1)
 
-const skuChange = (sku) => {
-  skuObj = sku
+// 存储当前选中的 SKU 信息
+interface SkuObj {
+  skuId?: string
+  price?: number
+  oldPrice?: number
+  specsText?: string
+}
+
+let skuObj = ref<SkuObj>({})
+
+const skuChange = (sku: SkuObj) => {
+  skuObj.value = sku
   // 价格联动逻辑：当选中完整规格时，更新界面显示的价格
   if (sku.skuId) {
-    goods.value.price = sku.price
-    goods.value.oldPrice = sku.oldPrice
+    goods.value.price = sku.price || goods.value.price
+    goods.value.oldPrice = sku.oldPrice || goods.value.oldPrice
   }
 }
 
 // 3. 添加购物车逻辑
 const addCart = () => {
   // 规格校验
-  if (!skuObj.skuId) {
+  if (!skuObj.value.skuId) {
     return ElMessage.warning('请选择商品规格（如成色/版本）')
   }
-
 
   cartStore.addCart({
     id: goods.value.id,
     name: goods.value.name,
-
     picture: goods.value.mainPictures ? goods.value.mainPictures[0] : '',
-
-    price: skuObj.price || goods.value.price,
-    nowPrice: skuObj.price || goods.value.price,
+    price: skuObj.value.price || goods.value.price,
+    nowPrice: skuObj.value.price || goods.value.price,
     count: count.value,
-    skuId: skuObj.skuId,
-    attrsText: skuObj.specsText,
-    selected: true
+    skuId: skuObj.value.skuId,
+    attrsText: skuObj.value.specsText || '',
+    selected: true,
   })
 
   ElMessage.success('已加入校园购物车')
@@ -75,7 +82,11 @@ const addCart = () => {
       <div class="bread-container">
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">校园首页</el-breadcrumb-item>
-          <el-breadcrumb-item v-for="cat in goods.categories" :key="cat.id" :to="{ path: `/category/${cat.id}` }">
+          <el-breadcrumb-item
+            v-for="cat in goods.categories"
+            :key="cat.id"
+            :to="{ path: `/category/${cat.id}` }"
+          >
             {{ cat.name }}
           </el-breadcrumb-item>
           <el-breadcrumb-item>{{ goods.name }}</el-breadcrumb-item>
@@ -112,8 +123,8 @@ const addCart = () => {
           </div>
 
           <div class="spec">
-            <p class="g-name"> {{ goods.name }} </p>
-            <p class="g-desc">{{ goods.desc }} </p>
+            <p class="g-name">{{ goods.name }}</p>
+            <p class="g-desc">{{ goods.desc }}</p>
             <p class="g-price">
               <span>{{ goods.price }}</span>
               <span v-if="goods.oldPrice">{{ goods.oldPrice }}</span>
@@ -142,9 +153,7 @@ const addCart = () => {
               <el-input-number v-model="count" :min="1" :max="goods.inventory || 99" />
             </div>
 
-            <el-button size="large" class="btn" @click="addCart">
-              加入购物车
-            </el-button>
+            <el-button size="large" class="btn" @click="addCart"> 加入购物车 </el-button>
           </div>
         </div>
 
@@ -159,7 +168,7 @@ const addCart = () => {
                     <span class="dd">{{ item.value }}</span>
                   </li>
                 </ul>
-                <img v-for="img in goods.details?.pictures" :src="img" :key="img" alt="详情图">
+                <img v-for="img in goods.details?.pictures" :src="img" :key="img" alt="详情图" />
               </div>
             </div>
           </div>
@@ -174,8 +183,8 @@ const addCart = () => {
   </div>
 </template>
 
-<style scoped lang='scss'>
-@use "sass:color";
+<style scoped lang="scss">
+@use 'sass:color';
 
 .campus-goods-page {
   .goods-info {
@@ -223,7 +232,7 @@ const addCart = () => {
         position: relative;
 
         &::after {
-          content: "";
+          content: '';
           position: absolute;
           left: 40px;
           bottom: -1px;
@@ -261,7 +270,7 @@ const addCart = () => {
 
     span {
       &::before {
-        content: "¥";
+        content: '¥';
         font-size: 14px;
       }
 
@@ -302,7 +311,7 @@ const addCart = () => {
           margin-right: 10px;
 
           &::before {
-            content: "•";
+            content: '•';
             color: $campusColor;
             margin-right: 2px;
           }
@@ -326,13 +335,13 @@ const addCart = () => {
       flex: 1;
       position: relative;
 
-      ~li::after {
+      ~ li::after {
         position: absolute;
         top: 10px;
         left: 0;
         height: 60px;
         border-left: 1px solid #e4e4e4;
-        content: "";
+        content: '';
       }
 
       p {
@@ -389,7 +398,7 @@ const addCart = () => {
     }
   }
 
-  >img {
+  > img {
     width: 100%;
   }
 }
