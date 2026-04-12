@@ -1,7 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { useCartStore } from '@/stores/cartStore'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import type { CartItem } from '@/types/api'
 
 const cartStore = useCartStore()
 const router = useRouter()
@@ -11,7 +12,7 @@ const router = useRouter()
  */
 
 // 切换全选/全不选
-const allCheck = (selected) => {
+const allCheck = (selected: boolean) => {
   cartStore.allCheck(selected)
 }
 
@@ -24,12 +25,12 @@ const goCheckout = () => {
 }
 
 // 同步商品购买数量至 Store
-const countChange = (skuId, count) => {
+const countChange = (skuId: string, count: number) => {
   cartStore.updateCartItem(skuId, { count })
 }
 
 // 同步单选状态至 Store
-const singleCheck = (skuId, selected) => {
+const singleCheck = (skuId: string, selected: boolean) => {
   cartStore.updateCartItem(skuId, { selected })
 }
 </script>
@@ -54,7 +55,10 @@ const singleCheck = (skuId, selected) => {
           <tbody>
             <tr v-for="i in cartStore.cartList" :key="i.skuId">
               <td>
-                <el-checkbox :model-value="i.selected" @change="(selected) => singleCheck(i.skuId, selected)" />
+                <el-checkbox
+                  :model-value="i.selected"
+                  @change="(selected) => singleCheck(i.skuId, selected as boolean)"
+                />
               </td>
               <td>
                 <div class="goods">
@@ -71,7 +75,11 @@ const singleCheck = (skuId, selected) => {
                 <p>&yen;{{ Number(i.nowPrice || i.price || 0).toFixed(2) }}</p>
               </td>
               <td class="tc">
-                <el-input-number :min="1" v-model="i.count" @change="(val) => countChange(i.skuId, val)" />
+                <el-input-number
+                  :min="1"
+                  v-model="i.count"
+                  @change="(val) => countChange(i.skuId, val as number)"
+                />
               </td>
               <td class="tc">
                 <p class="f16 red">
@@ -101,13 +109,19 @@ const singleCheck = (skuId, selected) => {
 
       <div class="action">
         <div class="batch">
-          共 <span class="green">{{ cartStore.allCount }}</span> 件，
-          已选 <span class="green">{{ cartStore.selectedCount }}</span> 件，
-          合计：<span class="red">¥ {{ Number(cartStore.selectedPrice || 0).toFixed(2) }}</span>
+          共 <span class="green">{{ cartStore.allCount }}</span> 件， 已选
+          <span class="green">{{ cartStore.selectedCount }}</span> 件， 合计：<span class="red"
+            >¥ {{ Number(cartStore.selectedPrice || 0).toFixed(2) }}</span
+          >
         </div>
         <div class="total">
-          <el-button size="large" type="primary" class="checkout-btn" @click="goCheckout"
-            :disabled="cartStore.selectedCount === 0">
+          <el-button
+            size="large"
+            type="primary"
+            class="checkout-btn"
+            @click="goCheckout"
+            :disabled="cartStore.selectedCount === 0"
+          >
             去结算
           </el-button>
         </div>
@@ -117,7 +131,7 @@ const singleCheck = (skuId, selected) => {
 </template>
 
 <style scoped lang="scss">
-@use "sass:color";
+@use 'sass:color';
 
 .campus-cart-page {
   margin-top: 20px;
@@ -202,7 +216,7 @@ const singleCheck = (skuId, selected) => {
       object-fit: cover;
     }
 
-    >div {
+    > div {
       width: 280px;
       font-size: 14px;
       padding-left: 15px;

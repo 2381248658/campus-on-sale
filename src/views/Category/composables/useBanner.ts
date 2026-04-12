@@ -4,9 +4,10 @@
  */
 import { ref, onMounted } from 'vue'
 import { getBannerAPI } from '@/apis/homeAPI'
+import type { Banner } from '@/types/api'
 
 export function useBanner() {
-  const bannerList = ref([])
+  const bannerList = ref<Banner[]>([])
 
   /**
    * 获取轮播图数据
@@ -14,8 +15,8 @@ export function useBanner() {
    */
   const getBanner = async () => {
     try {
-      // distributionSite: '2' 为首页分类/商品页 banner 标识
-      const res = await getBannerAPI({ distributionSite: '2' })
+      // distributionsite: '2' 为首页分类/商品页 banner 标识
+      const res = await getBannerAPI({ distributionsite: '2' })
 
       /**
        * 响应数据脱壳处理 (兼容性逻辑)
@@ -23,7 +24,7 @@ export function useBanner() {
        * 2. res.result: 拦截器已剥离 data 层
        * 3. res: 拦截器直接返回结果集
        */
-      const data = res.data || res
+      const data = (res as any).data || res
       bannerList.value = data.result || data
 
       // console.log('Banner 数据加载成功:', bannerList.value)
