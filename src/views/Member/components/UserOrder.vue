@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from 'vue'
+import type { TabPaneName } from 'element-plus'
 
 interface TabType {
-  name: string;
-  label: string;
-  state: number;
+  name: string
+  label: string
+  state: number
 }
 
 const tabTypes: TabType[] = [
-  { name: "all", label: "全部订单", state: 0 },
-  { name: "unpay", label: "待付款", state: 1 },
-  { name: "deliver", label: "待发货", state: 2 },
-  { name: "receive", label: "待收货", state: 3 },
-  { name: "comment", label: "待评价", state: 4 },
-  { name: "complete", label: "已完成", state: 5 },
-  { name: "cancel", label: "已取消", state: 6 }
+  { name: 'all', label: '全部订单', state: 0 },
+  { name: 'unpay', label: '待付款', state: 1 },
+  { name: 'deliver', label: '待发货', state: 2 },
+  { name: 'receive', label: '待收货', state: 3 },
+  { name: 'comment', label: '待评价', state: 4 },
+  { name: 'complete', label: '已完成', state: 5 },
+  { name: 'cancel', label: '已取消', state: 6 },
 ]
 
 // 2. 状态管理（清空逻辑，仅保留占位状态）
@@ -26,8 +27,8 @@ const activeName = ref<number>(0)
 */
 
 // 3. 模拟切换逻辑（不触发请求）
-const tabChange = (name: number): void => {
-  activeName.value = name
+const tabChange = (name: TabPaneName): void => {
+  activeName.value = Number(name)
   // console.log('当前切换至状态：', name, '（数据接口开发中）')
 }
 </script>
@@ -35,7 +36,12 @@ const tabChange = (name: number): void => {
 <template>
   <div class="order-container">
     <el-tabs v-model="activeName" @tab-change="tabChange">
-      <el-tab-pane v-for="item in tabTypes" :key="item.name" :label="item.label" :name="item.state" />
+      <el-tab-pane
+        v-for="item in tabTypes"
+        :key="item.name"
+        :label="item.label"
+        :name="item.state"
+      />
 
       <div class="main-container">
         <div class="dev-holder">

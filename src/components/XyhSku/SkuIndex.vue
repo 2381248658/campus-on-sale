@@ -1,6 +1,7 @@
 <template>
   <div class="goods-sku">
-    <dl v-for="item in goods.specs" :key="item.id">
+    <!-- 修复1：key 替换为 item.name（规格名称唯一，无需id） -->
+    <dl v-for="item in goods.specs" :key="item.name">
       <dt>{{ item.name }}</dt>
       <dd>
         <template v-for="val in item.values" :key="val.name">
@@ -46,7 +47,8 @@ interface SpecValue {
 
 // 规格项类型
 interface SpecItem {
-  id: string
+  // 修复2：id 改为可选属性（加?），兼容接口数据
+  id?: string
   name: string
   values: SpecValue[]
 }
