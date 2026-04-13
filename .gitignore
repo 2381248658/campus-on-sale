@@ -1,4 +1,8 @@
-# Logs
+# =============== 全局规则 ===============
+# 忽略所有子目录的 node_modules
+**/node_modules
+
+# 忽略所有日志文件
 logs
 *.log
 npm-debug.log*
@@ -7,30 +11,65 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# 操作系统/编辑器文件
 .DS_Store
-dist
-dist-ssr
-coverage
-*.local
+Thumbs.db
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# =============== 根目录特定规则 ===============
+# 忽略 .vscode 目录（安全第一！）
+.vscode/
+!.vscode/extensions.json  # 仅保留团队扩展推荐
+
+# 忽略 IDE 配置
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-
 *.tsbuildinfo
-
 .eslintcache
 
-# Cypress
-/cypress/videos/
-/cypress/screenshots/
+# =============== 前端特定规则 (frontend/) ===============
+frontend/dist
+frontend/dist-ssr
+frontend/coverage
+frontend/public/*.png
+frontend/public/*.jpg
+frontend/public/*.svg
+frontend/.vite
+frontend/.env.local
+frontend/.env.*.local
+
+# Cypress 测试
+frontend/cypress/videos/
+frontend/cypress/screenshots/
 
 # Vitest
-__screenshots__/
+frontend/__screenshots__/
+
+# =============== 后端特定规则 (backend/) ===============
+backend/dist
+backend/build
+backend/.env
+backend/.env.*
+backend/ormconfig.json
+backend/*.sqlite
+backend/*.db
+backend/upload/
+backend/.dockerignore
+
+# Node.js 调试
+backend/.node_repl_history
+
+# =============== 构建产物 ===============
+dist
+build
+coverage
+*.local
+
+# =============== 例外规则 ===============
+# 保留 package.json 和 README.md
+!**/package.json
+!**/README.md
+!**/tsconfig.json
