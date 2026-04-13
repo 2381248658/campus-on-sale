@@ -14,6 +14,15 @@ const userSchema = new Schema(
 			required: true,
 			select: false,
 		},
+		// 根据接口 4.1 LoginResult 补充字段
+		nickname: {
+			type: String,
+			default: '',
+		},
+		avatar: {
+			type: String,
+			default: '',
+		},
 	},
 	{
 		timestamps: true,

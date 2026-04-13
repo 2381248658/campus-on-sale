@@ -5,48 +5,41 @@ import { User } from '../models/User.js';
 
 const router = express.Router();
 
-/**
- * @interface 4.1 用户登录
- */
+// 4.1 用户登录
 router.post('/login', async (req, res) => {
 	const { account, password } = req.body;
 
 	try {
-		// 1. 查找用户
-		let user = await User.findOne({ account }).select('+password');
+		// 1. 查找用户 (必须加 select('+password') 破除 model 里的 select:false)
+		const user = await User.findOne({ account }).select('+password');
 
-		// 如果账号不存在则自动创建
+		// 2. 账号不存在直接报错，不做自动注册（符合常规电商逻辑）
 		if (!user) {
-			const hashedPassword = await bcryptjs.hash(password, 10);
-			user = await User.create({
-				account,
-				password: hashedPassword,
-			});
-		} else {
-			// 2. 校验密码
-			const isMatch = await bcryptjs.compare(password, user.password);
-			if (!isMatch) {
-				return res.status(400).json({ code: '400', msg: '密码错误' });
-			}
+			return res.status(400).json({ code: '400', msg: '账号不存在' });
 		}
 
-		// 3. 生成 7 天有效期的 Token
+		// 3. 校验密码
+		const isMatch = await bcryptjs.compare(password, user.password);
+		if (!isMatch) {
+			return res.status(400).json({ code: '400', msg: '密码错误' });
+		}
+
+		// 4. 生成 Token
 		const token = jwt.sign(
 			{ userId: user._id },
 			process.env.JWT_SECRET as string,
-			{ expiresIn: '7d', algorithm: 'HS256' },
+			{ expiresIn: '7d' },
 		);
 
-		// 4. 返回符合 ApiResponse<LoginResult> 规范的数据
-		// 移除模型中的 nickname 和 avatar，返回给前端时保持结构一致
+		// 5. 返回数据 (正常返回 nickname 和 avatar)
 		res.json({
 			code: '1',
 			msg: '操作成功',
 			result: {
-				id: user._id,
+				id: user._id.toString(),
 				account: user.account,
-				nickname: '', // 保持字段但返回空
-				avatar: '', // 保持字段但返回空
+				nickname: user.nickname,
+				avatar: user.avatar,
 				token,
 			},
 		});
