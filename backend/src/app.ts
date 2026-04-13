@@ -1,26 +1,30 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import connectDB from './config/db.js'; // 注意：ESM 模式下建议带上 .js 后缀
+import connectDB from './config/db.js';
 import userRouter from './routes/user.js';
+import homeRouter from './routes/home.js'; // 确保引入了 home
+import categoryRouter from './routes/category.js'; // 确保引入了 category
+import goodsRouter from './routes/goods.js'; // 新增：引入 goods
 
 dotenv.config();
 
 const app = express();
 
-// 连接数据库
 connectDB();
 
-// 中内件
 app.use(cors());
 app.use(express.json());
 
-// 基础测试路由
 app.get('/', (req, res) => {
 	res.send('校园惠 API 运行中... 🚀');
 });
+
 // 注册路由
 app.use(userRouter);
+app.use(homeRouter); // 挂载首页路由
+app.use(categoryRouter); // 挂载分类路由
+app.use(goodsRouter); // 挂载商品详情路由
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
