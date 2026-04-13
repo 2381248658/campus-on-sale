@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js'; // 注意：ESM 模式下建议带上 .js 后缀
+import userRouter from './routes/user.js';
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.use(express.json());
 app.get('/', (req, res) => {
 	res.send('校园惠 API 运行中... 🚀');
 });
+// 注册路由
+app.use(userRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
