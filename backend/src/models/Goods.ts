@@ -45,5 +45,8 @@ const goodsSchema = new Schema(
 	},
 	{ timestamps: true, versionKey: false },
 );
+goodsSchema.index({ 'skus.id': 1 });
+goodsSchema.index({ categoryId: 1 });
+goodsSchema.index({ orderNum: -1 });
 
 export const Goods = model('Goods', goodsSchema);

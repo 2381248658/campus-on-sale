@@ -27,9 +27,9 @@ const cartSchema = new Schema(
 	{
 		timestamps: true,
 		versionKey: false,
-		// 保证同一个用户下，同一个SKU只能有一条记录
-		indexes: [{ userId: 1, skuId: 1 }],
 	},
 );
+// 保证同一个用户下，同一个SKU只能有一条记录
+cartSchema.index({ userId: 1, skuId: 1 });
 
 export const Cart = model('Cart', cartSchema);

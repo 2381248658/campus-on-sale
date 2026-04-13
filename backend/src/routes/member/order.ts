@@ -179,13 +179,20 @@ router.post('/', async (req, res) => {
 
 		// 3. 扣减库存 (使用 $inc 原子操作保证并发安全)
 		for (const item of goods) {
-			await Goods.updateOne(
+			const updateRes = await Goods.updateOne(
 				{
 					'skus.id': item.skuId,
 					'skus.inventory': { $gte: item.count },
 				},
 				{ $inc: { 'skus.$.inventory': -item.count } },
 			);
+
+			if (updateRes.modifiedCount === 0) {
+				return res.status(400).json({
+					code: '400',
+					msg: '抢购失败，商品可能已售罄或库存不足',
+				});
+			}
 		}
 
 		// 4. 创建订单

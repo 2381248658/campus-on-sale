@@ -10,18 +10,30 @@ router.post('/', async (req, res) => {
 		const userId = req.userId!;
 		const { skuId, count = 1 } = req.body;
 
+		// 1. 基础参数校验
 		if (!skuId)
 			return res.status(400).json({ code: '400', msg: '缺少skuId' });
+		if (!Number.isInteger(count) || count <= 0) {
+			return res
+				.status(400)
+				.json({ code: '400', msg: '商品数量必须为正整数' });
+		}
 
-		// 查找是否已经加过该商品
+		// 2. 校验 SKU 是否真实存在 (防止脏数据/幽灵数据)
+		const skuExists = await Goods.findOne({ 'skus.id': skuId }).lean();
+		if (!skuExists) {
+			return res
+				.status(400)
+				.json({ code: '400', msg: '商品或规格不存在' });
+		}
+
+		// 3. 查找是否已经加过该商品
 		const existingItem = await Cart.findOne({ userId, skuId });
 
 		if (existingItem) {
-			// 如果已存在，数量叠加
 			existingItem.count += count;
 			await existingItem.save();
 		} else {
-			// 不存在，新建记录
 			await Cart.create({ userId, skuId, count });
 		}
 
@@ -35,28 +47,23 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
 	try {
 		const userId = req.userId!;
-
-		// 1. 拿到当前用户的所有购物车记录
 		const cartList = await Cart.find({ userId }).lean();
+
 		if (cartList.length === 0) {
 			return res.json({ code: '1', msg: '操作成功', result: [] });
 		}
 
-		// 2. 提取所有的 skuId，去 Goods 表查对应的商品和 SKU 详情
 		const skuIds = cartList.map((c) => c.skuId);
-		// 使用 MongoDB 数组查询：匹配 skus 数组中 id 在 skuIds 列表里的商品
 		const goodsList = await Goods.find({
 			'skus.id': { $in: skuIds },
 		}).lean();
 
-		// 3. 内存组装：把购物车记录和商品详情拼起来
 		const result = cartList.map((cartItem) => {
-			// 在查出的商品列表里找包含当前 skuId 的那个商品
 			const targetGoods = goodsList.find((g) =>
 				g.skus.some((sku: any) => sku.id === cartItem.skuId),
 			);
 
-			// 容错处理：如果商品被删了，返回基础结构
+			// 容错1：整个商品被删了
 			if (!targetGoods) {
 				return {
 					id: cartItem._id.toString(),
@@ -72,14 +79,28 @@ router.get('/', async (req, res) => {
 				};
 			}
 
-			// 找到具体的那个 SKU
 			const targetSku = targetGoods.skus.find(
 				(sku: any) => sku.id === cartItem.skuId,
 			);
 
-			// 拼装规格文本：比如 "颜色:黑 存储:256G"
+			// 容错2：商品在，但具体SKU下架了 (修复 undefined 隐患)
+			if (!targetSku) {
+				return {
+					id: cartItem._id.toString(),
+					skuId: cartItem.skuId,
+					name: `${targetGoods.name} (规格已失效)`,
+					picture: targetGoods.picture,
+					price: targetGoods.oldPrice || 0,
+					nowPrice: 0,
+					count: cartItem.count,
+					selected: false, // 规格失效自动取消选中
+					stock: 0,
+					attrsText: '规格已下架',
+				};
+			}
+
 			const attrsText =
-				targetSku?.specs
+				targetSku.specs
 					.map((spec: any) => `${spec.name} ${spec.valueName}`)
 					.join(' ') || '';
 
@@ -88,11 +109,11 @@ router.get('/', async (req, res) => {
 				skuId: cartItem.skuId,
 				name: targetGoods.name,
 				picture: targetGoods.picture,
-				price: targetGoods.oldPrice, // 原价
-				nowPrice: targetSku?.price, // 现价（SKU级别的价格）
+				price: targetGoods.oldPrice,
+				nowPrice: targetSku.price,
 				count: cartItem.count,
 				selected: cartItem.selected,
-				stock: targetSku?.inventory || 0, // SKU级别的库存
+				stock: targetSku.inventory || 0,
 				attrsText,
 			};
 		});
@@ -109,7 +130,8 @@ router.delete('/', async (req, res) => {
 		const userId = req.userId!;
 		const { ids } = req.body;
 
-		if (!ids || !Array.isArray(ids)) {
+		if (!ids || !Array.isArray(ids) || ids.length === 0) {
+			// 补充：防止传空数组进行无意义的DB操作
 			return res.status(400).json({ code: '400', msg: '缺少ids数组' });
 		}
 
@@ -120,29 +142,55 @@ router.delete('/', async (req, res) => {
 	}
 });
 
-// 5.4 合并购物车 (本地 -> 云端)
+// 5.4 合并购物车 (本地 -> 云端) 【核心重构】
 router.post('/merge', async (req, res) => {
 	try {
 		const userId = req.userId!;
-		const localCartList = req.body; // 接收数组 [{ skuId, selected, count }]
+		const localCartList = req.body;
 
 		if (!Array.isArray(localCartList)) {
 			return res.status(400).json({ code: '400', msg: '参数格式错误' });
 		}
 
-		// 使用 Promise.all 并发处理每个本地购物车项
-		const mergePromises = localCartList.map((item) => {
-			return Cart.findOneAndUpdate(
-				{ userId, skuId: item.skuId },
-				{
-					$setOnInsert: { selected: item.selected }, // 插入时使用本地状态
-					$inc: { count: item.count }, // 数量叠加
-				},
-				{ upsert: true, new: true },
-			).lean();
-		});
+		// 批量提取所有的 skuId 去校验存在性 (避免在 for 循环里 N 次查询数据库，提升性能)
+		const validSkuIds = localCartList
+			.filter(
+				(item) =>
+					item.skuId &&
+					Number.isInteger(item.count) &&
+					item.count > 0,
+			)
+			.map((item) => item.skuId);
 
-		await Promise.all(mergePromises);
+		if (validSkuIds.length > 0) {
+			const existingGoods = await Goods.find({
+				'skus.id': { $in: validSkuIds },
+			}).lean();
+			const realSkuIds = new Set(
+				existingGoods.flatMap((g) => g.skus.map((s: any) => s.id)),
+			);
+
+			// 过滤出真正合法的本地购物车项
+			const validItems = localCartList.filter((item) =>
+				realSkuIds.has(item.skuId),
+			);
+
+			// 并发执行更新/插入
+			const mergePromises = validItems.map((item) => {
+				// 修复逻辑：放弃 $setOnInsert，改用 $set 强制覆盖 selected 状态
+				return Cart.updateOne(
+					{ userId, skuId: item.skuId },
+					{
+						$inc: { count: item.count },
+						$set: { selected: item.selected }, // 本地状态为准
+					},
+					{ upsert: true },
+				);
+			});
+
+			await Promise.all(mergePromises);
+		}
+
 		res.json({ code: '1', msg: '合并成功', result: null });
 	} catch (error) {
 		res.status(500).json({ code: '500', msg: '服务器错误' });
@@ -156,10 +204,24 @@ router.put('/:skuId', async (req, res) => {
 		const { skuId } = req.params;
 		const { selected, count } = req.body;
 
-		// 动态构建更新对象 (只更新传了的字段)
 		const updateData: any = {};
 		if (typeof selected === 'boolean') updateData.selected = selected;
-		if (typeof count === 'number') updateData.count = count;
+
+		// 补充：数量正数校验
+		if (typeof count === 'number') {
+			if (!Number.isInteger(count) || count <= 0) {
+				return res
+					.status(400)
+					.json({ code: '400', msg: '商品数量必须为正整数' });
+			}
+			updateData.count = count;
+		}
+
+		if (Object.keys(updateData).length === 0) {
+			return res
+				.status(400)
+				.json({ code: '400', msg: '没有需要更新的数据' });
+		}
 
 		await Cart.updateOne({ userId, skuId }, { $set: updateData });
 		res.json({ code: '1', msg: '更新成功', result: null });
@@ -180,7 +242,6 @@ router.put('/selected', async (req, res) => {
 				.json({ code: '400', msg: '缺少selected参数' });
 		}
 
-		// 批量更新当前用户的所有购物车项
 		await Cart.updateMany({ userId }, { $set: { selected } });
 		res.json({ code: '1', msg: '操作成功', result: null });
 	} catch (error) {
