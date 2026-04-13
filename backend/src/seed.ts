@@ -3,16 +3,18 @@ import connectDB from './config/db.js';
 import { Banner } from './models/Banner.js';
 import { Category } from './models/Category.js';
 import { Goods } from './models/Goods.js';
+import { User } from './models/User.js';
+import bcrypt from 'bcryptjs'; // 官方推荐写法
 
 dotenv.config();
 
-// 清空并重新插入数据的封装函数
 const seedData = async () => {
 	await connectDB();
 	console.log('🚀 开始清理旧数据...');
 	await Banner.deleteMany({});
 	await Category.deleteMany({});
 	await Goods.deleteMany({});
+	await User.deleteMany({}); // 顺便清空用户
 
 	console.log('📦 开始插入新数据...');
 
@@ -29,10 +31,10 @@ const seedData = async () => {
 		{
 			imgUrl: 'https://picsum.photos/seed/banner3/1200/400',
 			distributionSite: '2',
-		}, // 测试分发站点过滤
+		},
 	]);
 
-	// 2. 插入分类 (先插一级，再插二级)
+	// 2. 插入分类（先一级，再二级）
 	const cat1 = await Category.create({
 		name: '手机数码',
 		subtitle: '最新手机与数码产品',
@@ -65,7 +67,7 @@ const seedData = async () => {
 		parentId: cat2._id,
 	});
 
-	// 3. 插入商品 (包含复杂的 specs 和 skus)
+	// 3. 插入商品（带 specs/skus/details）
 	await Goods.insertMany([
 		{
 			name: 'Apple iPhone 15 Pro',
@@ -277,7 +279,7 @@ const seedData = async () => {
 			orderNum: 60,
 			inventory: 100,
 			salesCount: 2000,
-			categoryId: subCat2_1._id, // 放在游戏本下面凑数据
+			categoryId: subCat2_1._id,
 			brand: { name: '罗技' },
 			specs: [
 				{ name: '颜色', values: [{ name: '黑色' }, { name: '白色' }] },
@@ -305,16 +307,24 @@ const seedData = async () => {
 		},
 	]);
 
+	// 4. 插入测试用户（密码：123456）
+	const hashedPassword = await bcrypt.hash('123456', 10);
+	await User.create({
+		account: 'test',
+		password: hashedPassword,
+		nickname: '校园小明',
+		avatar: 'https://picsum.photos/seed/avatar/100/100',
+	});
+
 	console.log('✅ 测试数据插入成功！');
 	console.log(`- 插入了 ${banners.length} 条轮播图`);
-	console.log(`- 插入了 2 个一级分类，4 个二级分类`);
-	console.log(`- 插入了 6 个商品（包含完整的SKU和规格参数）`);
+	console.log('- 插入了 2 个一级分类，4 个二级分类');
+	console.log('- 插入了 6 个商品（包含完整的SKU和规格参数）');
+	console.log('- 插入了 1 个测试用户：账号 test，密码 123456');
 
-	// 退出进程
 	process.exit(0);
 };
 
-// 执行并捕获错误
 seedData().catch((err) => {
 	console.error('❌ 数据初始化失败:', err);
 	process.exit(1);
