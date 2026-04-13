@@ -19,7 +19,7 @@ import type {
  */
 export const insertCartAPI = ({ skuId, count }: AddCartParams): Promise<unknown> => {
   return httpInstance({
-    url: 'member/cart',
+    url: '/member/cart',
     method: 'POST',
     data: {
       skuId,
@@ -34,7 +34,7 @@ export const insertCartAPI = ({ skuId, count }: AddCartParams): Promise<unknown>
 
 export const findNewCartListAPI = (): Promise<CartItem[]> => {
   return httpInstance({
-    url: 'member/cart',
+    url: '/member/cart',
   })
 }
 
@@ -48,7 +48,7 @@ export const findNewCartListAPI = (): Promise<CartItem[]> => {
  */
 export const delCartAPI = (ids: string[]): Promise<unknown> => {
   return httpInstance({
-    url: 'member/cart',
+    url: '/member/cart',
     method: 'DELETE',
     data: {
       ids,
@@ -87,7 +87,7 @@ export const updateNewCartAPI = (
   { selected, count }: UpdateCartParams,
 ): Promise<unknown> => {
   return httpInstance({
-    url: `member/cart/${skuId}`,
+    url: `/member/cart/${skuId}`,
     method: 'PUT',
     data: {
       selected,
@@ -106,7 +106,7 @@ export const updateNewCartAPI = (
  */
 export const batchUpdateCartAPI = ({ selected }: SelectAllParams): Promise<unknown> => {
   return httpInstance({
-    url: 'member/cart/selected',
+    url: '/member/cart/selected',
     method: 'PUT',
     data: {
       selected,

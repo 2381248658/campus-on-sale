@@ -1,331 +1,452 @@
+import mongoose from 'mongoose';
+import bcryptjs from 'bcryptjs';
 import dotenv from 'dotenv';
-import connectDB from './config/db.js';
+import { User } from './models/User.js';
+import { Address } from './models/Address.js';
 import { Banner } from './models/Banner.js';
 import { Category } from './models/Category.js';
 import { Goods } from './models/Goods.js';
-import { User } from './models/User.js';
-import bcrypt from 'bcryptjs'; // 官方推荐写法
 
 dotenv.config();
 
-const seedData = async () => {
-	await connectDB();
-	console.log('🚀 开始清理旧数据...');
-	await Banner.deleteMany({});
-	await Category.deleteMany({});
-	await Goods.deleteMany({});
-	await User.deleteMany({}); // 顺便清空用户
+// 辅助函数：生成指定范围的随机数
+const randomNum = (min: number, max: number) =>
+	Math.floor(Math.random() * (max - min + 1)) + min;
+const randomFloat = (min: number, max: number) =>
+	Number((Math.random() * (max - min) + min).toFixed(2));
 
-	console.log('📦 开始插入新数据...');
+// 辅助函数：生成复杂的 SKU 笛卡尔积 (保证每个商品都有真实的规格组合)
+function generateSkus(specsDef: any[]) {
+	const skuList: any[] = [];
+	// 提取所有规格的可能值
+	const valueArrays = specsDef.map((spec: any) => spec.values);
 
-	// 1. 插入轮播图
-	const banners = await Banner.insertMany([
-		{
-			imgUrl: 'https://picsum.photos/seed/banner1/1200/400',
-			distributionSite: '1',
-		},
-		{
-			imgUrl: 'https://picsum.photos/seed/banner2/1200/400',
-			distributionSite: '1',
-		},
-		{
-			imgUrl: 'https://picsum.photos/seed/banner3/1200/400',
-			distributionSite: '2',
-		},
-	]);
+	// 笛卡尔积递归计算组合
+	function cartesianProduct(
+		arr: any[][],
+		index: number = 0,
+		current: any[] = [],
+	): any[] {
+		if (index === arr.length) return [current];
+		const result: any[] = [];
+		for (const item of arr[index]) {
+			result.push(
+				...cartesianProduct(arr, index + 1, [...current, item]),
+			);
+		}
+		return result;
+	}
 
-	// 2. 插入分类（先一级，再二级）
-	const cat1 = await Category.create({
-		name: '手机数码',
-		subtitle: '最新手机与数码产品',
-		picture: 'https://picsum.photos/seed/cat-phone/200/200',
-	});
-	const cat2 = await Category.create({
-		name: '电脑办公',
-		subtitle: '电脑及外设装备',
-		picture: 'https://picsum.photos/seed/cat-pc/200/200',
-	});
+	const combinations = cartesianProduct(valueArrays);
 
-	const subCat1_1 = await Category.create({
-		name: '手机',
-		picture: 'https://picsum.photos/seed/sub-phone/200/200',
-		parentId: cat1._id,
-	});
-	const subCat1_2 = await Category.create({
-		name: '手机壳',
-		picture: 'https://picsum.photos/seed/sub-case/200/200',
-		parentId: cat1._id,
-	});
-	const subCat2_1 = await Category.create({
-		name: '游戏本',
-		picture: 'https://picsum.photos/seed/sub-laptop/200/200',
-		parentId: cat2._id,
-	});
-	const subCat2_2 = await Category.create({
-		name: '显示器',
-		picture: 'https://picsum.photos/seed/sub-monitor/200/200',
-		parentId: cat2._id,
+	combinations.forEach((combo: any, idx: number) => {
+		const basePrice = randomFloat(100, 5000); // 基础价格随机浮动模拟不同规格差价
+		skuList.push({
+			id: `sku_${Date.now()}_${randomNum(1000, 9999)}_${idx}`,
+			inventory: randomNum(10, 500),
+			price: basePrice,
+			oldPrice: basePrice + randomFloat(100, 800),
+			specs: combo.map((c: any) => ({
+				name: c.specName,
+				valueName: c.name,
+			})),
+		});
 	});
 
-	// 3. 插入商品（带 specs/skus/details）
-	await Goods.insertMany([
-		{
-			name: 'Apple iPhone 15 Pro',
-			desc: '全新A17 Pro芯片，钛金属设计',
-			price: 8999,
-			oldPrice: 9999,
-			picture: 'https://picsum.photos/seed/iphone/400/400',
-			mainPictures: [
-				'https://picsum.photos/seed/iphone1/800/800',
-				'https://picsum.photos/seed/iphone2/800/800',
-			],
-			orderNum: 100,
-			inventory: 50,
-			salesCount: 1200,
-			categoryId: subCat1_1._id,
-			brand: { name: '苹果' },
-			specs: [
-				{
-					name: '颜色',
-					values: [
-						{
-							name: '原色钛金属',
-							picture: 'https://picsum.photos/seed/c1/50/50',
-							desc: '闪亮银色',
-						},
-						{
-							name: '蓝色钛金属',
-							picture: 'https://picsum.photos/seed/c2/50/50',
-							desc: '深海蓝',
-						},
-					],
-				},
-				{
-					name: '存储',
-					values: [{ name: '256GB' }, { name: '512GB' }],
-				},
-			],
-			skus: [
-				{
-					id: 'sku-iphone-1',
-					inventory: 20,
-					price: 8999,
-					oldPrice: 9999,
-					specs: [
-						{ name: '颜色', valueName: '原色钛金属' },
-						{ name: '存储', valueName: '256GB' },
-					],
-				},
-				{
-					id: 'sku-iphone-2',
-					inventory: 30,
-					price: 9999,
-					oldPrice: 10999,
-					specs: [
-						{ name: '颜色', valueName: '原色钛金属' },
-						{ name: '存储', valueName: '512GB' },
-					],
-				},
-			],
-			details: {
-				pictures: ['https://picsum.photos/seed/detail1/800/1000'],
-				properties: [
-					{ name: '屏幕尺寸', value: '6.1英寸' },
-					{ name: '电池容量', value: '3274mAh' },
+	return skuList;
+}
+
+async function seedData() {
+	try {
+		await mongoose.connect(process.env.MONGO_URI as string);
+		console.log('🗑️  清空旧数据...');
+		await mongoose.connection.dropDatabase();
+
+		// ==========================================
+		// 1. 创建测试用户
+		// ==========================================
+		console.log('👤 创建测试用户...');
+		const hashedPassword = await bcryptjs.hash('123456', 10);
+		const testUser = await User.create({
+			account: 'test',
+			password: hashedPassword,
+			nickname: '校园惠剁手王',
+			avatar: 'https://picsum.photos/seed/avatar_test/100/100',
+		});
+
+		// ==========================================
+		// 2. 创建测试地址 (让结算页有数据展示)
+		// ==========================================
+		console.log('📍 创建测试地址...');
+		await Address.create([
+			{
+				userId: testUser._id,
+				receiver: '张三',
+				contact: '13800138000',
+				provinceCode: '110000',
+				cityCode: '110100',
+				countyCode: '110105',
+				address: '清华大学紫荆公寓2号楼409室',
+				isDefault: 1,
+				fullLocation: '北京市 市辖区 朝阳区',
+			},
+			{
+				userId: testUser._id,
+				receiver: '李四(代收)',
+				contact: '13900139000',
+				provinceCode: '330000',
+				cityCode: '330100',
+				countyCode: '330102',
+				address: '浙江大学紫金港校区碧峰圆通驿站',
+				isDefault: 0,
+				fullLocation: '浙江省 杭州市 上城区',
+			},
+		]);
+
+		// ==========================================
+		// 3. 创建轮播图
+		// ==========================================
+		console.log('🎠 创建轮播图...');
+		const bannerImgs = [
+			'https://picsum.photos/seed/banner_summer/1240/500',
+			'https://picsum.photos/seed/banner_digital/1240/500',
+			'https://picsum.photos/seed/banner_books/1240/500',
+			'https://picsum.photos/seed/banner_snacks/1240/500',
+			'https://picsum.photos/seed/banner_sports/1240/500',
+			'https://picsum.photos/seed/banner_beauty/1240/500',
+		];
+		await Banner.create(
+			bannerImgs.map((img: string) => ({
+				imgUrl: img,
+				distributionSite: '1',
+			})),
+		);
+
+		// ==========================================
+		// 4. 创建分类体系 (一级 & 二级) - 完全匹配前端截图
+		// ==========================================
+		console.log('📂 创建分类体系...');
+		const categoryTree = [
+			{
+				name: '宿舍百货',
+				subtitle: '生活必备',
+				subs: ['床品四件套', '收纳神器', '个护清洁', '实用小家电'],
+			},
+			{
+				name: '校园零食',
+				subtitle: '美味享不停',
+				subs: ['膨化速食', '坚果甜品', '饮料冲调', '新鲜水果'],
+			},
+			{
+				name: '二手教材',
+				subtitle: '学习好帮手',
+				subs: ['理工类专业', '文史类专业', '经管类专业', '考研考证'],
+			},
+			{
+				name: '代取服务',
+				subtitle: '懒人福音',
+				subs: ['快递代取', '外卖代拿', '文件打印', '跑腿服务'],
+			},
+			{
+				name: '数码租赁',
+				subtitle: '科技生活',
+				subs: ['手机租赁', '电脑租赁', '相机租赁', '其他设备'],
+			},
+			{
+				name: '学长推荐',
+				subtitle: '值得信赖',
+				subs: ['学习用品', '生活好物', '数码产品', '娱乐设备'],
+			},
+			{
+				name: '电子产品',
+				subtitle: '最新科技',
+				subs: ['手机', '电脑平板', '耳机音箱', '智能配件'],
+			},
+		];
+
+		const allSubCategories: any[] = []; // 存放所有二级分类，用于后续生成商品
+
+		for (const topCat of categoryTree) {
+			// 创建一级分类
+			const topCategory = await Category.create({
+				name: topCat.name,
+				subtitle: topCat.subtitle,
+				picture: `https://picsum.photos/seed/cat_${topCat.name}/150/150`,
+			});
+
+			// 创建二级分类
+			for (const subName of topCat.subs) {
+				const subCategory = await Category.create({
+					name: subName,
+					picture: `https://picsum.photos/seed/sub_${subName}/150/150`,
+					parentId: topCategory._id,
+				});
+				allSubCategories.push({
+					id: subCategory._id,
+					topName: topCat.name,
+					subName: subName,
+				});
+			}
+		}
+
+		// ==========================================
+		// 5. 批量生成海量商品 (核心重头戏)
+		// ==========================================
+		console.log('🛍️  开始批量生成海量商品 (可能需要几秒钟)...');
+
+		// 定义不同分类的规格池和价格区间
+		const specPool: Record<string, any> = {
+			宿舍百货: {
+				priceRange: [10, 300],
+				specs: [
+					{
+						name: '款式',
+						values: [
+							{ name: '简约风' },
+							{ name: 'ins风' },
+							{ name: '可爱风' },
+						],
+					},
+					{
+						name: '尺寸',
+						values: [
+							{ name: '小号' },
+							{ name: '标准款' },
+							{ name: '加大号' },
+						],
+					},
 				],
+				prefixes: ['【高配】', '【自用】', '【毕业急出】'],
 			},
-		},
-		{
-			name: '华为 Mate 60 Pro',
-			desc: '麒麟芯片回归，卫星通话',
-			price: 6999,
-			oldPrice: 6999,
-			picture: 'https://picsum.photos/seed/mate60/400/400',
-			mainPictures: ['https://picsum.photos/seed/mate1/800/800'],
-			orderNum: 90,
-			inventory: 10,
-			salesCount: 800,
-			categoryId: subCat1_1._id,
-			brand: { name: '华为' },
-			specs: [
-				{
-					name: '颜色',
-					values: [{ name: '雅丹黑' }, { name: '白沙银' }],
-				},
-			],
-			skus: [
-				{
-					id: 'sku-mate-1',
-					inventory: 10,
-					price: 6999,
-					oldPrice: 6999,
-					specs: [{ name: '颜色', valueName: '雅丹黑' }],
-				},
-			],
-			details: {
-				pictures: ['https://picsum.photos/seed/matedetail/800/1000'],
-				properties: [{ name: '系统', value: '鸿蒙OS 4.0' }],
+			校园零食: {
+				priceRange: [5, 80],
+				specs: [
+					{
+						name: '口味',
+						values: [
+							{ name: '经典原味' },
+							{ name: '香辣味' },
+							{ name: '番茄味' },
+						],
+					},
+					{
+						name: '规格',
+						values: [
+							{ name: '小包装' },
+							{ name: '家庭装' },
+							{ name: '整箱装' },
+						],
+					},
+				],
+				prefixes: ['【临期特惠】', '【免税仓发】', '【爆款秒杀】'],
 			},
-		},
-		{
-			name: 'iPhone 透明防摔壳',
-			desc: '气囊防摔，高透亮面',
-			price: 49.9,
-			oldPrice: 99,
-			picture: 'https://picsum.photos/seed/case1/400/400',
-			orderNum: 10,
-			inventory: 999,
-			salesCount: 5000,
-			categoryId: subCat1_2._id,
-			brand: { name: '绿联' },
-			specs: [
-				{
-					name: '型号',
-					values: [{ name: 'iPhone 15' }, { name: 'iPhone 15 Pro' }],
-				},
-			],
-			skus: [
-				{
-					id: 'sku-case-1',
-					inventory: 500,
-					price: 49.9,
-					oldPrice: 99,
-					specs: [{ name: '型号', valueName: 'iPhone 15' }],
-				},
-				{
-					id: 'sku-case-2',
-					inventory: 499,
-					price: 49.9,
-					oldPrice: 99,
-					specs: [{ name: '型号', valueName: 'iPhone 15 Pro' }],
-				},
-			],
-			details: {
-				pictures: [],
-				properties: [{ name: '材质', value: 'TPU' }],
+			二手教材: {
+				priceRange: [5, 60],
+				specs: [
+					{
+						name: '版本',
+						values: [{ name: '最新版' }, { name: '上一版' }],
+					},
+					{
+						name: '笔记情况',
+						values: [
+							{ name: '无笔记' },
+							{ name: '有少量笔记' },
+							{ name: '有重点标注' },
+						],
+					},
+				],
+				prefixes: ['【学霸笔记】', '【九成新】', '【划重点版】'],
 			},
-		},
-		{
-			name: '联想拯救者 Y9000P',
-			desc: '满血i9+4060，电竞屏',
-			price: 8999,
-			oldPrice: 9999,
-			picture: 'https://picsum.photos/seed/lenovo/400/400',
-			mainPictures: ['https://picsum.photos/seed/lenovo1/800/800'],
-			orderNum: 80,
-			inventory: 15,
-			salesCount: 600,
-			categoryId: subCat2_1._id,
-			brand: { name: '联想' },
-			specs: [
-				{
-					name: '配置',
-					values: [{ name: 'i9-13900HX / 16G / 1T / 4060' }],
-				},
-			],
-			skus: [
-				{
-					id: 'sku-lenovo-1',
-					inventory: 15,
-					price: 8999,
-					oldPrice: 9999,
-					specs: [
-						{
-							name: '配置',
-							valueName: 'i9-13900HX / 16G / 1T / 4060',
-						},
-					],
-				},
-			],
-			details: {
-				pictures: ['https://picsum.photos/seed/lenovod/800/1000'],
-				properties: [{ name: '屏幕', value: '16英寸 2.5K 240Hz' }],
+			代取服务: {
+				priceRange: [5, 50],
+				specs: [
+					{
+						name: '服务类型',
+						values: [
+							{ name: '快递代取' },
+							{ name: '外卖代拿' },
+							{ name: '文件打印' },
+						],
+					},
+					{
+						name: '服务范围',
+						values: [{ name: '校内' }, { name: '校外' }],
+					},
+				],
+				prefixes: ['【急速配送】', '【超值服务】', '【24小时响应】'],
 			},
-		},
-		{
-			name: '小米 Redmi 27寸显示器',
-			desc: '4K超清，Type-C反向充电',
-			price: 1299,
-			oldPrice: 1499,
-			picture: 'https://picsum.photos/seed/monitor1/400/400',
-			mainPictures: ['https://picsum.photos/seed/mon1/800/800'],
-			orderNum: 50,
-			inventory: 30,
-			salesCount: 300,
-			categoryId: subCat2_2._id,
-			brand: { name: '小米' },
-			specs: [{ name: '版本', values: [{ name: '标准版' }] }],
-			skus: [
-				{
-					id: 'sku-mon-1',
-					inventory: 30,
-					price: 1299,
-					oldPrice: 1499,
-					specs: [{ name: '版本', valueName: '标准版' }],
-				},
-			],
-			details: {
-				pictures: [],
-				properties: [{ name: '分辨率', value: '3840x2160' }],
+			数码租赁: {
+				priceRange: [50, 500],
+				specs: [
+					{
+						name: '设备类型',
+						values: [
+							{ name: '手机' },
+							{ name: '电脑' },
+							{ name: '相机' },
+						],
+					},
+					{
+						name: '租赁时长',
+						values: [
+							{ name: '日租' },
+							{ name: '周租' },
+							{ name: '月租' },
+						],
+					},
+				],
+				prefixes: ['【全新设备】', '【优惠套餐】', '【学生专享】'],
 			},
-		},
-		{
-			name: '罗技 G502 游戏鼠标',
-			desc: 'Hero传感器，自定义RGB',
-			price: 249,
-			oldPrice: 349,
-			picture: 'https://picsum.photos/seed/mouse1/400/400',
-			mainPictures: ['https://picsum.photos/seed/mouse2/800/800'],
-			orderNum: 60,
-			inventory: 100,
-			salesCount: 2000,
-			categoryId: subCat2_1._id,
-			brand: { name: '罗技' },
-			specs: [
-				{ name: '颜色', values: [{ name: '黑色' }, { name: '白色' }] },
-			],
-			skus: [
-				{
-					id: 'sku-mouse-1',
-					inventory: 50,
-					price: 249,
-					oldPrice: 349,
-					specs: [{ name: '颜色', valueName: '黑色' }],
-				},
-				{
-					id: 'sku-mouse-2',
-					inventory: 50,
-					price: 259,
-					oldPrice: 359,
-					specs: [{ name: '颜色', valueName: '白色' }],
-				},
-			],
-			details: {
-				pictures: [],
-				properties: [{ name: '连接方式', value: '有线/无线双模' }],
+			学长推荐: {
+				priceRange: [20, 500],
+				specs: [
+					{
+						name: '推荐类型',
+						values: [
+							{ name: '学习用品' },
+							{ name: '生活好物' },
+							{ name: '数码产品' },
+						],
+					},
+					{
+						name: '推荐理由',
+						values: [
+							{ name: '实用' },
+							{ name: '高性价比' },
+							{ name: '口碑好' },
+						],
+					},
+				],
+				prefixes: ['【学长亲测】', '【闭眼入】', '【宝藏单品】'],
 			},
-		},
-	]);
+			电子产品: {
+				priceRange: [500, 8000],
+				specs: [
+					{
+						name: '成色',
+						values: [
+							{ name: '全新' },
+							{ name: '九成新' },
+							{ name: '八成新' },
+						],
+					},
+					{
+						name: '颜色',
+						values: [
+							{ name: '暗夜黑' },
+							{ name: '钛空白' },
+							{ name: '远峰蓝' },
+						],
+					},
+				],
+				prefixes: ['【高配】', '【自用】', '【毕业急出】'],
+			},
+		};
 
-	// 4. 插入测试用户（密码：123456）
-	const hashedPassword = await bcrypt.hash('123456', 10);
-	await User.create({
-		account: 'test',
-		password: hashedPassword,
-		nickname: '校园小明',
-		avatar: 'https://picsum.photos/seed/avatar/100/100',
-	});
+		const goodsToInsert: any[] = [];
+		let totalGoodsCount = 0;
 
-	console.log('✅ 测试数据插入成功！');
-	console.log(`- 插入了 ${banners.length} 条轮播图`);
-	console.log('- 插入了 2 个一级分类，4 个二级分类');
-	console.log('- 插入了 6 个商品（包含完整的SKU和规格参数）');
-	console.log('- 插入了 1 个测试用户：账号 test，密码 123456');
+		for (const cat of allSubCategories) {
+			const pool = specPool[cat.topName] || specPool['宿舍百货']; // 兜底
+			const goodsCountPerSub = randomNum(9, 12); // 每个二级分类 9~12 个商品（匹配前端展示）
 
-	process.exit(0);
-};
+			for (let i = 0; i < goodsCountPerSub; i++) {
+				totalGoodsCount++;
+				const prefix =
+					pool.prefixes[randomNum(0, pool.prefixes.length - 1)];
 
-seedData().catch((err) => {
-	console.error('❌ 数据初始化失败:', err);
-	process.exit(1);
-});
+				// 给 specs 里的 values 加上 specName，方便后续笛卡尔积算法识别
+				const currentSpecs = pool.specs.map((spec: any) => ({
+					...spec,
+					values: spec.values.map((v: any) => ({
+						...v,
+						specName: spec.name,
+					})),
+				}));
+
+				// 生成复杂的 SKU 列表
+				const skus = generateSkus(currentSpecs);
+				// 取第一个 SKU 的价格作为商品主价格
+				const mainPrice =
+					skus[0]?.price ||
+					randomFloat(pool.priceRange[0], pool.priceRange[1]);
+				const mainOldPrice =
+					skus[0]?.oldPrice || mainPrice + randomFloat(50, 200);
+
+				// 组装主图列表 (5-6张，匹配详情页缩略图展示)
+			const mainPictureCount = randomNum(5, 6);
+			const mainPictures = [];
+			for (let p = 0; p < mainPictureCount; p++) {
+				mainPictures.push(`https://picsum.photos/seed/goods_${totalGoodsCount}_${p}/800/800`);
+			}
+
+				goodsToInsert.push({
+					name: `${prefix}${cat.subName}精选商品 ${totalGoodsCount}号`,
+					desc: `${cat.topName}类目下的优质${cat.subName}，性价比超高，${cat.topName === '二手教材' ? '笔记清晰' : '成色极新'}，手慢无！`,
+					price: mainPrice,
+					oldPrice: mainOldPrice,
+					picture: mainPictures[0],
+					mainPictures: mainPictures,
+					orderNum: randomNum(0, 10000),
+					inventory: randomNum(50, 1000),
+					salesCount: randomNum(10, 5000),
+					commentCount: randomNum(0, 500),
+					collectCount: randomNum(0, 300),
+					categoryId: cat.id,
+					brand: {
+						name:
+							cat.topName === '电子产品'
+								? ['苹果', '华为', '小米', '联想'][
+										randomNum(0, 3)
+									]
+								: '校园惠优选',
+					},
+					specs: currentSpecs.map((s: any) => ({
+						name: s.name,
+						values: s.values.map((v: any) => ({
+							name: v.name,
+							picture: `https://picsum.photos/seed/spec_${v.name}/50/50`,
+							desc: v.name,
+						})),
+					})),
+					skus: skus,
+					details: {
+					// 详情图片 6-7 张（匹配详情页介绍区域）
+					pictures: Array.from({ length: randomNum(6, 7) }, (_, idx) =>
+						`https://picsum.photos/seed/detail_${totalGoodsCount}_${idx}/1200/800`,
+					),
+						properties: [
+							{ name: '所属类目', value: cat.subName },
+							{ name: '上架时间', value: '2024-05-01' },
+						],
+					},
+				});
+			}
+		}
+
+		// 批量插入数据库 (极快)
+		await Goods.insertMany(goodsToInsert);
+
+		console.log(`\n✅ 数据初始化彻底完成！`);
+		console.log(`📊 数据统计：`);
+		console.log(`   - 测试账号: 1 个 (账号: test, 密码: 123456)`);
+		console.log(`   - 收货地址: 2 个`);
+		console.log(`   - 轮播图: ${bannerImgs.length} 张`);
+		console.log(`   - 一级分类: ${categoryTree.length} 个`);
+		console.log(`   - 二级分类: ${allSubCategories.length} 个`);
+		console.log(
+			`   - 商品总数: ${totalGoodsCount} 个 (每个商品包含 3~9 个独立SKU)`,
+		);
+		console.log(
+			`   - SKU总数: 约 ${goodsToInsert.reduce((acc: number, g: any) => acc + g.skus.length, 0)} 个`,
+		);
+		console.log(`\n🚀 前端可以使用 test / 123456 登录了！`);
+	} catch (error) {
+		console.error('❌ 数据初始化失败:', error);
+	} finally {
+		await mongoose.disconnect();
+	}
+}
+
+seedData();

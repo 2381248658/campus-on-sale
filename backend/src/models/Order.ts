@@ -8,7 +8,9 @@ const orderSkuSchema = new Schema(
 		picture: { type: String, required: true }, // 商品图片
 		price: { type: Number, required: true }, // 下单时价格
 		count: { type: Number, required: true }, // 购买数量
-		attrsText: { type: String, default: '' }, // 规格文本 (如: "颜色:黑 存储:256G")
+		attrsText: { type: String, default: '' }, // 规格文本
+		skuId: { type: String, default: '' }, // SKU ID (订单详情需要)
+		oldPrice: { type: Number, default: 0 }, // 原价 (订单详情需要)
 	},
 	{ _id: false },
 );

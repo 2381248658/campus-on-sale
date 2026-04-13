@@ -171,6 +171,8 @@ router.post('/', async (req, res) => {
 				price: targetSku.price,
 				count: item.count,
 				attrsText,
+				skuId: item.skuId, // 保存 skuId 供订单详情使用
+				oldPrice: targetGoods.oldPrice || targetSku.price, // 保存原价
 			});
 
 			payMoney += (targetSku?.price ?? 0) * item.count;
@@ -260,6 +262,58 @@ router.get('/', async (req, res) => {
 					totalNum: order.totalNum,
 					skus: order.skus,
 				})),
+			},
+		});
+	} catch (error) {
+		res.status(500).json({ code: '500', msg: '服务器错误' });
+	}
+});
+
+// ==========================================
+// 6.2 获取订单详情 (GET /member/order/:id)
+// ==========================================
+router.get('/:id', async (req, res) => {
+	try {
+		const userId = req.userId!;
+		const { id } = req.params;
+
+		const order = await Order.findOne({ _id: id, userId }).lean();
+		if (!order) {
+			return res.status(404).json({ code: '404', msg: '订单不存在' });
+		}
+
+		// 组装订单商品列表 (直接使用订单快照数据)
+		const goods = order.skus.map((sku: any) => ({
+			id: sku.id,
+			name: sku.name,
+			picture: sku.picture,
+			price: sku.price,
+			count: sku.count,
+			attrsText: sku.attrsText,
+			totalPrice: (sku.oldPrice || sku.price) * sku.count,
+			totalPayPrice: sku.price * sku.count,
+			skuId: sku.skuId || '',
+		}));
+
+		const totalPrice = goods.reduce((sum, g) => sum + g.totalPrice, 0);
+
+		res.json({
+			code: '1',
+			msg: '操作成功',
+			result: {
+				id: order._id.toString(),
+				createTime: order.createdAt,
+				orderState: order.orderState,
+				payMoney: order.payMoney,
+				userAddresses: order.deliveryAddress,
+				goods,
+				summary: {
+					goodsCount: order.totalNum,
+					totalPrice,
+					postFee: 0,
+					discountMoney: 0,
+					totalPay: order.payMoney,
+				},
 			},
 		});
 	} catch (error) {

@@ -17,7 +17,7 @@ import type { OrderListParams, PaginatedResult, OrderItem } from '@/types/api'
  */
 export const getUserOrderAPI = (params: OrderListParams): Promise<PaginatedResult<OrderItem>> => {
   return httpInstance({
-    url: 'member/order',
+    url: '/member/order',
     method: 'GET',
     params,
   })

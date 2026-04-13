@@ -11,6 +11,6 @@ import type { OrderDetail } from '@/types/api'
  */
 export const getOrderAPI = (id: string): Promise<OrderDetail> => {
   return httpInstance({
-    url: `member/order/${id}`,
+    url: `/member/order/${id}`,
   })
 }
