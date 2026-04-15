@@ -84,19 +84,19 @@ const categoryStore = useCategoryStore()
       }
 
       .layer {
-        width: 990px;
+        width: 1060px;
         height: 500px;
-        background: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.98);
         position: absolute;
         left: 180px;
         top: 0;
         display: none;
-        padding: 0 15px;
+        padding: 10px 15px 20px;
 
         h4 {
           font-size: 20px;
           font-weight: normal;
-          line-height: 80px;
+          line-height: 60px;
 
           small {
             font-size: 16px;
@@ -107,18 +107,20 @@ const categoryStore = useCategoryStore()
         ul {
           display: flex;
           flex-wrap: wrap;
+          gap: 15px;
 
           li {
-            width: 310px;
+            flex: none;
+            width: calc((100% - 30px) / 3);
             height: 120px;
-            margin-right: 15px;
-            margin-bottom: 15px;
             border: 1px solid #eee;
             border-radius: $borderRadiusSmall;
             background: #fff;
-
-            &:nth-child(3n) {
-              margin-right: 0;
+            transition: all 0.3s ease;
+            &:hover {
+              background: $campusColorLight;
+              transform: translateY(-1.5px);
+              box-shadow: 0 4px 12px rgba(0, 91, 172, 0.1);
             }
 
             a {
@@ -127,10 +129,6 @@ const categoryStore = useCategoryStore()
               height: 100%;
               align-items: center;
               padding: 10px;
-
-              &:hover {
-                background: $campusColorLight;
-              }
 
               img {
                 width: 95px;
