@@ -21,7 +21,7 @@ const getOrder = async (): Promise<void> => {
   try {
     const res = await getOrderAPI(route.query.id as string)
 
-    payInfo.value = (res as any).data?.result || (res as any).result || res
+    payInfo.value = res
   } catch (err) {
     console.log('支付页基础数据获取失败', err)
   }

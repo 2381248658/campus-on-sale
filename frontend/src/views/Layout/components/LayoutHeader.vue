@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { useCategoryStore } from '@/stores/categoryStore'
 import HeaderCart from './HeaderCart.vue'
+// 🌟 引入 useRoute，用来获取当前页面的真实路径
+import { useRoute } from 'vue-router'
 
 const categoryStore = useCategoryStore()
+const route = useRoute()
 </script>
 
 <template>
@@ -14,7 +17,7 @@ const categoryStore = useCategoryStore()
 
       <ul class="app-header-nav">
         <li class="home">
-          <RouterLink to="/" active-class="active">首页</RouterLink>
+          <RouterLink to="/" :class="{ active: route.path === '/' }">首页</RouterLink>
         </li>
         <li v-for="item in categoryStore.categoryList" :key="item.id">
           <RouterLink active-class="active" :to="`/category/${item.id}`">
@@ -41,7 +44,6 @@ const categoryStore = useCategoryStore()
   .container {
     display: flex;
     align-items: center;
-    // 确保容器在各种屏幕下都能正确居中
     margin: 0 auto;
     width: 1240px;
   }

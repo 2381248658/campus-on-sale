@@ -3,7 +3,7 @@ import { getCategoryFilterAPI, getSubCategoryAPI } from '@/apis/category'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import GoodsItem from '../Home/components/GoodsItem.vue'
-import type { SubCategoryFilter, CategoryGoods, PaginatedResult } from '@/types/api'
+import type { SubCategoryFilter, CategoryGoods } from '@/types/api'
 
 // 筛选数据类型
 const filterData = ref<SubCategoryFilter>({} as SubCategoryFilter)

@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { watchEffect } from 'vue'
 import getPowerSet from './power-set'
-import type { GoodsDetail, Sku, SkuSpec } from '@/types/api'
+import type { Sku, SkuSpec } from '@/types/api'
 
 // 路径字典的分隔符
 const spliter = '★'

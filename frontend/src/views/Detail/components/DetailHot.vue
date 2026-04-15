@@ -27,13 +27,7 @@ const getHotList = async () => {
       type: props.hotType,
     })
 
-    if (res && (res as any).result) {
-      goodList.value = (res as any).result
-    } else if (res && (res as any).data && (res as any).data.result) {
-      goodList.value = (res as any).data.result
-    } else {
-      goodList.value = res || []
-    }
+    goodList.value = res || []
   } catch (err) {
     console.error('获取校园热榜商品失败:', err)
   }

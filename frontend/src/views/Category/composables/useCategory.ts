@@ -30,13 +30,7 @@ export function useCategory() {
 
       const res = await getCategoryAPI(id as string)
 
-      /**
-       * 数据脱壳与容错处理：
-       * 1. rawData: 兼容响应拦截器是否剥离 data 层的情况
-       * 2. categoryData.value: 进一步剥离可能存在的 result 嵌套层级
-       */
-      const rawData = (res as any).data || res
-      categoryData.value = rawData.result || rawData
+      categoryData.value = res || categoryData.value
     } catch (err) {
       // 容错处理：发生异常时重置基础结构，确保页面模板指令不报错
       categoryData.value = {

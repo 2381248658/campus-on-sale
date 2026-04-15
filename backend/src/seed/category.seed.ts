@@ -73,25 +73,12 @@ export async function seedCategory() {
 	];
 
 	const allSubCategories: SubCategoryInfo[] = [];
-	let globalGoodsIndex = 0;
 
 	for (const topCat of categoryTree) {
-		const mockGoodsForHover = Array.from({ length: 9 }, () => {
-			globalGoodsIndex++;
-			return {
-				id: `mock_nav_goods_${globalGoodsIndex}`,
-				name: `${topCat.name}热门推荐好物 ${globalGoodsIndex}号`,
-				desc: '学长都在买，性价比超高，速来围观！',
-				price: Number((Math.random() * 200 + 10).toFixed(2)),
-				picture: `https://picsum.photos/seed/nav_goods_${globalGoodsIndex}/200/200`,
-			};
-		});
-
 		const topCategory = await Category.create({
 			name: topCat.name,
 			subtitle: topCat.subtitle,
 			picture: `https://picsum.photos/seed/cat_${topCat.name}/150/150`,
-			goods: mockGoodsForHover,
 		});
 
 		for (const subName of topCat.subs) {
@@ -101,13 +88,11 @@ export async function seedCategory() {
 				parentId: topCategory._id,
 			});
 
-			// 🔥🔥🔥 核心修改在这里 🔥🔥🔥
-			// 把 subCategory._id 换成 topCategory._id
-			// 这样商品生成时，就会全部挂到一级分类下
+			// 商品挂载到一级分类，用于首页侧边栏展示
 			allSubCategories.push({
 				id: topCategory._id,
 				topName: topCat.name,
-				subName: subName, // subName 保留，用于匹配 goods.seed.ts 里的真实模板
+				subName: subName,
 			});
 		}
 	}

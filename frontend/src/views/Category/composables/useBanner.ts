@@ -18,14 +18,7 @@ export function useBanner() {
       // 不再传递 distributionsite 参数，获取所有轮播图
       const res = await getBannerAPI()
 
-      /**
-       * 响应数据脱壳处理 (兼容性逻辑)
-       * 1. res.data.result: 标准 Axios 原始响应
-       * 2. res.result: 拦截器已剥离 data 层
-       * 3. res: 拦截器直接返回结果集
-       */
-      const data = (res as any).data || res
-      bannerList.value = data.result || data
+      bannerList.value = res || []
 
       // console.log('Banner 数据加载成功:', bannerList.value)
     } catch (error) {

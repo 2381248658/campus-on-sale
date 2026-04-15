@@ -51,7 +51,7 @@ const { categoryData } = useCategory()
           <p class="tag">优质好物 校园专供</p>
         </div>
         <div class="body">
-          <GoodsItem v-for="good in item.goods" :good="good" :key="good.id" />
+          <GoodsItem v-for="good in item.goods?.slice(0, 5)" :good="good" :key="good.id" />
         </div>
       </div>
     </div>

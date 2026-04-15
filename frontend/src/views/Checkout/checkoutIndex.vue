@@ -8,7 +8,7 @@ import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Iphone } from '@element-plus/icons-vue'
-import type { CheckoutInfo, OrderGoods, CreateOrderResult } from '@/types/api'
+import type { CheckoutInfo, OrderGoods } from '@/types/api'
 
 const router = useRouter()
 const checkInfo = ref<CheckoutInfo>({} as CheckoutInfo)
@@ -69,7 +69,7 @@ const getCheckoutInfo = async (): Promise<void> => {
   try {
     const res = await getCheckoutInfoAPI()
     // 兼容拦截器剥离 data 层后的不同响应结构
-    checkInfo.value = (res as any).result || res
+    checkInfo.value = res
   } catch (err) {
     console.error('获取结算信息失败', err)
   }
@@ -106,7 +106,7 @@ const createOrder = async (): Promise<void> => {
      * 数据脱壳兼容：安全获取订单 ID
      * 适配 res.data?.result?.id, res.result?.id, 或 res.id 结构
      */
-    const orderId = (res as any).data?.result?.id || (res as any).result?.id || (res as any).id
+    const orderId = res?.id
 
     if (!orderId) {
       throw new Error('订单 ID 获取失败')
