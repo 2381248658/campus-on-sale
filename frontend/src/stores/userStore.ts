@@ -2,16 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { loginAPI } from '@/apis/user'
 import { useCartStore } from './cartStore'
-import type { LoginResult } from '@/types/api'
-
-// ============================================
-// 登录参数类型
-// ============================================
-
-export interface LoginParams {
-  account: string
-  password: string
-}
+import type { LoginResult, LoginParams } from '@/types/api'
 
 export const useUserStore = defineStore(
   'user',

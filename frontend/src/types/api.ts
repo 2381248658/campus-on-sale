@@ -87,7 +87,6 @@ export interface CategoryHead {
     id: string
     name: string
     picture?: string
-    goods?: CategoryGoods[]
   }>
 }
 
@@ -217,7 +216,17 @@ export interface GoodsDetail {
 
 // 热销榜单查询参数
 export interface HotGoodsParams {
-  type?: string
+  /** 商品id */
+  id: string
+  /** 1代表24小时热销榜 2代表周热销榜 */
+  type: number
+  /** 获取个数，默认3 */
+  limit?: number
+}
+
+// 猜你喜欢查询参数
+export interface LikeListParams {
+  limit?: number
 }
 
 // ============================================
@@ -258,7 +267,6 @@ export interface DeleteCartParams {
 // 全选参数
 export interface SelectAllParams {
   selected: boolean
-  ids?: string[]
 }
 
 // 合并购物车参数

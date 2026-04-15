@@ -9,7 +9,7 @@ import {
   updateNewCartAPI,
   batchUpdateCartAPI,
 } from '@/apis/carts'
-import type { CartItem, MergeCartItem } from '@/types/api'
+import type { CartItem, MergeCartItem, UpdateCartParams } from '@/types/api'
 
 // ============================================
 // 添加购物车商品参数（本地未登录状态）
@@ -24,15 +24,6 @@ export interface AddCartGoods {
   nowPrice?: number
   selected?: boolean
   [key: string]: unknown
-}
-
-// ============================================
-// 更新购物车项参数
-// ============================================
-
-export interface UpdateCartItemParams {
-  selected?: boolean
-  count?: number
 }
 
 export const useCartStore = defineStore(
@@ -143,7 +134,7 @@ export const useCartStore = defineStore(
      */
     const updateCartItem = async (
       skuId: string,
-      { selected, count }: UpdateCartItemParams,
+      { selected, count }: UpdateCartParams,
     ): Promise<void> => {
       const item = cartList.value.find((i) => i.skuId === skuId)
       if (!item) return

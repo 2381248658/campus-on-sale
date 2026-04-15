@@ -22,15 +22,6 @@ export const getDetail = (id?: string): Promise<GoodsDetail> => {
 // 热点商品接口（热销榜单）
 // ============================================
 
-export interface FetchHotGoodsParams {
-  /** 商品id */
-  id: string
-  /** 1代表24小时热销榜 2代表周热销榜 */
-  type: number
-  /** 获取个数，默认3 */
-  limit?: number
-}
-
 /**
  * 获取热点商品列表
  * @param id - 商品id
@@ -41,7 +32,7 @@ export const fetchHotGoodsAPI = ({
   id,
   type,
   limit = 3,
-}: FetchHotGoodsParams): Promise<CategoryGoods[]> => {
+}: HotGoodsParams): Promise<CategoryGoods[]> => {
   return httpInstance({
     url: '/goods/hot',
     params: {

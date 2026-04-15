@@ -1,5 +1,5 @@
 import httpInstance from '@/utils/http'
-import type { LoginParams, LoginResult, RelevantGoods } from '@/types/api'
+import type { LoginParams, LoginResult, RelevantGoods, LikeListParams } from '@/types/api'
 
 // ============================================
 // 用户相关接口：登录、个人中心推荐等
@@ -10,12 +10,7 @@ import type { LoginParams, LoginResult, RelevantGoods } from '@/types/api'
  * @param account - 学号/账号
  * @param password - 密码
  */
-export interface LoginAPIParams {
-  account: string
-  password: string
-}
-
-export const loginAPI = ({ account, password }: LoginAPIParams): Promise<LoginResult> => {
+export const loginAPI = ({ account, password }: LoginParams): Promise<LoginResult> => {
   return httpInstance({
     url: '/login',
     method: 'POST',
@@ -29,10 +24,6 @@ export const loginAPI = ({ account, password }: LoginAPIParams): Promise<LoginRe
 // ============================================
 // 个人中心猜你喜欢模块
 // ============================================
-
-export interface LikeListParams {
-  limit?: number
-}
 
 export const getLikeListAPI = ({ limit = 4 }: LikeListParams = {}): Promise<RelevantGoods[]> => {
   return httpInstance({

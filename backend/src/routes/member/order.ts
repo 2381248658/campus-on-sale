@@ -113,7 +113,16 @@ router.get('/pre', async (req, res) => {
 router.post('/', async (req, res) => {
 	try {
 		const userId = req.userId!;
-		const { goods, addressId, deliveryAddress, buyerMessage } = req.body;
+		// 【修复点 1】：补全前端结算页可能传过来的支付与配送字段
+		const {
+			goods,
+			addressId,
+			deliveryAddress,
+			buyerMessage,
+			deliveryTimeType,
+			payType,
+			payChannel,
+		} = req.body;
 
 		if (!goods || goods.length === 0) {
 			return res.status(400).json({ code: '400', msg: '缺少商品信息' });
@@ -198,6 +207,7 @@ router.post('/', async (req, res) => {
 		}
 
 		// 4. 创建订单
+		// 【修复点 2】：将补全的字段存入数据库，防止前端传过来的业务数据丢失
 		const order = await Order.create({
 			userId,
 			payMoney,
@@ -205,6 +215,9 @@ router.post('/', async (req, res) => {
 			skus: orderSkus,
 			buyerMessage: buyerMessage || '',
 			deliveryAddress: finalAddress,
+			deliveryTimeType,
+			payType,
+			payChannel,
 		});
 
 		// 5. 清除购物车中已下单的商品
@@ -260,6 +273,7 @@ router.get('/', async (req, res) => {
 					orderState: order.orderState,
 					payMoney: order.payMoney,
 					totalNum: order.totalNum,
+					// 保持原样：前端订单列表页处于开发中，多返回字段不会引发报错，后续开发时如需严格过滤再改此处
 					skus: order.skus,
 				})),
 			},

@@ -29,15 +29,12 @@ export function generateSkus(specsDef: any[], priceRange: [number, number]) {
 	const combinations = cartesianProduct(valueArrays);
 
 	combinations.forEach((combo: any, idx: number) => {
-		// 🛠️ 优化：使用传入的具体分类价格区间，而不是死代码 100-5000
 		const basePrice = randomFloat(priceRange[0], priceRange[1]);
 		skuList.push({
 			id: `sku_${Date.now()}_${randomNum(1000, 9999)}_${idx}`,
 			inventory: randomNum(10, 500),
 			price: basePrice,
-			oldPrice:
-				basePrice +
-				randomFloat(priceRange[0] * 0.2, priceRange[1] * 0.3),
+			oldPrice: Number((basePrice * randomFloat(1.2, 1.5)).toFixed(2)),
 			specs: combo.map((c: any) => ({
 				name: c.specName,
 				valueName: c.name,
