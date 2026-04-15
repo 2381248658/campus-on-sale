@@ -1,5 +1,5 @@
 import httpInstance from '@/utils/http'
-import type { OrderListParams, PaginatedResult, OrderItem } from '@/types/api'
+import type { OrderDetail, OrderItem, OrderListParams, PaginatedResult } from '@/types/api'
 
 // ============================================
 // 订单列表相关接口
@@ -20,5 +20,16 @@ export const getUserOrderAPI = (params: OrderListParams): Promise<PaginatedResul
     url: '/member/order',
     method: 'GET',
     params,
+  })
+}
+
+/**
+ * 获取订单详情
+ * @param id - 订单ID
+ */
+export const getOrderDetailAPI = (id: string): Promise<OrderDetail> => {
+  return httpInstance({
+    url: `/member/order/${id}`,
+    method: 'GET',
   })
 }

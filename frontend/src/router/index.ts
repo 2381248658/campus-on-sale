@@ -67,6 +67,16 @@ const routes: RouteRecordRaw[] = [
             name: 'memberOrder',
             component: () => import('@/views/Member/components/UserOrder.vue'),
           },
+          {
+            path: 'order/:id',
+            name: 'memberOrderDetail',
+            component: () => import('@/views/Member/components/UserOrderDetail.vue'),
+          },
+          {
+            path: 'address',
+            name: 'memberAddress',
+            component: () => import('@/views/Member/components/UserAddress.vue'),
+          },
         ],
       },
     ],

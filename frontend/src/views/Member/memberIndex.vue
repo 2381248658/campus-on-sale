@@ -11,6 +11,7 @@
         <h4>交易管理</h4>
         <div class="links">
           <RouterLink to="/member/order" active-class="active">我的订单</RouterLink>
+          <RouterLink to="/member/address" active-class="active">地址管理</RouterLink>
         </div>
       </div>
     </div>

@@ -105,6 +105,12 @@ const goToPay = (order: OrderItem): void => {
   })
 }
 
+const goToOrderDetail = (order: OrderItem): void => {
+  router.push({
+    path: `/member/order/${order.id}`,
+  })
+}
+
 const syncFromPayQuery = (): void => {
   if (String(route.query.fromPay || '') !== '1') return
   activeName.value = 2
@@ -153,11 +159,10 @@ onMounted(() => {
 
       <template v-else-if="orderList.length > 0">
         <article
-          class="order-card"
+          class="order-card clickable"
           v-for="order in orderList"
           :key="order.id"
-          :class="{ clickable: order.orderState === 1 }"
-          @click="order.orderState === 1 && goToPay(order)"
+          @click="goToOrderDetail(order)"
         >
           <header class="order-head">
             <div class="meta">
@@ -188,11 +193,13 @@ onMounted(() => {
               type="primary"
               size="small"
               class="order-action-btn"
-              @click="goToPay(order)"
+              @click.stop="goToPay(order)"
             >
               去支付
             </el-button>
-            <el-button v-else size="small" disabled class="order-action-btn">已完成</el-button>
+            <el-button v-else size="small" class="order-action-btn" @click.stop="goToOrderDetail(order)">
+              查看详情
+            </el-button>
           </footer>
         </article>
 

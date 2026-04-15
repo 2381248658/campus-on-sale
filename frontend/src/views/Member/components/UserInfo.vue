@@ -43,10 +43,10 @@ onMounted(() => getLikeList())
         <span class="iconfont icon-shezhi"></span>
         <p>安全设置</p>
       </a>
-      <a href="javascript:;">
+      <RouterLink to="/member/address">
         <span class="iconfont icon-dizhi"></span>
         <p>地址管理</p>
-      </a>
+      </RouterLink>
     </div>
   </div>
 
