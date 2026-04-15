@@ -284,7 +284,54 @@ router.get('/', async (req, res) => {
 });
 
 // ==========================================
-// 6.2 获取订单详情 (GET /member/order/:id)
+// 6.2 支付确认 (PUT /member/order/:id/pay)
+// ==========================================
+router.put('/:id/pay', async (req, res) => {
+	try {
+		const userId = req.userId!;
+		const { id } = req.params;
+
+		const order = await Order.findOne({ _id: id, userId });
+		if (!order) {
+			return res.status(404).json({ code: '404', msg: '订单不存在' });
+		}
+
+		// 已是已支付状态，按幂等处理返回成功
+		if (order.orderState === 2) {
+			return res.json({
+				code: '1',
+				msg: '订单已支付',
+				result: {
+					id: order._id.toString(),
+					orderState: order.orderState,
+				},
+			});
+		}
+
+		if (order.orderState !== 1) {
+			return res
+				.status(400)
+				.json({ code: '400', msg: '当前订单状态不可支付' });
+		}
+
+		order.orderState = 2;
+		await order.save();
+
+		res.json({
+			code: '1',
+			msg: '支付成功',
+			result: {
+				id: order._id.toString(),
+				orderState: order.orderState,
+			},
+		});
+	} catch (error) {
+		res.status(500).json({ code: '500', msg: '服务器错误' });
+	}
+});
+
+// ==========================================
+// 6.3 获取订单详情 (GET /member/order/:id)
 // ==========================================
 router.get('/:id', async (req, res) => {
 	try {

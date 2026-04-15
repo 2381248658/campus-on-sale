@@ -59,7 +59,7 @@ const singleCheck = (skuId: string, selected: boolean) => {
               <td>
                 <el-checkbox
                   :model-value="i.selected"
-                  @change="(selected) => singleCheck(i.skuId, selected as boolean)"
+                  @change="singleCheck(i.skuId, $event as boolean)"
                 />
               </td>
               <td>
@@ -80,7 +80,7 @@ const singleCheck = (skuId: string, selected: boolean) => {
                 <el-input-number
                   :min="1"
                   v-model="i.count"
-                  @change="(val) => countChange(i.skuId, val as number)"
+                  @change="countChange(i.skuId, $event as number)"
                 />
               </td>
               <td class="tc">

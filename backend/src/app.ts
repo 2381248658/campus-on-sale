@@ -9,6 +9,7 @@ import goodsRouter from './routes/goods.js';
 import { auth } from './middleware/auth.js';
 import cartRouter from './routes/member/cart.js';
 import orderRouter from './routes/member/order.js';
+import addressRouter from './routes/member/address.js';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use(goodsRouter);
 // 认证接口
 app.use('/member/cart', auth, cartRouter);
 app.use('/member/order', auth, orderRouter);
+app.use('/member/address', auth, addressRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>

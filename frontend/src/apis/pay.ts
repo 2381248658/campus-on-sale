@@ -14,3 +14,16 @@ export const getOrderAPI = (id: string): Promise<OrderDetail> => {
     url: `/member/order/${id}`,
   })
 }
+
+/**
+ * 支付确认（将订单状态更新为待发货）
+ * @param id - 订单ID
+ */
+export const confirmOrderPayAPI = (
+  id: string,
+): Promise<{ id: string; orderState: number }> => {
+  return httpInstance({
+    url: `/member/order/${id}/pay`,
+    method: 'PUT',
+  })
+}

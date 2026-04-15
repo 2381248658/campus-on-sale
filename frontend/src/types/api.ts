@@ -293,6 +293,34 @@ export interface Address {
   fullLocation: string
 }
 
+// 地址接口返回可能是 Mongo 风格 _id 或业务 id
+export interface AddressApiItem extends Omit<Address, 'id'> {
+  id?: string
+  _id?: string
+}
+
+export interface AddressFormData {
+  receiver: string
+  contact: string
+  provinceCode?: string
+  cityCode?: string
+  countyCode?: string
+  address: string
+  fullLocation?: string
+  isDefault?: number
+}
+
+// 订单里的收货地址快照（后端返回可能不含 id/isDefault）
+export interface DeliveryAddressSnapshot {
+  receiver: string
+  contact: string
+  provinceCode?: string
+  cityCode?: string
+  countyCode?: string
+  address: string
+  fullLocation?: string
+}
+
 // 订单商品（补充 skuId）
 export interface OrderGoods {
   id: string
@@ -355,11 +383,11 @@ export interface OrderListParams {
 // 订单项
 export interface OrderItem {
   id: string
-  createTime: string
+  createTime: string | Date
   orderState: number
   payMoney: number
   totalNum: number
-  skus: Array<{
+  skus?: Array<{
     id: string
     name: string
     picture: string
@@ -372,10 +400,10 @@ export interface OrderItem {
 // 订单详情
 export interface OrderDetail {
   id: string
-  createTime: string
+  createTime: string | Date
   orderState: number
   payMoney: number
-  userAddresses: Address
+  userAddresses: DeliveryAddressSnapshot
   goods: OrderGoods[]
   summary: OrderSummary
 }

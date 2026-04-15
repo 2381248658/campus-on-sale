@@ -98,4 +98,29 @@ const router = createRouter({
   scrollBehavior,
 })
 
+router.beforeEach((to, _from, next) => {
+  const protectedPaths = ['/checkout', '/pay', '/member']
+  const requiresAuth = protectedPaths.some((path) => to.path.startsWith(path))
+  if (!requiresAuth) {
+    next()
+    return
+  }
+
+  const persistedUser = localStorage.getItem('user')
+  let token = ''
+  if (persistedUser) {
+    try {
+      token = JSON.parse(persistedUser)?.userInfo?.token || ''
+    } catch {
+      token = ''
+    }
+  }
+
+  if (token) {
+    next()
+  } else {
+    next({ path: '/login', query: { redirect: to.fullPath } })
+  }
+})
+
 export default router

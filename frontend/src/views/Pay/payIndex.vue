@@ -1,25 +1,28 @@
 <script setup lang="ts">
-import { getOrderAPI } from '@/apis/pay'
+import { confirmOrderPayAPI, getOrderAPI } from '@/apis/pay'
 import { onMounted, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
-import { useCartStore } from '@/stores/cartStore'
 import type { OrderDetail } from '@/types/api'
 
 const route = useRoute()
 const router = useRouter()
-const cartStore = useCartStore()
 const payInfo = ref<OrderDetail>({} as OrderDetail)
+const confirming = ref<boolean>(false)
 // 获取支付方式，1为在线支付，2为货到付款
 const payType = ref<number>(parseInt(route.query.payType as string) || 1)
 // 根据支付方式计算按钮文本
 const payButtonText = computed<string>(() => {
   return payType.value === 1 ? '立即确认支付' : '确认订单'
 })
+const canConfirmPay = computed<boolean>(() => {
+  return !confirming.value && payInfo.value.orderState === 1
+})
+const orderId = computed<string>(() => String(route.query.id || ''))
 
 const getOrder = async (): Promise<void> => {
   try {
-    const res = await getOrderAPI(route.query.id as string)
+    const res = await getOrderAPI(orderId.value)
 
     payInfo.value = res
   } catch (err) {
@@ -30,7 +33,14 @@ const getOrder = async (): Promise<void> => {
 onMounted(() => getOrder())
 
 const handleConfirmPay = (): void => {
-  if (!payInfo.value.payMoney) return
+  if (!payInfo.value.payMoney || !orderId.value) return
+  if (!canConfirmPay.value) {
+    ElMessage({
+      type: 'warning',
+      message: '当前订单状态不可重复支付',
+    })
+    return
+  }
 
   // 根据支付方式显示不同的确认信息
   const confirmMessage =
@@ -45,57 +55,58 @@ const handleConfirmPay = (): void => {
     cancelButtonText: '取消',
     type: 'success',
   })
-    .then(() => {
+    .then(async () => {
+      confirming.value = true
       // 增加一个简单的加载反馈，提升真实感
       const loading = ElLoading.service({
         lock: true,
-        text: payType.value === 1 ? '正在处理结算并同步购物车...' : '正在提交订单...',
+        text: payType.value === 1 ? '正在确认支付...' : '正在确认订单...',
         background: 'rgba(255, 255, 255, 0.7)',
       })
 
-      // 模拟支付处理延迟
-      setTimeout(async () => {
-        // 无论支付方式如何，都清理购物车中选中的商品
-        try {
-          if (cartStore.clearSelectedCart) {
-            await cartStore.clearSelectedCart()
-          }
-        } catch (error) {
-          console.error('购物车清理失败', error)
-        }
-
+      try {
+        await confirmOrderPayAPI(orderId.value)
         loading.close()
-
-        if (payType.value === 1) {
-          // 在线支付：跳转到首页
-          ElMessage({
-            type: 'success',
-            message: '支付成功！祝您生活愉快',
-            duration: 1500,
+        const successMessage =
+          payType.value === 1 ? '支付成功，订单已进入待发货' : '订单已确认，商家将尽快发货'
+        ElMessage({
+          type: 'success',
+          message: successMessage,
+          duration: 1500,
+        })
+        setTimeout(() => {
+          router.push({
+            path: '/member/order',
+            query: {
+              fromPay: '1',
+              orderId: orderId.value,
+            },
           })
-
-          // 延迟跳转回首页
-          setTimeout(() => {
-            router.push('/')
-          }, 1000)
-        } else {
-          // 货到付款：直接跳转到订单列表页
-          ElMessage({
-            type: 'success',
-            message: '订单已提交，请准备收货付款',
-            duration: 1500,
-          })
-
-          // 延迟跳转到订单列表页
-          setTimeout(() => {
-            router.push('/member/order')
-          }, 1000)
-        }
-      }, 1200)
+        }, 500)
+      } catch (error) {
+        loading.close()
+        ElMessage({
+          type: 'error',
+          message: '支付确认失败，请稍后重试',
+        })
+      } finally {
+        confirming.value = false
+      }
     })
     .catch(() => {
       // 用户取消支付不执行任何操作
     })
+}
+
+const handlePayLater = (): void => {
+  ElMessage({
+    type: 'info',
+    message: '订单已保留，可在我的订单继续支付',
+    duration: 1500,
+  })
+  setTimeout(() => {
+    router.push('/member/order')
+  }, 600)
 }
 </script>
 
@@ -120,9 +131,19 @@ const handleConfirmPay = (): void => {
         </div>
         <div class="content">
           <p class="notice">您正在进行校园惠快速结算，点击下方按钮即可完成支付。</p>
-          <el-button type="primary" class="main-pay-btn" size="large" @click="handleConfirmPay">
-            {{ payButtonText }}
-          </el-button>
+          <div class="pay-actions">
+            <el-button
+              type="primary"
+              class="main-pay-btn"
+              size="large"
+              :disabled="!canConfirmPay"
+              @click="handleConfirmPay"
+            >
+              {{ payButtonText }}
+            </el-button>
+            <el-button plain class="later-pay-btn" size="large" @click="handlePayLater">稍后支付</el-button>
+          </div>
+          <p v-if="payInfo.orderState !== 1" class="safe-tip">当前订单状态不可支付，请前往我的订单查看</p>
           <p class="safe-tip">支付保障：校园惠安全支付系统</p>
         </div>
       </div>
@@ -209,19 +230,34 @@ const handleConfirmPay = (): void => {
       font-size: 16px;
     }
 
+    .pay-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .main-pay-btn,
+    .later-pay-btn {
+      width: 220px;
+      height: 52px;
+      font-size: 18px;
+      border-radius: $borderRadiusSmall;
+    }
+
     .main-pay-btn {
-      width: 300px;
-      height: 55px;
-      font-size: 20px;
       background-color: $campusColor;
       border-color: $campusColor;
-      border-radius: 4px;
       transition: all 0.3s;
-
       &:hover {
-        opacity: 0.9;
-        transform: scale(1.02);
+        opacity: 0.92;
       }
+    }
+
+    .later-pay-btn {
+      color: $campusColor;
+      border-color: rgba($campusColor, 0.35);
     }
 
     .safe-tip {

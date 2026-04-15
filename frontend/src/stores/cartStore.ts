@@ -159,7 +159,7 @@ export const useCartStore = defineStore(
      */
     const allCheck = async (selected: boolean): Promise<void> => {
       if (isLogin.value) {
-        await batchUpdateCartAPI({ selected, ids: cartList.value.map((i) => i.skuId) })
+        await batchUpdateCartAPI({ selected })
         await updateCartList()
       } else {
         cartList.value.forEach((item) => (item.selected = selected))

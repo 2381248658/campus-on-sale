@@ -36,7 +36,7 @@ const confirm = (): void => {
               </template>
             </el-popconfirm>
           </li>
-          <li><a href="javascript:;">我的订单</a></li>
+          <li><a href="javascript:;" @click="$router.push('/member/order')">我的订单</a></li>
           <li>
             <a href="javascript:;" @click="$router.push('/member')">会员中心</a>
           </li>
