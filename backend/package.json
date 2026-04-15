@@ -7,7 +7,8 @@
 		"dev": "nodemon --watch src --ext ts,js --exec \"node --loader ts-node/esm\" src/app.ts",
 		"build": "rimraf dist && tsc",
 		"start": "node dist/app.js",
-		"seed": "node --loader ts-node/esm src/seed.ts"
+		"seed": "node --loader ts-node/esm src/seed/index.ts",
+		"seed:reset": "node --loader ts-node/esm src/seed/index.ts --reset"
 	},
 	"keywords": [],
 	"author": "",

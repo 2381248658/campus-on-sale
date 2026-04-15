@@ -15,8 +15,8 @@ export function useBanner() {
    */
   const getBanner = async () => {
     try {
-      // distributionsite: '2' 为首页分类/商品页 banner 标识
-      const res = await getBannerAPI({ distributionsite: '2' })
+      // 不再传递 distributionsite 参数，获取所有轮播图
+      const res = await getBannerAPI()
 
       /**
        * 响应数据脱壳处理 (兼容性逻辑)

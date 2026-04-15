@@ -4,17 +4,10 @@ import type { Banner, FreshGoods, HotRecommend, HomeProduct } from '@/types/api'
 // ============================================
 // 1.1 获取首页/商品页轮播图
 // ============================================
-
-export interface BannerParams {
-  distributionsite?: string
-}
-
-export function getBannerAPI(params: BannerParams = {}): Promise<Banner[]> {
-  const { distributionsite = '1' } = params
+export function getBannerAPI(): Promise<Banner[]> {
   return httpInstance({
     url: '/recommend/banner',
     method: 'get',
-    params: { distributionsite },
   })
 }
 

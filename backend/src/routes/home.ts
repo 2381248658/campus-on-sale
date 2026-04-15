@@ -8,11 +8,7 @@ const router = express.Router();
 // 1.1 获取轮播图
 router.get('/recommend/banner', async (req, res) => {
 	try {
-		const { distributionsite = '1' } = req.query;
-		// 修复：加上 as string 断言
-		const banners = await Banner.find({
-			distributionSite: distributionsite as string,
-		}).lean();
+		const banners = await Banner.find({}).lean();
 		res.json({
 			code: '1',
 			msg: '操作成功',
@@ -36,7 +32,7 @@ router.get('/home/category/head', async (req, res) => {
 				const [goods, children] = await Promise.all([
 					Goods.find({ categoryId: cat._id })
 						.sort({ orderNum: -1 })
-						.limit(9) // 侧边栏每个分类显示 9 个商品
+						.limit(9)
 						.lean(),
 					Category.find({ parentId: cat._id }).lean(),
 				]);

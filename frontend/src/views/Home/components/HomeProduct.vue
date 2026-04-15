@@ -45,7 +45,7 @@ onMounted(() => {
           </strong>
         </RouterLink>
         <ul class="goods-list">
-          <li v-for="good in cate.goods" :key="good.id">
+          <li v-for="good in cate.goods?.slice(0, 8)" :key="good.id">
             <GoodsItem :good="good"></GoodsItem>
           </li>
         </ul>

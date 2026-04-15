@@ -56,7 +56,7 @@ const categoryStore = useCategoryStore()
       height: 100px;
       text-decoration: none;
       background: url('@/assets/images/logo.png') no-repeat center 10px / contain;
-      transform: scale(1.2);
+      transform: scale(1);
     }
   }
 

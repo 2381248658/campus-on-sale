@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosError, AxiosInstance } from 'axios'
 import 'element-plus/theme-chalk/el-message.css'
 import { ElMessage } from 'element-plus'
 
@@ -6,7 +6,7 @@ import { ElMessage } from 'element-plus'
 
 const httpInstance: AxiosInstance = axios.create({
   // 🔥 唯一修改：替换为 Apifox 云端 Mock 完整地址（包含你的接口前缀）
-  baseURL: 'https://m1.apifoxmock.com/m1/7606020-7344783-default',
+  baseURL: 'http://localhost:3000',
   timeout: 10000,
 })
 

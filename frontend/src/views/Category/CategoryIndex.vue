@@ -8,7 +8,6 @@
 import GoodsItem from '../Home/components/GoodsItem.vue'
 import { useBanner } from './composables/useBanner'
 import { useCategory } from './composables/useCategory'
-import type { Banner, ChildCategory } from '@/types/api'
 
 // 轮播图业务逻辑
 const { bannerList } = useBanner()
@@ -100,6 +99,7 @@ const { categoryData } = useCategory()
       display: flex;
       padding: 20px 32px;
       flex-wrap: wrap;
+      justify-content: space-evenly;
 
       li {
         width: 168px;
@@ -158,6 +158,7 @@ const { categoryData } = useCategory()
       flex-wrap: wrap;
       padding: 0 20px 30px;
       gap: 15px;
+      justify-content: space-evenly;
     }
   }
 }

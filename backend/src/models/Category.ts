@@ -11,6 +11,15 @@ const categorySchema = new Schema(
 			ref: 'Category',
 			default: null,
 		},
+		goods: [
+			{
+				id: { type: String },
+				name: { type: String },
+				desc: { type: String },
+				price: { type: Number },
+				picture: { type: String },
+			},
+		],
 	},
 	{ timestamps: true, versionKey: false },
 );
