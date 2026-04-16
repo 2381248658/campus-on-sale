@@ -62,7 +62,7 @@ const singleCheck = (skuId: string, selected: boolean) => {
               </td>
               <td>
                 <div class="goods">
-                  <RouterLink :to="`/detail/${i.id}`">
+                  <RouterLink :to="i.goodsId ? `/detail/${i.goodsId}` : '#'">
                     <img v-img-lazy="i.picture" alt="校园好物" />
                   </RouterLink>
                   <div>

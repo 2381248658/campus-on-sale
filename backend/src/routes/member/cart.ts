@@ -68,6 +68,7 @@ router.get('/', async (req, res) => {
 				return {
 					id: cartItem._id.toString(),
 					skuId: cartItem.skuId,
+					goodsId: null,
 					name: '商品已失效',
 					picture: '',
 					price: 0,
@@ -88,6 +89,7 @@ router.get('/', async (req, res) => {
 				return {
 					id: cartItem._id.toString(),
 					skuId: cartItem.skuId,
+					goodsId: targetGoods._id.toString(),
 					name: `${targetGoods.name} (规格已失效)`,
 					picture: targetGoods.picture,
 					price: targetGoods.oldPrice || 0,
@@ -107,6 +109,7 @@ router.get('/', async (req, res) => {
 			return {
 				id: cartItem._id.toString(),
 				skuId: cartItem.skuId,
+				goodsId: targetGoods._id.toString(),
 				name: targetGoods.name,
 				picture: targetGoods.picture,
 				price: targetGoods.oldPrice,

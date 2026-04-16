@@ -14,7 +14,7 @@ const cartStore = useCartStore()
     <div class="layer">
       <div class="list">
         <div class="item" v-for="i in cartStore.cartList" :key="i.skuId">
-          <RouterLink :to="`/detail/${i.id}`">
+          <RouterLink :to="i.goodsId ? `/detail/${i.goodsId}` : '#'">
             <img
               v-img-lazy="i.picture"
               alt="校园好物"

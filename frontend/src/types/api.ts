@@ -243,6 +243,7 @@ export interface LikeListParams {
 export interface CartItem {
   id: string
   skuId: string
+  goodsId: string | null
   name: string
   picture: string
   price: number
