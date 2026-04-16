@@ -2,8 +2,7 @@
 import { ref, watch } from 'vue'
 import { useMouseInElement } from '@vueuse/core'
 
-// props适配主图列表
-const props = defineProps<{
+defineProps<{
   imageList: string[]
 }>()
 

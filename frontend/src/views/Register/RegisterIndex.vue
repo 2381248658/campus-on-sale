@@ -3,35 +3,56 @@ import { ref } from 'vue'
 import 'element-plus/theme-chalk/el-message.css'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import { useRoute } from 'vue-router'
 import router from '@/router'
 import { useUserStore } from '@/stores/userStore'
 
 const userStore = useUserStore()
-const route = useRoute()
 const formRef = ref<FormInstance>()
 
-interface LoginForm {
+interface RegisterForm {
   account: string
   password: string
+  confirmPassword: string
+  nickname: string
   agree: boolean
 }
 
-const form = ref<LoginForm>({
+const form = ref<RegisterForm>({
   account: '',
   password: '',
+  confirmPassword: '',
+  nickname: '',
   agree: false,
 })
 
-const rules: FormRules<LoginForm> = {
-  account: [{ required: true, message: '学号不能为空', trigger: 'blur' }],
+const validateConfirmPassword = (
+  _rule: unknown,
+  value: string,
+  callback: (err?: Error) => void,
+) => {
+  if (value !== form.value.password) {
+    callback(new Error('两次输入的密码不一致'))
+  } else {
+    callback()
+  }
+}
+
+const rules: FormRules<RegisterForm> = {
+  account: [
+    { required: true, message: '学号不能为空', trigger: 'blur' },
+    { min: 4, max: 20, message: '学号长度应在4~20位之间', trigger: 'blur' },
+  ],
   password: [
     { required: true, message: '密码不能为空', trigger: 'blur' },
     { min: 6, max: 14, message: '密码应该在6~14位之间', trigger: 'blur' },
   ],
+  confirmPassword: [
+    { required: true, message: '请确认密码', trigger: 'blur' },
+    { validator: validateConfirmPassword, trigger: 'blur' },
+  ],
   agree: [
     {
-      validator: (rule, value, callback) => {
+      validator: (_rule, value, callback) => {
         if (value) {
           callback()
         } else {
@@ -42,17 +63,16 @@ const rules: FormRules<LoginForm> = {
   ],
 }
 
-const doLogin = () => {
-  const { account, password } = form.value
+const doRegister = () => {
+  const { account, password, nickname } = form.value
   formRef.value?.validate(async (valid) => {
     if (valid) {
       try {
-        await userStore.getUserInfo({ account, password })
-        ElMessage({ type: 'success', message: '登录成功' })
-        const redirect = (route.query.redirect as string) || '/'
-        router.replace(redirect)
+        await userStore.registerUserInfo({ account, password, nickname: nickname || undefined })
+        ElMessage({ type: 'success', message: '注册成功' })
+        router.replace({ path: '/' })
       } catch (err) {
-        console.log('登录出错啦', err)
+        console.log('注册出错啦', err)
       }
     }
   })
@@ -60,8 +80,8 @@ const doLogin = () => {
 </script>
 
 <template>
-  <div class="login-page">
-    <header class="login-header">
+  <div class="register-page">
+    <header class="register-header">
       <div class="container">
         <h1 class="logo">
           <RouterLink to="/">EasyHub</RouterLink>
@@ -74,16 +94,19 @@ const doLogin = () => {
       </div>
     </header>
 
-    <section class="login-section">
+    <section class="register-section">
       <div class="wrapper">
         <nav>
-          <a href="javascript:;">账户登录</a>
+          <a href="javascript:;">账户注册</a>
         </nav>
         <div class="account-box">
           <div class="form">
             <el-form ref="formRef" :model="form" :rules="rules" status-icon label-position="top">
               <el-form-item label="学号" prop="account">
                 <el-input v-model="form.account" placeholder="请输入学号" />
+              </el-form-item>
+              <el-form-item label="昵称" prop="nickname">
+                <el-input v-model="form.nickname" placeholder="请输入昵称（选填，默认使用学号）" />
               </el-form-item>
               <el-form-item label="密码" prop="password">
                 <el-input
@@ -93,22 +116,28 @@ const doLogin = () => {
                   show-password
                 />
               </el-form-item>
+              <el-form-item label="确认密码" prop="confirmPassword">
+                <el-input
+                  v-model="form.confirmPassword"
+                  type="password"
+                  placeholder="请再次输入密码"
+                  show-password
+                />
+              </el-form-item>
               <el-form-item prop="agree">
                 <el-checkbox size="large" v-model="form.agree">
                   我已同意隐私条款和服务条款
                 </el-checkbox>
               </el-form-item>
-              <el-button size="large" class="subBtn" @click="doLogin">点击登录</el-button>
-              <div class="to-register">
-                还没有账号？<RouterLink to="/register">立即注册</RouterLink>
-              </div>
+              <el-button size="large" class="subBtn" @click="doRegister">点击注册</el-button>
+              <div class="to-login">已有账号？<RouterLink to="/login">去登录</RouterLink></div>
             </el-form>
           </div>
         </div>
       </div>
     </section>
 
-    <footer class="login-footer">
+    <footer class="register-footer">
       <div class="container">
         <p>
           <a href="javascript:;">关于我们</a>
@@ -128,13 +157,12 @@ const doLogin = () => {
 <style scoped lang="scss">
 @use 'sass:color';
 
-.login-page {
-  // 局部限制当前页面最大宽度，配合 min-width 形成安全夹角
+.register-page {
   max-width: 100vw;
   overflow-x: hidden;
 }
 
-.login-header {
+.register-header {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(228, 228, 228, 0.5);
@@ -186,16 +214,16 @@ const doLogin = () => {
   }
 }
 
-.login-section {
+.register-section {
   background: url('@/assets/images/login-bg.jpg') no-repeat center / cover;
-  height: 634px;
+  height: 734px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 10%; // 🌟 优化：用百分比代替固定 margin，保证不被挤出屏幕
+  padding-right: 10%;
 
   .wrapper {
-    width: 420px; // 🌟 优化：恢复标准宽度，去掉 1.3 倍放大导致的臃肿
+    width: 420px;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
@@ -244,18 +272,17 @@ const doLogin = () => {
 
 .account-box {
   .form {
-    padding: 35px 40px 45px; // 🌟 优化：缩小内边距，防止挤压
+    padding: 30px 40px 40px;
 
     :deep(.el-form) {
       width: 100%;
     }
 
-    // 🌟 优化：因为改成了 label-position="top"，去掉 label-width 的挤压
     :deep(.el-form-item) {
-      margin-bottom: 22px;
+      margin-bottom: 18px;
 
       &:last-of-type {
-        margin-bottom: 30px;
+        margin-bottom: 24px;
       }
 
       .el-form-item__label {
@@ -273,7 +300,7 @@ const doLogin = () => {
       --el-input-border-radius: 8px;
 
       .el-input__wrapper {
-        height: 50px;
+        height: 46px;
         border-radius: 8px;
         transition: all 0.3s ease;
 
@@ -284,8 +311,8 @@ const doLogin = () => {
       }
 
       .el-input__inner {
-        height: 50px;
-        line-height: 50px;
+        height: 46px;
+        line-height: 46px;
         font-size: 16px;
       }
     }
@@ -298,7 +325,7 @@ const doLogin = () => {
       .el-checkbox__label {
         font-size: 14px;
         color: #5f6368;
-        white-space: normal; // 允许协议文字换行
+        white-space: normal;
       }
     }
   }
@@ -335,7 +362,7 @@ const doLogin = () => {
   }
 }
 
-.to-register {
+.to-login {
   text-align: center;
   margin-top: 16px;
   font-size: 14px;
@@ -352,7 +379,7 @@ const doLogin = () => {
   }
 }
 
-.login-footer {
+.register-footer {
   padding: 40px 0 30px;
   background: rgba(255, 255, 255, 0.95);
   border-top: 1px solid rgba(228, 228, 228, 0.5);

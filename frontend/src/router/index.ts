@@ -6,12 +6,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import type { RouterScrollBehavior } from 'vue-router'
 
 import Layout from '@/views/Layout/LayoutIndex.vue'
-// 登录页通常也是高频且关键页面，可以静态也可以动态
 import Login from '@/views/Login/LoginIndex.vue'
-
-// ============================================
-// 路由配置
-// ============================================
 
 const routes: RouteRecordRaw[] = [
   {
@@ -86,21 +81,18 @@ const routes: RouteRecordRaw[] = [
     name: 'login',
     component: Login,
   },
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import('@/views/Register/RegisterIndex.vue'),
+  },
 ]
-
-// ============================================
-// 滚动行为
-// ============================================
 
 const scrollBehavior: RouterScrollBehavior = () => {
   return {
     top: 0,
   }
 }
-
-// ============================================
-// 创建路由实例
-// ============================================
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -111,10 +103,6 @@ const router = createRouter({
 router.beforeEach((to, _from, next) => {
   const protectedPaths = ['/checkout', '/pay', '/member']
   const requiresAuth = protectedPaths.some((path) => to.path.startsWith(path))
-  if (!requiresAuth) {
-    next()
-    return
-  }
 
   const persistedUser = localStorage.getItem('user')
   let token = ''
@@ -124,6 +112,20 @@ router.beforeEach((to, _from, next) => {
     } catch {
       token = ''
     }
+  }
+
+  if (to.name === 'login' || to.name === 'register') {
+    if (token) {
+      next({ path: '/' })
+    } else {
+      next()
+    }
+    return
+  }
+
+  if (!requiresAuth) {
+    next()
+    return
   }
 
   if (token) {

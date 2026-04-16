@@ -32,7 +32,7 @@ onMounted(() => getLikeList())
           "
         />
       </div>
-      <h4>{{ userStore.userInfo?.account || '尊贵的校园用户' }}</h4>
+      <h4>{{ userStore.userInfo?.nickname || '尊贵的校园用户' }}</h4>
     </div>
     <div class="item">
       <a href="javascript:;">

@@ -17,6 +17,12 @@ export interface LoginParams {
   password: string
 }
 
+export interface RegisterParams {
+  account: string
+  password: string
+  nickname?: string
+}
+
 export interface LoginResult {
   id: string
   account: string

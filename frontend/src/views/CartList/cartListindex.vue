@@ -2,9 +2,7 @@
 import { useCartStore } from '@/stores/cartStore'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-// 👇 新增：导入Element Plus 复选框类型
 import type { CheckboxValueType } from 'element-plus'
-import type { CartItem } from '@/types/api'
 
 const cartStore = useCartStore()
 const router = useRouter()

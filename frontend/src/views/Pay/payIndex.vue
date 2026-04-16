@@ -83,7 +83,7 @@ const handleConfirmPay = (): void => {
             },
           })
         }, 500)
-      } catch (error) {
+      } catch {
         loading.close()
         ElMessage({
           type: 'error',
