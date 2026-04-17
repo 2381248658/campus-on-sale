@@ -13,9 +13,6 @@ import { PluginManager } from './components'
 import App from './App.vue'
 import router from './router'
 
-// Element Plus 样式
-import 'element-plus/dist/index.css'
-
 const app = createApp(App)
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)

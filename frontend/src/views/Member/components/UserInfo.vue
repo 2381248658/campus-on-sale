@@ -25,12 +25,7 @@ onMounted(() => getLikeList())
   <div class="home-overview">
     <div class="user-meta">
       <div class="avatar">
-        <img
-          :src="
-            userStore.userInfo?.avatar ||
-            'http://yjy-xiaotuxian-dev.oss-cn-beijing.aliyuncs.com/uploads/avatar_1.png'
-          "
-        />
+        <img src="@/assets/images/head.jpg" alt="用户头像" />
       </div>
       <h4>{{ userStore.userInfo?.nickname || '尊贵的校园用户' }}</h4>
     </div>
@@ -65,14 +60,40 @@ onMounted(() => getLikeList())
 <style scoped lang="scss">
 .home-overview {
   height: 132px;
-  background: url(@/assets/images/center-bg.png) no-repeat center / cover;
+  background: linear-gradient(135deg, $campusColor 0%, #004080 50%, #003366 100%);
   display: flex;
   border-radius: $borderRadiusSmall $borderRadiusSmall 0 0;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
 
   .user-meta {
     flex: 1;
     display: flex;
     align-items: center;
+    position: relative;
+    z-index: 1;
 
     .avatar {
       width: 85px;
@@ -102,6 +123,8 @@ onMounted(() => getLikeList())
     display: flex;
     align-items: center;
     justify-content: space-around;
+    position: relative;
+    z-index: 1;
 
     a {
       color: white;
