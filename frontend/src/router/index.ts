@@ -4,6 +4,7 @@
  */
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import type { RouterScrollBehavior } from 'vue-router'
+import { ElLoading } from 'element-plus'
 
 import Layout from '@/views/Layout/LayoutIndex.vue'
 import Login from '@/views/Login/LoginIndex.vue'
@@ -100,7 +101,15 @@ const router = createRouter({
   scrollBehavior,
 })
 
+let loadingInstance: ReturnType<typeof ElLoading.service> | null = null
+
 router.beforeEach((to, _from, next) => {
+  loadingInstance = ElLoading.service({
+    lock: true,
+    text: '页面加载中...',
+    background: 'rgba(255, 255, 255, 0.7)',
+  })
+
   const protectedPaths = ['/checkout', '/pay', '/member']
   const requiresAuth = protectedPaths.some((path) => to.path.startsWith(path))
 
@@ -133,6 +142,11 @@ router.beforeEach((to, _from, next) => {
   } else {
     next({ path: '/login', query: { redirect: to.fullPath } })
   }
+})
+
+router.afterEach(() => {
+  loadingInstance?.close()
+  loadingInstance = null
 })
 
 export default router
