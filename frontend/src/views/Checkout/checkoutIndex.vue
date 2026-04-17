@@ -9,10 +9,18 @@ import {
 import { onMounted, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useCartStore } from '@/stores/cartStore'
 import { User, Iphone, Location } from '@element-plus/icons-vue'
-import type { CheckoutInfo, OrderGoods, Address, AddressApiItem, AddressFormData } from '@/types/api'
+import type {
+  CheckoutInfo,
+  OrderGoods,
+  Address,
+  AddressApiItem,
+  AddressFormData,
+} from '@/types/api'
 
 const router = useRouter()
+const cartStore = useCartStore()
 const checkInfo = ref<CheckoutInfo>({} as CheckoutInfo)
 const checkoutLoading = ref<boolean>(false)
 const submitLoading = ref<boolean>(false)
@@ -310,6 +318,8 @@ const createOrder = async (): Promise<void> => {
     if (!orderId) {
       throw new Error('订单 ID 获取失败')
     }
+
+    await cartStore.clearSelectedCart()
 
     ElMessage.success('订单已生成，正在前往支付页...')
     router.push({
