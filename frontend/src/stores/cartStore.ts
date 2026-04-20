@@ -1,3 +1,8 @@
+/**
+ * @file 购物车状态管理
+ * @description 管理购物车数据，包括商品列表、选中状态、价格计算等
+ *              支持登录/未登录两种状态下的购物车操作
+ */
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useUserStore } from './userStore'
@@ -11,10 +16,7 @@ import {
 } from '@/apis/carts'
 import type { CartItem, MergeCartItem, UpdateCartParams } from '@/types/api'
 
-// ============================================
-// 添加购物车商品参数（本地未登录状态）
-// ============================================
-
+/** 添加购物车商品参数 */
 export interface AddCartGoods {
   skuId: string
   count: number
@@ -29,18 +31,19 @@ export interface AddCartGoods {
 export const useCartStore = defineStore(
   'cart',
   () => {
+    /** 用户状态 */
     const userStore = useUserStore()
+    /** 是否已登录 */
     const isLogin = computed<boolean>(() => !!userStore.userInfo?.token)
+    /** 购物车商品列表 */
     const cartList = ref<CartItem[]>([])
 
-    // ============================================
-    // 计算属性 (增加容错)
-    // ============================================
-
+    /** 购物车商品总数量（件） */
     const allCount = computed<number>(() =>
       cartList.value.reduce((a, c) => a + (Number(c.count) || 0), 0),
     )
 
+    /** 购物车商品总价（元） */
     const allPrice = computed<number>(() =>
       cartList.value.reduce(
         (a, c) => a + Number(c.nowPrice || c.price || 0) * (Number(c.count) || 0),
@@ -48,12 +51,14 @@ export const useCartStore = defineStore(
       ),
     )
 
+    /** 已选中商品数量（件） */
     const selectedCount = computed<number>(() =>
       cartList.value
         .filter((item) => item.selected)
         .reduce((a, c) => a + (Number(c.count) || 0), 0),
     )
 
+    /** 已选中商品总价（元） */
     const selectedPrice = computed<number>(() =>
       cartList.value
         .filter((item) => item.selected)
@@ -63,16 +68,14 @@ export const useCartStore = defineStore(
         }, 0),
     )
 
+    /** 是否全选 */
     const isAll = computed<boolean>(
       () => cartList.value.length > 0 && cartList.value.every((item) => item.selected),
     )
 
-    // ============================================
-    // Actions
-    // ============================================
-
     /**
-     * 刷新购物车列表（登录状态）
+     * 从服务器同步购物车列表
+     * @description 登录状态下从服务器获取最新购物车数据
      */
     const updateCartList = async (): Promise<void> => {
       if (!isLogin.value) return
@@ -81,7 +84,8 @@ export const useCartStore = defineStore(
     }
 
     /**
-     * 合并本地购物车到云端（登录后执行）
+     * 合并本地购物车到服务器
+     * @description 登录时将本地购物车数据合并到服务器
      */
     const mergeCart = async (): Promise<void> => {
       if (cartList.value.length > 0) {
@@ -97,7 +101,7 @@ export const useCartStore = defineStore(
 
     /**
      * 添加商品到购物车
-     * @param goods - 商品信息
+     * @param goods - 商品信息（skuId、count必填）
      */
     const addCart = async (goods: AddCartGoods): Promise<void> => {
       if (isLogin.value) {
@@ -108,15 +112,14 @@ export const useCartStore = defineStore(
         if (item) {
           item.count += goods.count
         } else {
-          // 确保所有添加到购物车的商品都有明确的selected初始值（默认选中）
           cartList.value.push({ ...goods, selected: true } as CartItem)
         }
       }
     }
 
     /**
-     * 删除购物车商品
-     * @param skuId - SKU ID
+     * 从购物车删除商品
+     * @param skuId - 商品SKU ID
      */
     const delCart = async (skuId: string): Promise<void> => {
       if (isLogin.value) {
@@ -128,9 +131,9 @@ export const useCartStore = defineStore(
     }
 
     /**
-     * 更新单项状态 (单选/改数量)
-     * @param skuId - SKU ID
-     * @param params - 更新参数
+     * 更新购物车商品信息
+     * @param skuId - 商品SKU ID
+     * @param params - 更新参数（selected选中状态、count数量）
      */
     const updateCartItem = async (
       skuId: string,
@@ -142,10 +145,7 @@ export const useCartStore = defineStore(
       if (isLogin.value) {
         const finalSelected = selected !== undefined ? selected : item.selected
         const finalCount = count !== undefined ? count : item.count
-        await updateNewCartAPI(skuId, {
-          selected: finalSelected,
-          count: finalCount,
-        })
+        await updateNewCartAPI(skuId, { selected: finalSelected, count: finalCount })
         await updateCartList()
       } else {
         if (selected !== undefined) item.selected = selected
@@ -155,7 +155,7 @@ export const useCartStore = defineStore(
 
     /**
      * 全选/取消全选
-     * @param selected - 选中状态
+     * @param selected - 是否全选
      */
     const allCheck = async (selected: boolean): Promise<void> => {
       if (isLogin.value) {
@@ -167,33 +167,25 @@ export const useCartStore = defineStore(
     }
 
     /**
-     * 精准清除选中商品 (用于支付成功后)
+     * 清除已选中的商品
+     * @description 删除所有选中状态的购物车商品
      */
     const clearSelectedCart = async (): Promise<void> => {
       if (isLogin.value) {
-        // 找到所有选中的 skuId
         const selectedIds = cartList.value.filter((item) => item.selected).map((item) => item.skuId)
-
         if (selectedIds.length > 0) {
-          await delCartAPI(selectedIds) // 批量删除
-          await updateCartList() // 同步后端列表
+          await delCartAPI(selectedIds)
+          await updateCartList()
         }
       } else {
-        // 未登录：直接本地过滤
         cartList.value = cartList.value.filter((item) => !item.selected)
       }
     }
 
-    /**
-     * 清空购物车
-     */
+    /** 清空购物车 */
     const clearCart = (): void => {
       cartList.value = []
     }
-
-    // ============================================
-    // Return
-    // ============================================
 
     return {
       cartList,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getBannerAPI } from '@/apis/homeAPI'
+import { getBannerAPI } from '@/apis/home'
 import { onMounted, ref } from 'vue'
 import type { Banner } from '@/types/api'
 

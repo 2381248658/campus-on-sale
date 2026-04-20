@@ -1,3 +1,7 @@
+<!--
+  @file 商品详情页
+  @description 展示商品详情信息，支持规格选择、加入购物车
+-->
 <script setup lang="ts">
 import { getDetail } from '@/apis/detail'
 import { onMounted, ref } from 'vue'
@@ -9,16 +13,18 @@ import { useCartStore } from '@/stores/cartStore'
 import type { GoodsDetail } from '@/types/api'
 
 const cartStore = useCartStore()
+/** 商品详情数据 */
 const goods = ref<GoodsDetail>({} as GoodsDetail)
 const route = useRoute()
 
-// 1. 获取校园商品详细信息
+/**
+ * 获取商品详情
+ * @param id - 商品ID
+ */
 const getGoods = async (id: string | string[] = route.params.id) => {
   try {
     const res = await getDetail(id as string)
-
     goods.value = res
-    // console.log('当前商品详情:', goods.value)
   } catch (err) {
     console.error('获取商品详情失败:', err)
   }
@@ -26,15 +32,14 @@ const getGoods = async (id: string | string[] = route.params.id) => {
 
 onMounted(() => getGoods())
 
-// 处理详情页内跳转不刷新问题（如点击下方的热榜商品）
 onBeforeRouteUpdate((to) => {
   getGoods(to.params.id)
 })
 
-// 2. 数量与规格处理
+/** 购买数量 */
 const count = ref<number>(1)
 
-// 存储当前选中的 SKU 信息
+/** SKU选择结果 */
 interface SkuObj {
   skuId?: string
   price?: number
@@ -42,20 +47,24 @@ interface SkuObj {
   specsText?: string
 }
 
-let skuObj = ref<SkuObj>({})
+const skuObj = ref<SkuObj>({})
 
+/**
+ * SKU变更回调
+ * @param sku - 选中的SKU信息
+ */
 const skuChange = (sku: SkuObj) => {
   skuObj.value = sku
-  // 价格联动逻辑：当选中完整规格时，更新界面显示的价格
   if (sku.skuId) {
     goods.value.price = sku.price || goods.value.price
     goods.value.oldPrice = sku.oldPrice || goods.value.oldPrice
   }
 }
 
-// 3. 添加购物车逻辑
+/**
+ * 加入购物车
+ */
 const addCart = () => {
-  // 规格校验
   if (!skuObj.value.skuId) {
     return ElMessage.warning('请选择商品规格（如成色/版本）')
   }
@@ -79,6 +88,7 @@ const addCart = () => {
 <template>
   <div class="campus-goods-page">
     <div class="container" v-if="goods.id">
+      <!-- ========== 面包屑导航 ========== -->
       <div class="bread-container">
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">校园首页</el-breadcrumb-item>
@@ -93,11 +103,12 @@ const addCart = () => {
         </el-breadcrumb>
       </div>
 
+      <!-- ========== 商品信息区域 ========== -->
       <div class="info-container">
         <div class="goods-info">
+          <!-- ========== 左侧媒体区域 ========== -->
           <div class="media">
             <ViewIndex :image-list="goods.mainPictures" />
-
             <ul class="goods-sales">
               <li>
                 <p>近期热度</p>
@@ -122,6 +133,7 @@ const addCart = () => {
             </ul>
           </div>
 
+          <!-- ========== 右侧规格区域 ========== -->
           <div class="spec">
             <p class="g-name">{{ goods.name }}</p>
             <p class="g-desc">{{ goods.desc }}</p>
@@ -153,10 +165,11 @@ const addCart = () => {
               <el-input-number v-model="count" :min="1" :max="goods.inventory || 99" />
             </div>
 
-            <el-button size="large" class="btn" @click="addCart"> 加入购物车 </el-button>
+            <el-button size="large" class="btn" @click="addCart">加入购物车</el-button>
           </div>
         </div>
 
+        <!-- ========== 底部详情区域 ========== -->
         <div class="goods-footer">
           <div class="goods-article">
             <div class="goods-tabs">
@@ -172,7 +185,6 @@ const addCart = () => {
               </div>
             </div>
           </div>
-
           <div class="goods-aside">
             <DetailHot :hot-type="1" title="24小时热搜" />
             <DetailHot :hot-type="2" title="周榜好物" />
@@ -186,17 +198,16 @@ const addCart = () => {
 <style scoped lang="scss">
 @use 'sass:color';
 
+/* ========== 商品详情页 ========== */
 .campus-goods-page {
   .goods-info {
     min-height: 600px;
     background: #fff;
     display: flex;
-
     .media {
       width: 580px;
       padding: 30px 50px;
     }
-
     .spec {
       flex: 1;
       padding: 30px 30px 30px 0;
@@ -206,31 +217,27 @@ const addCart = () => {
   .goods-footer {
     display: flex;
     margin-top: 20px;
-
     .goods-article {
       width: 940px;
       margin-right: 20px;
     }
-
     .goods-aside {
       width: 280px;
     }
   }
 
+  /* ========== 商品标签页 ========== */
   .goods-tabs {
     background: #fff;
-
     nav {
       height: 70px;
       line-height: 70px;
       display: flex;
       border-bottom: 1px solid #f5f5f5;
-
       a {
         padding: 0 40px;
         font-size: 18px;
         position: relative;
-
         &::after {
           content: '';
           position: absolute;
@@ -244,11 +251,11 @@ const addCart = () => {
     }
   }
 
+  /* ========== 数量选择 ========== */
   .number-box {
     display: flex;
     align-items: center;
     margin: 20px 0;
-
     .label {
       width: 60px;
       color: #999;
@@ -259,27 +266,24 @@ const addCart = () => {
   .g-name {
     font-size: 22px;
   }
-
   .g-desc {
     color: #999;
     margin-top: 10px;
   }
 
+  /* ========== 价格样式 ========== */
   .g-price {
     margin-top: 10px;
-
     span {
       &::before {
         content: '¥';
         font-size: 14px;
       }
-
       &:first-child {
         color: $priceColor;
         margin-right: 10px;
         font-size: 22px;
       }
-
       &:last-child {
         color: #999;
         text-decoration: line-through;
@@ -288,35 +292,30 @@ const addCart = () => {
     }
   }
 
+  /* ========== 服务保障 ========== */
   .g-service {
     background: #f5f5f5;
     width: 500px;
     padding: 20px 10px 0 10px;
     margin-top: 10px;
-
     dl {
       padding-bottom: 20px;
       display: flex;
       align-items: center;
-
       dt {
         width: 50px;
         color: #999;
       }
-
       dd {
         color: #666;
-
         span {
           margin-right: 10px;
-
           &::before {
             content: '•';
             color: $campusColor;
             margin-right: 2px;
           }
         }
-
         a {
           color: $campusColor;
         }
@@ -324,17 +323,16 @@ const addCart = () => {
     }
   }
 
+  /* ========== 销售数据 ========== */
   .goods-sales {
     display: flex;
     width: 400px;
     align-items: center;
     text-align: center;
     height: 140px;
-
     li {
       flex: 1;
       position: relative;
-
       ~ li::after {
         position: absolute;
         top: 10px;
@@ -343,26 +341,21 @@ const addCart = () => {
         border-left: 1px solid #e4e4e4;
         content: '';
       }
-
       p {
         &:first-child {
           color: #999;
         }
-
         &:nth-child(2) {
           color: $priceColor;
           margin-top: 10px;
         }
-
         &:last-child {
           color: #666;
           margin-top: 10px;
-
           i {
             color: $campusColor;
             font-size: 14px;
           }
-
           &:hover {
             color: $campusColor;
             cursor: pointer;
@@ -373,42 +366,38 @@ const addCart = () => {
   }
 }
 
+/* ========== 商品详情内容 ========== */
 .goods-detail {
   padding: 40px;
-
   .attrs {
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 30px;
-
     li {
       display: flex;
       margin-bottom: 10px;
       width: 50%;
-
       .dt {
         width: 100px;
         color: #999;
       }
-
       .dd {
         flex: 1;
         color: #666;
       }
     }
   }
-
   > img {
     width: 100%;
   }
 }
 
+/* ========== 加入购物车按钮 ========== */
 .btn {
   margin-top: 20px;
   background-color: $campusColor;
   color: #fff;
   border: none;
-
   &:hover {
     background-color: color.adjust($campusColor, $lightness: -5%);
   }

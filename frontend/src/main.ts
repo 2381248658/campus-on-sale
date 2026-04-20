@@ -1,25 +1,27 @@
 /**
- * 职责：创建 Vue 应用实例，挂载全局插件
+ * @file 应用入口
+ * @description 创建Vue应用实例，注册全局插件和指令
  */
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
-
-// 全局自定义插件
 import imgLazy from './directives/imgLazy'
 import { PluginManager } from './components'
-
-// 根组件 & 路由
 import App from './App.vue'
 import router from './router'
 
+// 创建Vue应用实例
 const app = createApp(App)
+
+// 创建Pinia状态管理并启用持久化插件
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
-app.use(pinia)
-app.use(router)
-app.use(imgLazy)
-app.use(PluginManager)
+// 注册全局插件
+app.use(pinia) // 状态管理
+app.use(router) // 路由
+app.use(imgLazy) // 图片懒加载指令
+app.use(PluginManager) // 全局组件
 
+// 挂载应用
 app.mount('#app')

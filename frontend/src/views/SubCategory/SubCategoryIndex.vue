@@ -1,3 +1,7 @@
+<!--
+  @file 二级分类页面
+  @description 展示二级分类下的商品列表，支持排序和无限加载
+-->
 <script setup lang="ts">
 import { getCategoryFilterAPI, getSubCategoryAPI } from '@/apis/category'
 import { onMounted, ref } from 'vue'
@@ -5,11 +9,13 @@ import { useRoute } from 'vue-router'
 import GoodsItem from '../Home/components/GoodsItem.vue'
 import type { SubCategoryFilter, CategoryGoods } from '@/types/api'
 
-// 筛选数据类型
+/** 筛选数据 */
 const filterData = ref<SubCategoryFilter>({} as SubCategoryFilter)
 const route = useRoute()
 
-// 1. 获取校园分类数据
+/**
+ * 获取分类筛选数据
+ */
 const getCategoryData = async (): Promise<void> => {
   try {
     const res = await getCategoryFilterAPI(route.params.id as string)
@@ -21,10 +27,10 @@ const getCategoryData = async (): Promise<void> => {
 
 onMounted(() => getCategoryData())
 
-// 2. 获取校内商品列表
+/** 商品列表 */
 const goodList = ref<CategoryGoods[]>([])
 
-// 请求参数类型
+/** 请求参数 */
 interface ReqData {
   categoryId: string
   page: number
@@ -39,6 +45,9 @@ const reqData = ref<ReqData>({
   sortField: 'publishTime',
 })
 
+/**
+ * 获取商品列表
+ */
 const getGoodList = async (): Promise<void> => {
   try {
     const res = await getSubCategoryAPI(reqData.value)
@@ -50,17 +59,23 @@ const getGoodList = async (): Promise<void> => {
 
 onMounted(() => getGoodList())
 
-// 3. 排序切换（最新/热度/评价）
+/**
+ * 排序切换
+ */
 const tabChange = (): void => {
   reqData.value.page = 1
   disabled.value = false
   getGoodList()
 }
 
-// 4. 无限加载逻辑
+/** 无限加载禁用状态 */
 const disabled = ref<boolean>(false)
+/** 加载中状态 */
 const loading = ref<boolean>(false)
 
+/**
+ * 无限加载
+ */
 const load = async (): Promise<void> => {
   if (loading.value) return
   loading.value = true
@@ -84,6 +99,7 @@ const load = async (): Promise<void> => {
 
 <template>
   <div class="container">
+    <!-- ========== 面包屑导航 ========== -->
     <div class="bread-container">
       <el-breadcrumb separator=">">
         <el-breadcrumb-item :to="{ name: 'home' }">校园首页</el-breadcrumb-item>
@@ -94,33 +110,40 @@ const load = async (): Promise<void> => {
       </el-breadcrumb>
     </div>
 
+    <!-- ========== 商品列表区域 ========== -->
     <div class="sub-container">
+      <!-- ========== 排序标签 ========== -->
       <el-tabs v-model="reqData.sortField" @tab-change="tabChange">
         <el-tab-pane label="最新发布" name="publishTime"></el-tab-pane>
         <el-tab-pane label="校园热度" name="orderNum"></el-tab-pane>
         <el-tab-pane label="学生好评" name="evaluateNum"></el-tab-pane>
       </el-tabs>
 
+      <!-- ========== 商品列表 ========== -->
       <div class="body" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
         <GoodsItem v-for="good in goodList" :good="good" :key="good.id" />
       </div>
 
+      <!-- ========== 加载完毕提示 ========== -->
       <div v-if="disabled" class="no-more">—— 已经到底啦，去看看其他校内好物吧 ——</div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+/* ========== 面包屑 ========== */
 .bread-container {
   padding: 25px 0;
   color: #666;
 }
 
+/* ========== 商品容器 ========== */
 .sub-container {
   padding: 20px 40px;
   background-color: #fff;
   border-radius: 8px;
 
+  /* ========== 商品列表 ========== */
   .body {
     display: flex;
     flex-wrap: wrap;
@@ -129,6 +152,7 @@ const load = async (): Promise<void> => {
     padding: 20px 0;
   }
 
+  /* ========== 加载完毕 ========== */
   .no-more {
     text-align: center;
     color: #bbb;
@@ -138,6 +162,7 @@ const load = async (): Promise<void> => {
   }
 }
 
+/* ========== 标签页样式 ========== */
 :deep(.el-tabs__item) {
   font-size: 16px;
 

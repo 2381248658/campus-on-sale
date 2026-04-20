@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import HomePanel from './HomePanel.vue'
-import { findNewAPI } from '@/apis/homeAPI'
+import { findNewAPI } from '@/apis/home'
 import type { FreshGoods } from '@/types/api'
 
 // ============================================

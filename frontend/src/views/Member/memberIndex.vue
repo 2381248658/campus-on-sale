@@ -1,7 +1,12 @@
+<!--
+  @file 会员中心布局
+  @description 会员中心页面布局框架，包含侧边导航和内容区域
+-->
 <script setup lang="ts"></script>
 
 <template>
   <div class="container">
+    <!-- ========== 侧边导航 ========== -->
     <div class="campus-member-aside">
       <div class="user-manage">
         <h4>我的账户</h4>
@@ -15,6 +20,7 @@
         </div>
       </div>
     </div>
+    <!-- ========== 内容区域 ========== -->
     <div class="article">
       <RouterView />
     </div>
@@ -24,12 +30,14 @@
 <style scoped lang="scss">
 @use 'sass:color';
 
+/* ========== 容器布局 ========== */
 .container {
   display: flex;
   padding-top: 20px;
   margin: 0 auto;
   align-items: flex-start;
 
+  /* ========== 侧边导航 ========== */
   .campus-member-aside {
     width: 220px;
     margin-right: 20px;
@@ -54,6 +62,7 @@
         padding: 0 52px 10px;
       }
 
+      /* ========== 导航链接 ========== */
       a {
         display: block;
         line-height: 1;
@@ -67,6 +76,7 @@
           color: $campusColor;
         }
 
+        /* ========== 激活状态 ========== */
         &.active {
           color: $campusColor;
           font-weight: bold;
@@ -91,6 +101,7 @@
     }
   }
 
+  /* ========== 内容区域 ========== */
   .article {
     width: 1000px;
     min-height: 600px;

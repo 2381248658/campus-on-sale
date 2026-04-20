@@ -1,16 +1,8 @@
-// ============================================
-// 通用响应类型（保持与你后端格式一致）
-// ============================================
-
 export interface ApiResponse<T> {
   code: string
   msg: string
   result: T
 }
-
-// ============================================
-// 用户管理模块
-// ============================================
 
 export interface LoginParams {
   account: string
@@ -38,7 +30,6 @@ export interface UserInfo {
   avatar: string
 }
 
-// 猜你喜欢商品（个人中心）
 export interface RelevantGoods {
   id: string
   name: string
@@ -47,17 +38,11 @@ export interface RelevantGoods {
   picture: string
 }
 
-// ============================================
-// 首页模块
-// ============================================
-
-// 轮播图
 export interface Banner {
   id: string
   imgUrl: string
 }
 
-// 人气推荐
 export interface HotRecommend {
   id: string
   title: string
@@ -65,7 +50,6 @@ export interface HotRecommend {
   picture: string
 }
 
-// 学长推荐（新鲜好物）
 export interface FreshGoods {
   id: string
   name: string
@@ -74,7 +58,6 @@ export interface FreshGoods {
   picture: string
 }
 
-// 分类导航中的商品
 export interface CategoryGoods {
   id: string
   name: string
@@ -83,20 +66,14 @@ export interface CategoryGoods {
   picture: string
 }
 
-// 分类导航
 export interface CategoryHead {
   id: string
   name: string
   subtitle: string
   goods: CategoryGoods[]
-  children?: Array<{
-    id: string
-    name: string
-    picture?: string
-  }>
+  children?: Array<{ id: string; name: string; picture?: string }>
 }
 
-// 首页产品板块
 export interface HomeProduct {
   id: string
   name: string
@@ -104,11 +81,6 @@ export interface HomeProduct {
   goods: CategoryGoods[]
 }
 
-// ============================================
-// 分类模块
-// ============================================
-
-// 子分类
 export interface ChildCategory {
   id: string
   name: string
@@ -116,7 +88,6 @@ export interface ChildCategory {
   goods: CategoryGoods[]
 }
 
-// 一级分类详情
 export interface CategoryDetail {
   id: string
   name: string
@@ -125,30 +96,23 @@ export interface CategoryDetail {
   children: ChildCategory[]
 }
 
-// 分类查询参数
 export interface CategoryParams {
   id?: string
 }
 
-// 二级分类筛选结果
 export interface SubCategoryFilter {
   id: string
   name: string
   parentId: string
   parentName: string
-  categories: Array<{
-    id: string
-    name: string
-  }>
+  categories: Array<{ id: string; name: string }>
 }
 
-// 分页参数
 export interface PaginationParams {
   page?: number
   pageSize?: number
 }
 
-// 分页结果包装
 export interface PaginatedResult<T> {
   counts: number
   pageSize: number
@@ -157,22 +121,15 @@ export interface PaginatedResult<T> {
   items: T[]
 }
 
-// ============================================
-// 商品模块
-// ============================================
-
-// 商品详情查询参数
 export interface GoodsParams {
   id?: string
 }
 
-// SKU规格
 export interface SkuSpec {
   name: string
   valueName: string
 }
 
-// SKU
 export interface Sku {
   id: string
   inventory: number
@@ -181,7 +138,6 @@ export interface Sku {
   specs: SkuSpec[]
 }
 
-// 商品详情
 export interface GoodsDetail {
   id: string
   name: string
@@ -190,56 +146,29 @@ export interface GoodsDetail {
   mainPictures: string[]
   specs: Array<{
     name: string
-    values: Array<{
-      name: string
-      picture?: string
-      desc?: string
-    }>
+    values: Array<{ name: string; picture?: string; desc?: string }>
   }>
   skus: Sku[]
-  details: {
-    pictures: string[]
-    properties: Array<{
-      name: string
-      value: string
-    }>
-  }
-  categories: Array<{
-    id: string
-    name: string
-  }>
-  // ========== 新增字段 ==========
+  details: { pictures: string[]; properties: Array<{ name: string; value: string }> }
+  categories: Array<{ id: string; name: string }>
   desc?: string
   inventory?: number
   salesCount?: number | string
   commentCount?: number | string
   collectCount?: number | string
-  brand?: {
-    name: string
-  }
-  // =============================
+  brand?: { name: string }
 }
 
-// 热销榜单查询参数
 export interface HotGoodsParams {
-  /** 商品id */
   id: string
-  /** 1代表24小时热销榜 2代表周热销榜 */
   type: number
-  /** 获取个数，默认3 */
   limit?: number
 }
 
-// 猜你喜欢查询参数
 export interface LikeListParams {
   limit?: number
 }
 
-// ============================================
-// 购物车模块
-// ============================================
-
-// 购物车商品
 export interface CartItem {
   id: string
   skuId: string
@@ -254,40 +183,30 @@ export interface CartItem {
   attrsText: string
 }
 
-// 添加到购物车参数
 export interface AddCartParams {
   skuId: string
   count?: number
 }
 
-// 更新购物车商品参数
 export interface UpdateCartParams {
   selected?: boolean
   count?: number
 }
 
-// 删除购物车参数
 export interface DeleteCartParams {
   ids: string[]
 }
 
-// 全选参数
 export interface SelectAllParams {
   selected: boolean
 }
 
-// 合并购物车参数
 export interface MergeCartItem {
   skuId: string
   selected: boolean
   count: number
 }
 
-// ============================================
-// 订单模块
-// ============================================
-
-// 地址信息
 export interface Address {
   id: string
   receiver: string
@@ -300,7 +219,6 @@ export interface Address {
   fullLocation: string
 }
 
-// 地址接口返回可能是 Mongo 风格 _id 或业务 id
 export interface AddressApiItem extends Omit<Address, 'id'> {
   id?: string
   _id?: string
@@ -317,7 +235,6 @@ export interface AddressFormData {
   isDefault?: number
 }
 
-// 订单里的收货地址快照（后端返回可能不含 id/isDefault）
 export interface DeliveryAddressSnapshot {
   receiver: string
   contact: string
@@ -328,7 +245,6 @@ export interface DeliveryAddressSnapshot {
   fullLocation?: string
 }
 
-// 订单商品（补充 skuId）
 export interface OrderGoods {
   id: string
   name: string
@@ -341,7 +257,6 @@ export interface OrderGoods {
   skuId: string
 }
 
-// 订单汇总
 export interface OrderSummary {
   goodsCount: number
   totalPrice: number
@@ -350,23 +265,18 @@ export interface OrderSummary {
   totalPay: number
 }
 
-// 结账信息
 export interface CheckoutInfo {
   userAddresses: Address[]
   goods: OrderGoods[]
   summary: OrderSummary
 }
 
-// 创建订单参数（补充实际使用字段）
 export interface CreateOrderParams {
   deliveryTimeType?: number
   payType?: number
   payChannel?: number
   buyerMessage?: string
-  goods: Array<{
-    skuId: string
-    count: number
-  }>
+  goods: Array<{ skuId: string; count: number }>
   addressId?: string
   address?: string
   receiver?: string
@@ -374,37 +284,26 @@ export interface CreateOrderParams {
   deliveryAddress?: Address
 }
 
-// 创建订单结果
 export interface CreateOrderResult {
   id: string
   payMoney: number
 }
 
-// 订单列表查询参数
 export interface OrderListParams {
   orderState?: number
   page?: number
   pageSize?: number
 }
 
-// 订单项
 export interface OrderItem {
   id: string
   createTime: string | Date
   orderState: number
   payMoney: number
   totalNum: number
-  skus?: Array<{
-    id: string
-    name: string
-    picture: string
-    price: number
-    count: number
-    attrsText: string
-  }>
+  skus?: Array<{ id: string; name: string; picture: string; price: number; count: number; attrsText: string }>
 }
 
-// 订单详情
 export interface OrderDetail {
   id: string
   createTime: string | Date

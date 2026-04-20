@@ -1,3 +1,7 @@
+<!--
+  @file 购物车页面
+  @description 展示购物车商品列表，支持全选、单选、数量修改、删除、结算
+-->
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cartStore'
 import { useRouter } from 'vue-router'
@@ -8,15 +12,16 @@ const cartStore = useCartStore()
 const router = useRouter()
 
 /**
- * 购物车交互处理逻辑
+ * 全选切换
+ * @param selected - 是否全选
  */
-
-// 👇 修复：切换全选/全不选，修正参数类型
 const allCheck = (selected: CheckboxValueType) => {
   cartStore.allCheck(selected as boolean)
 }
 
-// 结算跳转逻辑
+/**
+ * 去结算
+ */
 const goCheckout = () => {
   if (cartStore.selectedCount === 0) {
     return ElMessage.warning('请至少选择一件校内好物再结算哦')
@@ -24,12 +29,20 @@ const goCheckout = () => {
   router.push('/checkout')
 }
 
-// 同步商品购买数量至 Store
+/**
+ * 数量变更
+ * @param skuId - 商品SKU ID
+ * @param count - 新数量
+ */
 const countChange = (skuId: string, count: number) => {
   cartStore.updateCartItem(skuId, { count })
 }
 
-// 同步单选状态至 Store
+/**
+ * 单选切换
+ * @param skuId - 商品SKU ID
+ * @param selected - 是否选中
+ */
 const singleCheck = (skuId: string, selected: boolean) => {
   cartStore.updateCartItem(skuId, { selected })
 }
@@ -38,6 +51,7 @@ const singleCheck = (skuId: string, selected: boolean) => {
 <template>
   <div class="campus-cart-page">
     <div class="container m-top-20">
+      <!-- ========== 购物车列表 ========== -->
       <div class="cart">
         <table>
           <thead>
@@ -94,6 +108,7 @@ const singleCheck = (skuId: string, selected: boolean) => {
                 </el-popconfirm>
               </td>
             </tr>
+            <!-- ========== 空购物车提示 ========== -->
             <tr v-if="cartStore.cartList.length === 0">
               <td colspan="6">
                 <div class="cart-none">
@@ -107,6 +122,7 @@ const singleCheck = (skuId: string, selected: boolean) => {
         </table>
       </div>
 
+      <!-- ========== 结算栏 ========== -->
       <div class="action">
         <div class="batch">
           共 <span class="green">{{ cartStore.allCount }}</span> 件， 已选
@@ -133,10 +149,12 @@ const singleCheck = (skuId: string, selected: boolean) => {
 <style scoped lang="scss">
 @use 'sass:color';
 
+/* ========== 购物车页面 ========== */
 .campus-cart-page {
   margin-top: 20px;
   min-height: 600px;
 
+  /* ========== 购物车表格 ========== */
   .cart {
     background: #fff;
     color: #666;
@@ -154,7 +172,6 @@ const singleCheck = (skuId: string, selected: boolean) => {
       td {
         padding: 15px;
         border-bottom: 1px solid #f5f5f5;
-
         &:first-child {
           text-align: left;
           padding-left: 30px;
@@ -170,19 +187,19 @@ const singleCheck = (skuId: string, selected: boolean) => {
     }
   }
 
+  /* ========== 空购物车 ========== */
   .cart-none {
     text-align: center;
     padding: 80px 0;
     background: #fff;
   }
 
+  /* ========== 表格居中 ========== */
   .tc {
     text-align: center;
-
     .del-btn {
       color: #999;
       transition: color 0.3s;
-
       &:hover {
         color: $priceColor;
       }
@@ -193,21 +210,19 @@ const singleCheck = (skuId: string, selected: boolean) => {
     color: $priceColor;
     font-weight: bold;
   }
-
   .green {
     color: $campusColor;
     font-weight: bold;
     margin: 0 5px;
   }
-
   .f16 {
     font-size: 16px;
   }
 
+  /* ========== 商品信息 ========== */
   .goods {
     display: flex;
     align-items: center;
-
     img {
       width: 80px;
       height: 80px;
@@ -215,18 +230,15 @@ const singleCheck = (skuId: string, selected: boolean) => {
       border: 1px solid #eee;
       object-fit: cover;
     }
-
     > div {
       width: 280px;
       font-size: 14px;
       padding-left: 15px;
-
       .name {
         font-size: 16px;
         margin-bottom: 5px;
         color: #333;
       }
-
       .attr {
         color: #999;
         font-size: 13px;
@@ -234,6 +246,7 @@ const singleCheck = (skuId: string, selected: boolean) => {
     }
   }
 
+  /* ========== 结算栏 ========== */
   .action {
     display: flex;
     background: #fff;
@@ -245,30 +258,28 @@ const singleCheck = (skuId: string, selected: boolean) => {
     padding: 0 30px;
     border-radius: $borderRadius;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    position: sticky; // 开启吸底效果
+    position: sticky;
     bottom: 0;
 
     .batch {
       color: #666;
-
       .red {
         font-size: 26px;
         margin-left: 10px;
       }
     }
 
+    /* ========== 结算按钮 ========== */
     .checkout-btn {
       width: 180px;
       height: 50px;
       font-size: 18px;
       background-color: $campusColor;
       border-color: $campusColor;
-
       &:hover {
         background-color: color.adjust($campusColor, $lightness: -5%);
         border-color: color.adjust($campusColor, $lightness: -5%);
       }
-
       &:disabled {
         background-color: #ccc;
         border-color: #ccc;

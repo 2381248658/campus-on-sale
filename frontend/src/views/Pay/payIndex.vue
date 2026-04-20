@@ -1,3 +1,7 @@
+<!--
+  @file 支付页面
+  @description 订单支付确认页面，支持在线支付和货到付款
+-->
 <script setup lang="ts">
 import { confirmOrderPayAPI, getOrderAPI } from '@/apis/pay'
 import { onMounted, ref, computed } from 'vue'
@@ -7,23 +11,28 @@ import type { OrderDetail } from '@/types/api'
 
 const route = useRoute()
 const router = useRouter()
+/** 订单详情 */
 const payInfo = ref<OrderDetail>({} as OrderDetail)
+/** 确认支付中 */
 const confirming = ref<boolean>(false)
-// 获取支付方式，1为在线支付，2为货到付款
+/** 支付方式：1在线支付 2货到付款 */
 const payType = ref<number>(parseInt(route.query.payType as string) || 1)
-// 根据支付方式计算按钮文本
-const payButtonText = computed<string>(() => {
-  return payType.value === 1 ? '立即确认支付' : '确认订单'
-})
-const canConfirmPay = computed<boolean>(() => {
-  return !confirming.value && payInfo.value.orderState === 1
-})
+
+/** 支付按钮文案 */
+const payButtonText = computed<string>(() => (payType.value === 1 ? '立即确认支付' : '确认订单'))
+
+/** 是否可确认支付 */
+const canConfirmPay = computed<boolean>(() => !confirming.value && payInfo.value.orderState === 1)
+
+/** 订单ID */
 const orderId = computed<string>(() => String(route.query.id || ''))
 
+/**
+ * 获取订单详情
+ */
 const getOrder = async (): Promise<void> => {
   try {
     const res = await getOrderAPI(orderId.value)
-
     payInfo.value = res
   } catch (err) {
     console.log('支付页基础数据获取失败', err)
@@ -32,17 +41,16 @@ const getOrder = async (): Promise<void> => {
 
 onMounted(() => getOrder())
 
+/**
+ * 确认支付
+ */
 const handleConfirmPay = (): void => {
   if (!payInfo.value.payMoney || !orderId.value) return
   if (!canConfirmPay.value) {
-    ElMessage({
-      type: 'warning',
-      message: '当前订单状态不可重复支付',
-    })
+    ElMessage({ type: 'warning', message: '当前订单状态不可重复支付' })
     return
   }
 
-  // 根据支付方式显示不同的确认信息
   const confirmMessage =
     payType.value === 1
       ? `确认支付金额 ¥${payInfo.value.payMoney?.toFixed(2)} 吗？`
@@ -51,13 +59,12 @@ const handleConfirmPay = (): void => {
   const confirmButtonText = payType.value === 1 ? '确认支付' : '确认提交'
 
   ElMessageBox.confirm(confirmMessage, confirmTitle, {
-    confirmButtonText: confirmButtonText,
+    confirmButtonText,
     cancelButtonText: '取消',
     type: 'success',
   })
     .then(async () => {
       confirming.value = true
-      // 增加一个简单的加载反馈，提升真实感
       const loading = ElLoading.service({
         lock: true,
         text: payType.value === 1 ? '正在确认支付...' : '正在确认订单...',
@@ -69,50 +76,33 @@ const handleConfirmPay = (): void => {
         loading.close()
         const successMessage =
           payType.value === 1 ? '支付成功，订单已进入待发货' : '订单已确认，商家将尽快发货'
-        ElMessage({
-          type: 'success',
-          message: successMessage,
-          duration: 1500,
-        })
+        ElMessage({ type: 'success', message: successMessage, duration: 1500 })
         setTimeout(() => {
-          router.push({
-            path: '/member/order',
-            query: {
-              fromPay: '1',
-              orderId: orderId.value,
-            },
-          })
+          router.push({ path: '/member/order', query: { fromPay: '1', orderId: orderId.value } })
         }, 500)
       } catch {
         loading.close()
-        ElMessage({
-          type: 'error',
-          message: '支付确认失败，请稍后重试',
-        })
+        ElMessage({ type: 'error', message: '支付确认失败，请稍后重试' })
       } finally {
         confirming.value = false
       }
     })
-    .catch(() => {
-      // 用户取消支付不执行任何操作
-    })
+    .catch(() => {})
 }
 
+/**
+ * 稍后支付
+ */
 const handlePayLater = (): void => {
-  ElMessage({
-    type: 'info',
-    message: '订单已保留，可在我的订单继续支付',
-    duration: 1500,
-  })
-  setTimeout(() => {
-    router.push('/member/order')
-  }, 600)
+  ElMessage({ type: 'info', message: '订单已保留，可在我的订单继续支付', duration: 1500 })
+  setTimeout(() => router.push('/member/order'), 600)
 }
 </script>
 
 <template>
   <div class="campus-pay-page">
     <div class="container">
+      <!-- ========== 支付信息 ========== -->
       <div class="pay-info" v-if="payInfo.payMoney">
         <span class="icon iconfont icon-lijiqueren"></span>
         <div class="tip">
@@ -125,10 +115,9 @@ const handlePayLater = (): void => {
         </div>
       </div>
 
+      <!-- ========== 支付操作卡片 ========== -->
       <div class="pay-action-card" v-if="payInfo.payMoney">
-        <div class="header">
-          <p>结算确认</p>
-        </div>
+        <div class="header"><p>结算确认</p></div>
         <div class="content">
           <p class="notice">您正在进行校园惠快速结算，点击下方按钮即可完成支付。</p>
           <div class="pay-actions">
@@ -141,13 +130,18 @@ const handlePayLater = (): void => {
             >
               {{ payButtonText }}
             </el-button>
-            <el-button plain class="later-pay-btn" size="large" @click="handlePayLater">稍后支付</el-button>
+            <el-button plain class="later-pay-btn" size="large" @click="handlePayLater"
+              >稍后支付</el-button
+            >
           </div>
-          <p v-if="payInfo.orderState !== 1" class="safe-tip">当前订单状态不可支付，请前往我的订单查看</p>
+          <p v-if="payInfo.orderState !== 1" class="safe-tip">
+            当前订单状态不可支付，请前往我的订单查看
+          </p>
           <p class="safe-tip">支付保障：校园惠安全支付系统</p>
         </div>
       </div>
 
+      <!-- ========== 加载中 ========== -->
       <div v-else style="padding: 100px; text-align: center; background: #fff; margin-top: 20px">
         <p style="color: #999">正在加载订单结算信息...</p>
       </div>
@@ -156,10 +150,12 @@ const handlePayLater = (): void => {
 </template>
 
 <style scoped lang="scss">
+/* ========== 支付页面 ========== */
 .campus-pay-page {
   margin-top: 20px;
 }
 
+/* ========== 支付信息 ========== */
 .pay-info {
   background: #fff;
   display: flex;
@@ -167,36 +163,30 @@ const handlePayLater = (): void => {
   height: 200px;
   padding: 0 80px;
   border-bottom: 1px solid #f5f5f5;
-
   .icon {
     font-size: 80px;
     color: #1dc779;
   }
-
   .tip {
     padding-left: 20px;
     flex: 1;
-
     p {
       &:first-child {
         font-size: 20px;
         margin-bottom: 5px;
       }
-
       &:last-child {
         color: #999;
         font-size: 16px;
       }
     }
   }
-
   .amount {
     span {
       &:first-child {
         font-size: 16px;
         color: #999;
       }
-
       &.money {
         color: $priceColor;
         font-size: 28px;
@@ -206,12 +196,12 @@ const handlePayLater = (): void => {
   }
 }
 
+/* ========== 支付操作卡片 ========== */
 .pay-action-card {
   margin-top: 20px;
   background-color: #fff;
   padding-bottom: 70px;
   text-align: center;
-
   .header {
     height: 70px;
     line-height: 70px;
@@ -220,16 +210,13 @@ const handlePayLater = (): void => {
     font-size: 16px;
     border-bottom: 1px solid #f5f5f5;
   }
-
   .content {
     padding: 60px 0;
-
     .notice {
       color: #666;
       margin-bottom: 30px;
       font-size: 16px;
     }
-
     .pay-actions {
       display: flex;
       align-items: center;
@@ -237,7 +224,6 @@ const handlePayLater = (): void => {
       gap: 14px;
       flex-wrap: wrap;
     }
-
     .main-pay-btn,
     .later-pay-btn {
       width: 220px;
@@ -245,7 +231,6 @@ const handlePayLater = (): void => {
       font-size: 18px;
       border-radius: $borderRadiusSmall;
     }
-
     .main-pay-btn {
       background-color: $campusColor;
       border-color: $campusColor;
@@ -254,12 +239,10 @@ const handlePayLater = (): void => {
         opacity: 0.92;
       }
     }
-
     .later-pay-btn {
       color: $campusColor;
       border-color: rgba($campusColor, 0.35);
     }
-
     .safe-tip {
       margin-top: 20px;
       color: #ccc;

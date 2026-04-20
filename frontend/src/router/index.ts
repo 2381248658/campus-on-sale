@@ -1,14 +1,19 @@
 /**
- * 路由配置 - 懒加载
- * 职责：通过动态导入实现组件按需加载，提升首屏性能
+ * @file 路由配置
+ * @description 定义应用路由、路由守卫、页面加载状态
  */
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import type { RouterScrollBehavior } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  type RouteRecordRaw,
+  type RouterScrollBehavior,
+} from 'vue-router'
 import { ElLoading } from 'element-plus'
 
 import Layout from '@/views/Layout/LayoutIndex.vue'
 import Login from '@/views/Login/LoginIndex.vue'
 
+/** 路由配置表 */
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -32,26 +37,26 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'detail/:id',
         name: 'detail',
-        component: () => import('@/views/Detail/detailIndex.vue'),
+        component: () => import('@/views/Detail/DetailIndex.vue'),
       },
       {
         path: 'cartlist',
         name: 'cartlist',
-        component: () => import('@/views/CartList/cartListindex.vue'),
+        component: () => import('@/views/CartList/CartListIndex.vue'),
       },
       {
         path: 'checkout',
         name: 'checkout',
-        component: () => import('@/views/Checkout/checkoutIndex.vue'),
+        component: () => import('@/views/Checkout/CheckoutIndex.vue'),
       },
       {
         path: 'pay',
         name: 'pay',
-        component: () => import('@/views/Pay/payIndex.vue'),
+        component: () => import('@/views/Pay/PayIndex.vue'),
       },
       {
         path: 'member',
-        component: () => import('@/views/Member/memberIndex.vue'),
+        component: () => import('@/views/Member/MemberIndex.vue'),
         children: [
           {
             path: '',
@@ -89,10 +94,9 @@ const routes: RouteRecordRaw[] = [
   },
 ]
 
+/** 页面滚动行为：跳转后回到顶部 */
 const scrollBehavior: RouterScrollBehavior = () => {
-  return {
-    top: 0,
-  }
+  return { top: 0 }
 }
 
 const router = createRouter({
@@ -101,18 +105,26 @@ const router = createRouter({
   scrollBehavior,
 })
 
+/** 页面加载Loading实例 */
 let loadingInstance: ReturnType<typeof ElLoading.service> | null = null
 
+/**
+ * 路由前置守卫
+ * @description 处理页面加载状态、登录状态校验、权限控制
+ */
 router.beforeEach((to, _from, next) => {
+  // 显示页面加载动画
   loadingInstance = ElLoading.service({
     lock: true,
     text: '页面加载中...',
     background: 'rgba(255, 255, 255, 0.7)',
   })
 
+  // 需要登录权限的路径
   const protectedPaths = ['/checkout', '/pay', '/member']
   const requiresAuth = protectedPaths.some((path) => to.path.startsWith(path))
 
+  // 获取token
   const persistedUser = localStorage.getItem('user')
   let token = ''
   if (persistedUser) {
@@ -123,6 +135,7 @@ router.beforeEach((to, _from, next) => {
     }
   }
 
+  // 已登录用户访问登录/注册页，重定向到首页
   if (to.name === 'login' || to.name === 'register') {
     if (token) {
       next({ path: '/' })
@@ -132,11 +145,13 @@ router.beforeEach((to, _from, next) => {
     return
   }
 
+  // 不需要权限的页面直接放行
   if (!requiresAuth) {
     next()
     return
   }
 
+  // 需要权限的页面检查token
   if (token) {
     next()
   } else {
@@ -144,6 +159,10 @@ router.beforeEach((to, _from, next) => {
   }
 })
 
+/**
+ * 路由后置守卫
+ * @description 关闭页面加载动画
+ */
 router.afterEach(() => {
   loadingInstance?.close()
   loadingInstance = null

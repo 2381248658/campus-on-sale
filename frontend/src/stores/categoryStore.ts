@@ -1,41 +1,29 @@
+/**
+ * @file 分类状态管理
+ * @description 管理商品分类导航数据
+ */
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getCategoryAPI } from '@/apis/layoutAPI'
+import { getCategoryAPI } from '@/apis/layout'
 import type { CategoryHead } from '@/types/api'
 
 export const useCategoryStore = defineStore('category', () => {
-  // ============================================
-  // State
-  // ============================================
-
-  // 导航列表中的数据
+  /** 分类列表（用于顶部导航） */
   const categoryList = ref<CategoryHead[]>([])
 
-  // ============================================
-  // Actions
-  // ============================================
-
   /**
-   * 获取分类导航数据
+   * 获取分类列表
+   * @description 从服务器获取商品分类数据
    */
   const getCategory = async (): Promise<void> => {
     try {
       const res = await getCategoryAPI()
       categoryList.value = res || []
-      // console.log('校园惠导航栏加载成功:', categoryList.value)
     } catch (error) {
-      // 增强容错
       categoryList.value = []
       console.error('分类加载异常:', error)
     }
   }
 
-  // ============================================
-  // Return
-  // ============================================
-
-  return {
-    categoryList,
-    getCategory,
-  }
+  return { categoryList, getCategory }
 })

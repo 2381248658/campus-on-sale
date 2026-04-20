@@ -3,7 +3,7 @@
  * 包含：数据请求、多环境响应格式兼容、异常容错处理
  */
 import { ref, onMounted } from 'vue'
-import { getBannerAPI } from '@/apis/homeAPI'
+import { getBannerAPI } from '@/apis/home'
 import type { Banner } from '@/types/api'
 
 export function useBanner() {

@@ -1,3 +1,7 @@
+<!--
+  @file 一级分类详情页
+  @description 展示一级分类下的二级分类列表和推荐商品
+-->
 <script setup lang="ts">
 /**
  * CategoryIndex.vue - 校园惠一级分类详情页
@@ -18,6 +22,7 @@ const { categoryData } = useCategory()
 <template>
   <div class="top-category">
     <div class="container m-top-20">
+      <!-- ========== 面包屑导航 ========== -->
       <div class="bread-container">
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -25,6 +30,7 @@ const { categoryData } = useCategory()
         </el-breadcrumb>
       </div>
 
+      <!-- ========== 轮播图 ========== -->
       <div class="home-banner">
         <el-carousel height="500px">
           <el-carousel-item v-for="item in bannerList" :key="item.id">
@@ -33,6 +39,7 @@ const { categoryData } = useCategory()
         </el-carousel>
       </div>
 
+      <!-- ========== 二级分类列表 ========== -->
       <div class="sub-list" v-if="categoryData.children">
         <h3>- 本校精选分类 -</h3>
         <ul>
@@ -45,6 +52,7 @@ const { categoryData } = useCategory()
         </ul>
       </div>
 
+      <!-- ========== 分类商品推荐 ========== -->
       <div class="ref-goods" v-for="item in categoryData.children" :key="item.id">
         <div class="head">
           <h3>- {{ item.name }}-</h3>
@@ -59,6 +67,7 @@ const { categoryData } = useCategory()
 </template>
 
 <style scoped lang="scss">
+/* ========== 分类页面 ========== */
 .top-category {
   h3 {
     font-size: 28px;
@@ -68,6 +77,7 @@ const { categoryData } = useCategory()
     line-height: 100px;
   }
 
+  /* ========== 面包屑 ========== */
   .bread-container {
     padding: 25px 0;
 
@@ -76,6 +86,7 @@ const { categoryData } = useCategory()
     }
   }
 
+  /* ========== 轮播图 ========== */
   .home-banner {
     width: 1240px;
     height: 500px;
@@ -90,6 +101,7 @@ const { categoryData } = useCategory()
     }
   }
 
+  /* ========== 二级分类列表 ========== */
   .sub-list {
     margin-top: 20px;
     background-color: #fff;
@@ -132,6 +144,7 @@ const { categoryData } = useCategory()
     }
   }
 
+  /* ========== 分类商品推荐 ========== */
   .ref-goods {
     background-color: #fff;
     margin-top: 20px;

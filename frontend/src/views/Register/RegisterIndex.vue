@@ -1,3 +1,7 @@
+<!--
+  @file 注册页
+  @description 用户注册页面，包含注册表单和表单验证
+-->
 <script setup lang="ts">
 import { ref } from 'vue'
 import 'element-plus/theme-chalk/el-message.css'
@@ -9,11 +13,17 @@ import { useUserStore } from '@/stores/userStore'
 const userStore = useUserStore()
 const formRef = ref<FormInstance>()
 
+/** 注册表单数据 */
 interface RegisterForm {
+  /** 学号 */
   account: string
+  /** 密码 */
   password: string
+  /** 确认密码 */
   confirmPassword: string
+  /** 昵称 */
   nickname: string
+  /** 是否同意协议 */
   agree: boolean
 }
 
@@ -25,6 +35,12 @@ const form = ref<RegisterForm>({
   agree: false,
 })
 
+/**
+ * 确认密码验证
+ * @param _rule - 规则
+ * @param value - 输入值
+ * @param callback - 回调
+ */
 const validateConfirmPassword = (
   _rule: unknown,
   value: string,
@@ -37,6 +53,7 @@ const validateConfirmPassword = (
   }
 }
 
+/** 表单验证规则 */
 const rules: FormRules<RegisterForm> = {
   account: [
     { required: true, message: '学号不能为空', trigger: 'blur' },
@@ -63,6 +80,10 @@ const rules: FormRules<RegisterForm> = {
   ],
 }
 
+/**
+ * 执行注册
+ * @description 验证表单后调用注册接口
+ */
 const doRegister = () => {
   const { account, password, nickname } = form.value
   formRef.value?.validate(async (valid) => {
@@ -81,6 +102,7 @@ const doRegister = () => {
 
 <template>
   <div class="register-page">
+    <!-- ========== 头部区域 ========== -->
     <header class="register-header">
       <div class="container">
         <h1 class="logo">
@@ -94,6 +116,7 @@ const doRegister = () => {
       </div>
     </header>
 
+    <!-- ========== 注册表单区域 ========== -->
     <section class="register-section">
       <div class="wrapper">
         <nav>
@@ -137,6 +160,7 @@ const doRegister = () => {
       </div>
     </section>
 
+    <!-- ========== 底部区域 ========== -->
     <footer class="register-footer">
       <div class="container">
         <p>
@@ -157,11 +181,13 @@ const doRegister = () => {
 <style scoped lang="scss">
 @use 'sass:color';
 
+/* ========== 页面容器 ========== */
 .register-page {
   max-width: 100vw;
   overflow-x: hidden;
 }
 
+/* ========== 头部区域 ========== */
 .register-header {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -214,6 +240,7 @@ const doRegister = () => {
   }
 }
 
+/* ========== 注册表单区域 ========== */
 .register-section {
   background: url('@/assets/images/login-bg.jpg') no-repeat center / cover;
   height: 734px;
@@ -270,6 +297,7 @@ const doRegister = () => {
   }
 }
 
+/* ========== 表单样式 ========== */
 .account-box {
   .form {
     padding: 30px 40px 40px;
@@ -331,6 +359,7 @@ const doRegister = () => {
   }
 }
 
+/* ========== 注册按钮 ========== */
 .subBtn {
   background: linear-gradient(
     135deg,
@@ -362,6 +391,7 @@ const doRegister = () => {
   }
 }
 
+/* ========== 登录链接 ========== */
 .to-login {
   text-align: center;
   margin-top: 16px;
@@ -379,6 +409,7 @@ const doRegister = () => {
   }
 }
 
+/* ========== 底部区域 ========== */
 .register-footer {
   padding: 40px 0 30px;
   background: rgba(255, 255, 255, 0.95);

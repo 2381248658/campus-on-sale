@@ -1,3 +1,7 @@
+/**
+ * @file 分类相关接口
+ * @description 一级分类、二级分类、分类商品列表等API
+ */
 import httpInstance from '@/utils/http'
 import type {
   CategoryDetail,
@@ -7,55 +11,36 @@ import type {
   PaginationParams,
 } from '@/types/api'
 
-// ============================================
-// 分类相关接口
-// ============================================
-
 /**
  * 获取一级分类详情
  * @param id - 分类ID
+ * @returns 分类详情（含子分类）
  */
 export const getCategoryAPI = (id?: string): Promise<CategoryDetail> => {
-  return httpInstance({
-    url: '/category',
-    params: {
-      id,
-    },
-  })
+  return httpInstance({ url: '/category', params: { id } })
 }
-
-// ============================================
-// 获取二级分类筛选条件
-// ============================================
 
 /**
- * 获取二级分类筛选数据
- * @param id - 子分类ID
+ * 获取二级分类筛选条件
+ * @param id - 二级分类ID
+ * @returns 筛选条件数据
  */
 export const getCategoryFilterAPI = (id?: string): Promise<SubCategoryFilter> => {
-  return httpInstance({
-    url: '/category/sub/filter',
-    params: {
-      id,
-    },
-  })
+  return httpInstance({ url: '/category/sub/filter', params: { id } })
 }
 
-// ============================================
-// 获取导航数据（二级分类商品列表）
-// ============================================
-
+/** 二级分类商品查询参数 */
 export interface SubCategoryData extends PaginationParams {
   /** 分类ID */
   categoryId: string
-  /** 排序字段: 'publishTime' | 'orderNum' | 'evaluateNum' */
+  /** 排序字段 */
   sortField?: 'publishTime' | 'orderNum' | 'evaluateNum'
 }
 
 /**
- * 获取二级分类下的商品列表（分页）
+ * 获取二级分类商品列表
  * @param data - 查询参数
- * @description 支持分页和排序
+ * @returns 分页商品列表
  */
 export const getSubCategoryAPI = (
   data: SubCategoryData,

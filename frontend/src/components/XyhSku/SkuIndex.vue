@@ -1,9 +1,17 @@
+<!--
+ * SKU规格选择组件
+ * 职责：
+ * 1. 展示商品规格选项（颜色、尺寸等）
+ * 2. 处理规格选中逻辑，实现规格互斥和库存校验
+ * 3. 选完规格后通过 change 事件向父组件传递 SKU 信息
+ -->
 <template>
   <div class="goods-sku">
-    <!-- 修复1：key 替换为 item.name（规格名称唯一，无需id） -->
+    <!-- 规格项列表 -->
     <dl v-for="item in goods.specs" :key="item.name">
       <dt>{{ item.name }}</dt>
       <dd>
+        <!-- 图片类型规格按钮 -->
         <template v-for="val in item.values" :key="val.name">
           <img
             :class="{ selected: val.selected, disabled: val.disabled }"
@@ -12,6 +20,7 @@
             :src="val.picture"
             :title="val.name"
           />
+          <!-- 文字类型规格按钮 -->
           <span
             :class="{ selected: val.selected, disabled: val.disabled }"
             @click="clickSpecs(item, val)"
@@ -30,13 +39,13 @@ import { watchEffect } from 'vue'
 import getPowerSet from './power-set'
 import type { Sku, SkuSpec } from '@/types/api'
 
-// 路径字典的分隔符
+/** 路径字典的分隔符 */
 const spliter = '★'
 
-// 路径字典类型
+/** 路径字典类型：key 为规格组合，value 为对应的 skuId 数组 */
 type PathMap = Record<string, string[]>
 
-// 规格值类型（扩展 selected/disabled 属性）
+/** 规格值类型（扩展 selected/disabled 属性） */
 interface SpecValue {
   name: string
   picture?: string
@@ -45,29 +54,25 @@ interface SpecValue {
   disabled?: boolean
 }
 
-// 规格项类型
+/** 规格项类型 */
 interface SpecItem {
-  // 修复2：id 改为可选属性（加?），兼容接口数据
   id?: string
   name: string
   values: SpecValue[]
 }
 
 /**
- * 根据 skus 数据得到路径字典对象
- * @param skus - 所有的 sku 组合
+ * 根据 skus 数据生成路径字典对象
+ * @param skus - 所有的 sku 组合数据
+ * @returns 路径字典对象
  */
 const getPathMap = (skus: Sku[]): PathMap => {
   const pathMap: PathMap = {}
   if (skus && skus.length > 0) {
     skus.forEach((sku) => {
-      // 1. 过滤出有效库存的 sku
       if (sku.inventory > 0) {
-        // 2. 得到 sku 属性值数组 ['蓝色', '128G']
         const specs = sku.specs.map((spec: SkuSpec) => spec.valueName)
-        // 3. 得到 sku 属性值数组的子集（幂集算法）
         const powerSet = getPowerSet(specs)
-        // 4. 设置给路径字典对象
         powerSet.forEach((set) => {
           const key = set.join(spliter)
           if (!pathMap[key]) {
@@ -82,13 +87,14 @@ const getPathMap = (skus: Sku[]): PathMap => {
 }
 
 /**
- * 初始化禁用状态
+ * 初始化规格按钮的禁用状态
+ * @param specs - 规格项数组
+ * @param pathMap - 路径字典
  */
 function initDisabledStatus(specs: SpecItem[], pathMap: PathMap): void {
   if (specs && specs.length > 0) {
     specs.forEach((spec) => {
       spec.values.forEach((val) => {
-        // 如果路径字典里查不到该名称，说明此规格初始就无货
         val.disabled = !pathMap[val.name]
       })
     })
@@ -96,8 +102,9 @@ function initDisabledStatus(specs: SpecItem[], pathMap: PathMap): void {
 }
 
 /**
- * 得到当前选中规格集合
- * @returns Array [undefined, '蓝色', undefined]
+ * 获取当前选中的规格值数组
+ * @param specs - 规格项数组
+ * @returns 选中规格数组，如 [undefined, '蓝色', undefined]
  */
 const getSelectedArr = (specs: SpecItem[]): (string | undefined)[] => {
   const selectedArr: (string | undefined)[] = []
@@ -113,14 +120,15 @@ const getSelectedArr = (specs: SpecItem[]): (string | undefined)[] => {
 }
 
 /**
- * 更新按钮的禁用状态（点击时的核心匹配逻辑）
+ * 更新规格按钮的禁用状态（点击时的核心匹配逻辑）
+ * @param specs - 规格项数组
+ * @param pathMap - 路径字典
  */
 const updateDisabledStatus = (specs: SpecItem[], pathMap: PathMap): void => {
   specs.forEach((item, i) => {
     const selectedArr = getSelectedArr(specs)
     item.values.forEach((val) => {
       if (!val.selected) {
-        // 尝试模拟：如果当前项被选中，路径是否还通畅
         selectedArr[i] = val.name
         const key = selectedArr.filter((value): value is string => !!value).join(spliter)
         val.disabled = !pathMap[key]
@@ -129,7 +137,7 @@ const updateDisabledStatus = (specs: SpecItem[], pathMap: PathMap): void => {
   })
 }
 
-// 组件 props 定义
+/** 组件 props 定义 */
 interface Props {
   goods: {
     specs: SpecItem[]
@@ -141,7 +149,7 @@ const props = withDefaults(defineProps<Props>(), {
   goods: () => ({ specs: [], skus: [] }),
 })
 
-// 组件 emits 定义
+/** 组件 emits 定义 */
 interface Emits {
   (
     e: 'change',
@@ -159,54 +167,51 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
+/** 路径字典缓存 */
 let pathMap: PathMap = {}
 
-// 监听 goods 数据，一旦传入则初始化路径字典
 watchEffect(() => {
   pathMap = getPathMap(props.goods.skus)
   initDisabledStatus(props.goods.specs, pathMap)
 })
 
+/**
+ * 点击规格按钮处理函数
+ * @param item - 当前规格项
+ * @param val - 当前点击的规格值
+ * @returns 是否处理成功
+ */
 const clickSpecs = (item: SpecItem, val: SpecValue): boolean => {
-  // 禁用状态点击无效
   if (val.disabled) return false
 
-  // 选中与取消选中切换
   if (val.selected) {
     val.selected = false
   } else {
-    // 同规格组排他逻辑
     item.values.forEach((bv) => {
       bv.selected = false
     })
     val.selected = true
   }
 
-  // 点击后实时更新其他规格的禁用状态
   updateDisabledStatus(props.goods.specs, pathMap)
 
-  // 产出选中结果
   const selectedArr = getSelectedArr(props.goods.specs).filter((value): value is string => !!value)
-  // 如果所有规格都已选齐
   if (selectedArr.length === props.goods.specs.length) {
     const skuId = pathMap[selectedArr.join(spliter)][0]
     const sku = props.goods.skus.find((sku: Sku) => sku.id === skuId)
 
     if (sku) {
-      // 触发 change 事件将完整 SKU 数据传递给父组件
       emit('change', {
         skuId: sku.id,
         price: sku.price,
         oldPrice: sku.oldPrice,
         inventory: sku.inventory,
-        // 拼接规格字符串，例如: "颜色:红色 尺寸:XL"
         specsText: sku.specs
           .reduce((p: string, n: SkuSpec) => `${p} ${n.name}:${n.valueName}`, '')
           .trim(),
       })
     }
   } else {
-    // 选不全时传出空对象
     emit('change', {})
   }
   return true
@@ -221,10 +226,12 @@ const clickSpecs = (item: SpecItem, val: SpecValue): boolean => {
   cursor: pointer;
   transition: all 0.2s;
 
+  /* 选中状态 */
   &.selected {
     border-color: $campusColor;
   }
 
+  /* 禁用状态 */
   &.disabled {
     opacity: 0.5;
     border-style: dashed;
@@ -233,26 +240,31 @@ const clickSpecs = (item: SpecItem, val: SpecValue): boolean => {
   }
 }
 
+/* SKU 选择容器 */
 .goods-sku {
   padding-left: 10px;
   padding-top: 20px;
 
+  /* 规格项 */
   dl {
     display: flex;
     padding-bottom: 20px;
     align-items: center;
 
+    /* 规格名称 */
     dt {
       width: 50px;
       color: #999;
     }
 
+    /* 规格值列表 */
     dd {
       flex: 1;
       color: #666;
       display: flex;
       flex-wrap: wrap;
 
+      /* 图片类型规格按钮 */
       > img {
         width: 50px;
         height: 50px;
@@ -260,6 +272,7 @@ const clickSpecs = (item: SpecItem, val: SpecValue): boolean => {
         @include sku-state-mixin;
       }
 
+      /* 文字类型规格按钮 */
       > span {
         display: inline-block;
         height: 30px;

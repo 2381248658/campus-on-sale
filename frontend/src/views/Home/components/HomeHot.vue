@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import HomePanel from './HomePanel.vue'
-import { findHotAPI } from '@/apis/homeAPI'
+import { findHotAPI } from '@/apis/home'
 import type { HotRecommend } from '@/types/api'
 
 // ============================================

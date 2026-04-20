@@ -1,3 +1,10 @@
+<!--
+ * 图片预览组件
+ * 职责：
+ * 1. 展示商品图片列表，支持小图切换大图
+ * 2. 实现放大镜功能，鼠标悬停显示局部放大效果
+ * 3. 用于商品详情页的商品图片展示
+ -->
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useMouseInElement } from '@vueuse/core'
@@ -6,56 +13,54 @@ defineProps<{
   imageList: string[]
 }>()
 
-// 图片列表
-// const imageList = [
-//   "https://picsum.photos/1240/500?random=1",
-//   "https://picsum.photos/1240/500?random=2",
-//   "https://picsum.photos/1240/500?random=3",
-//   "https://picsum.photos/1240/500?random=4",
-//   "https://picsum.photos/1240/500?random=5",
-// ]
-
-// 1.实现大小图切换
-// 2.实现放大镜功能
-// 3.渲染数据
-// 1.
+/** 当前选中的图片索引 */
 const activeIndex = ref<number>(0)
+
+/**
+ * 切换当前显示的图片
+ * @param i - 图片索引
+ */
 const SwitchImageSize = (i: number): void => {
   activeIndex.value = i
 }
-// 2.
-// 安装库 vueuse 使用里面的函数useMouseInElement
-//大图容器
+
+/** 大图容器 DOM 引用 */
 const target = ref<HTMLElement | null>(null)
-// 获取鼠标相对位置
+
+/** 鼠标在大图容器内的相对 X 坐标（像素） */
+/** 鼠标在大图容器内的相对 Y 坐标（像素） */
+/** 鼠标是否在大图容器外 */
 const { elementX, elementY, isOutside } = useMouseInElement(target)
-// 浮块位置
+
+/** 浮块左边距（像素） */
 const left = ref<number>(0)
+/** 浮块上边距（像素） */
 const top = ref<number>(0)
-// 放大镜大图背景位置
+/** 放大镜大图背景 X 偏移（像素） */
 const positionX = ref<number>(0)
+/** 放大镜大图背景 Y 偏移（像素） */
 const positionY = ref<number>(0)
 
-// 容器和浮块尺寸（可调整）
+/** 大图容器宽度（像素） */
 const containerWidth: number = 400
+/** 大图容器高度（像素） */
 const containerHeight: number = 400
+/** 浮块宽度（像素） */
 const layerWidth: number = 200
+/** 浮块高度（像素） */
 const layerHeight: number = 200
-const zoom: number = 2 // 放大倍数
+/** 放大倍数（倍） */
+const zoom: number = 2
 
-// 监听鼠标变化,计算浮块位置和大图偏移
 watch([elementX, elementY, isOutside], () => {
-  // 鼠标离开图片位置,浮块隐藏
   if (isOutside.value) {
-    left.value = 0 // 离开时重置浮块位置
+    left.value = 0
     top.value = 0
     return
   }
-  // 计算浮块左上角位置, 鼠标坐标-浮块一半位置
   left.value = Math.min(Math.max(elementX.value - layerWidth / 2, 0), containerWidth - layerWidth)
   top.value = Math.min(Math.max(elementY.value - layerHeight / 2, 0), containerHeight - layerHeight)
 
-  // 大图背景偏移 = -浮块位置 * 放大倍数
   positionX.value = -left.value * zoom
   positionY.value = -top.value * zoom
 })
@@ -63,13 +68,14 @@ watch([elementX, elementY, isOutside], () => {
 
 <template>
   <div class="goods-image">
-    <!-- 左侧大图-->
+    <!-- 左侧大图区域 -->
     <div class="middle" ref="target">
       <img :src="imageList[activeIndex]" alt="" />
-      <!-- 蒙层小滑块 -->
+      <!-- 放大镜浮块 -->
       <div class="layer" v-show="!isOutside" :style="{ left: left + `px`, top: top + `px` }"></div>
     </div>
-    <!-- 小图列表 -->
+
+    <!-- 右侧小图列表 -->
     <ul class="small">
       <li
         v-for="(img, i) in imageList"
@@ -80,7 +86,8 @@ watch([elementX, elementY, isOutside], () => {
         <img :src="img" alt="" />
       </li>
     </ul>
-    <!-- 放大镜大图 -->
+
+    <!-- 放大镜大图预览区域 -->
     <div
       class="large"
       :style="[
@@ -97,6 +104,7 @@ watch([elementX, elementY, isOutside], () => {
 </template>
 
 <style scoped lang="scss">
+/* 图片预览容器 */
 .goods-image {
   width: 480px;
   height: 400px;
@@ -117,7 +125,7 @@ watch([elementX, elementY, isOutside], () => {
     }
   }
 
-  /* 放大镜大图 */
+  /* 放大镜大图预览 */
   .large {
     position: absolute;
     top: 0;
@@ -130,7 +138,7 @@ watch([elementX, elementY, isOutside], () => {
     background-color: #f8f8f8;
   }
 
-  /* 浮块 */
+  /* 放大镜浮块 */
   .layer {
     width: 200px;
     height: 200px;
@@ -154,10 +162,10 @@ watch([elementX, elementY, isOutside], () => {
       cursor: pointer;
       border: 2px solid transparent;
 
+      /* 选中/悬停状态 */
       &.active,
       &:hover {
         border-color: #f56c6c;
-        /* 可自定义高亮颜色 */
       }
 
       img {
