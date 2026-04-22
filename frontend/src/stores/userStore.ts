@@ -59,6 +59,8 @@ export const useUserStore = defineStore(
       userInfo.value = {} as LoginResult
       const cartStore = useCartStore()
       cartStore.clearCart()
+      localStorage.removeItem('user')
+      localStorage.removeItem('cart')
     }
 
     return { userInfo, getUserInfo, registerUserInfo, clearUserInfo }

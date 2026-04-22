@@ -9,11 +9,22 @@ import LayoutNav from './components/LayoutNav.vue'
 import LayoutHeader from './components/LayoutHeader.vue'
 import LayoutFooter from './components/LayoutFooter.vue'
 import { useCategoryStore } from '@/stores/categoryStore'
+import { useCartStore } from '@/stores/cartStore'
+import { useUserStore } from '@/stores/userStore'
 
 const categoryStore = useCategoryStore()
+const cartStore = useCartStore()
+const userStore = useUserStore()
 
-onMounted(() => {
+onMounted(async () => {
   categoryStore.getCategory()
+  if (userStore.userInfo?.token) {
+    try {
+      await cartStore.updateCartList()
+    } catch {
+      // ignore cart sync errors
+    }
+  }
 })
 </script>
 
