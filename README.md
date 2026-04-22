@@ -1,17 +1,21 @@
-<div align="center">
-
 # 校园惠 Campus On Sale
 
-**一个现代化的校园二手交易平台**
+<p align="center">
+  <strong>一个现代化的校园二手交易平台</strong>
+</p>
 
-[![Vue](https://img.shields.io/badge/Vue-3.5-4FC08D?style=flat-square&logo=vue.js)](https://vuejs.org/)
-[![Vite](https://img.shields.io/badge/Vite-7.2-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
-[![Element Plus](https://img.shields.io/badge/Element_Plus-2.12-409EFF?style=flat-square&logo=element)](https://element-plus.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Express](https://img.shields.io/badge/Express-5.2-000000?style=flat-square&logo=express)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-9.4-47A248?style=flat-square&logo=mongodb)](https://www.mongodb.com/)
+<p align="center">
+  <a href="https://vuejs.org/"><img src="https://img.shields.io/badge/Vue-3.5-4FC08D?style=flat-square&logo=vue.js" alt="Vue"></a>
+  <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-7.2-646CFF?style=flat-square&logo=vite" alt="Vite"></a>
+  <a href="https://element-plus.org/"><img src="https://img.shields.io/badge/Element_Plus-2.12-409EFF?style=flat-square&logo=element" alt="Element Plus"></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript" alt="TypeScript"></a>
+  <a href="https://expressjs.com/"><img src="https://img.shields.io/badge/Express-5.2-000000?style=flat-square&logo=express" alt="Express"></a>
+  <a href="https://www.mongodb.com/"><img src="https://img.shields.io/badge/MongoDB-9.4-47A248?style=flat-square&logo=mongodb" alt="MongoDB"></a>
+</p>
 
-[🌐 在线演示](http://121.43.248.176/) · [📝 接口文档](./docs/接口.md)
+<p align="center">
+  <a href="https://emoa.tech">🌐 在线演示</a> · <a href="./docs/接口.md">📝 接口文档</a>
+</p>
 
 ---
 
@@ -367,39 +371,6 @@ npm run build
 
 编译产物位于 `backend/dist/` 目录。
 
-### Nginx 配置
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    root /var/www/campus-on-sale/dist;
-    index index.html;
-
-    # SPA 路由支持
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    # API 代理
-    location /api/ {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    # 静态资源缓存
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-
-    # Gzip 压缩
-    gzip on;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
-}
-```
-
 ### 构建优化配置
 
 前端已配置代码分割策略（`vite.config.ts`）：
@@ -447,10 +418,6 @@ build: {
 
 ---
 
-<div align="center">
-
 **如果这个项目对你有帮助，请给一个 ⭐ Star**
 
 Made with ❤️
-
-</div>
