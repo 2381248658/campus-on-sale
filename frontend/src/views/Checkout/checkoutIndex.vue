@@ -24,6 +24,7 @@ const cartStore = useCartStore()
 const checkInfo = ref<CheckoutInfo>({} as CheckoutInfo)
 const checkoutLoading = ref<boolean>(false)
 const submitLoading = ref<boolean>(false)
+const noGoods = ref<boolean>(false)
 
 // 地址相关状态
 const addressLoading = ref<boolean>(false)
@@ -148,6 +149,9 @@ const getCheckoutInfo = async (): Promise<void> => {
   try {
     const res = await getCheckoutInfoAPI()
     checkInfo.value = res
+    if (!res.goods || res.goods.length === 0) {
+      noGoods.value = true
+    }
   } catch (err) {
     console.error('获取结算信息失败', err)
     ElMessage.error('结算信息加载失败，请稍后刷新')
@@ -342,7 +346,15 @@ onMounted(async () => {
 <template>
   <div class="campus-pay-checkout-page">
     <div class="container">
-      <div class="wrapper" v-loading="checkoutLoading">
+      <!-- 没有商品时显示 -->
+      <div v-if="noGoods && !checkoutLoading" class="no-goods-card">
+        <el-empty description="暂无待结算商品，请先在购物车中选择商品">
+          <el-button type="primary" @click="router.replace('/cartlist')">前往购物车</el-button>
+        </el-empty>
+      </div>
+
+      <!-- 正常结算流程 -->
+      <div v-else class="wrapper" v-loading="checkoutLoading">
         <h3 class="box-title">收货信息</h3>
         <div class="box-body">
           <div class="address-box">
@@ -589,6 +601,13 @@ onMounted(async () => {
 <style scoped lang="scss">
 .campus-pay-checkout-page {
   margin-top: 20px;
+  .no-goods-card {
+    background: #fff;
+    padding: 60px 20px;
+    border-radius: $borderRadius;
+    box-shadow: $cardShadow;
+    text-align: center;
+  }
   .wrapper {
     background: #fff;
     padding: 0 20px;

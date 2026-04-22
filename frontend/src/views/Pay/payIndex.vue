@@ -17,6 +17,8 @@ const payInfo = ref<OrderDetail>({} as OrderDetail)
 const confirming = ref<boolean>(false)
 /** 支付方式：1在线支付 2货到付款 */
 const payType = ref<number>(parseInt(route.query.payType as string) || 1)
+/** 加载失败 */
+const loadError = ref<boolean>(false)
 
 /** 支付按钮文案 */
 const payButtonText = computed<string>(() => (payType.value === 1 ? '立即确认支付' : '确认订单'))
@@ -31,11 +33,16 @@ const orderId = computed<string>(() => String(route.query.id || ''))
  * 获取订单详情
  */
 const getOrder = async (): Promise<void> => {
+  if (!orderId.value) {
+    loadError.value = true
+    return
+  }
   try {
     const res = await getOrderAPI(orderId.value)
     payInfo.value = res
   } catch (err) {
     console.log('支付页基础数据获取失败', err)
+    loadError.value = true
   }
 }
 
@@ -78,7 +85,7 @@ const handleConfirmPay = (): void => {
           payType.value === 1 ? '支付成功，订单已进入待发货' : '订单已确认，商家将尽快发货'
         ElMessage({ type: 'success', message: successMessage, duration: 1500 })
         setTimeout(() => {
-          router.push({ path: '/member/order', query: { fromPay: '1', orderId: orderId.value } })
+          router.replace({ path: '/member/order', query: { fromPay: '1', orderId: orderId.value } })
         }, 500)
       } catch {
         loading.close()
@@ -95,7 +102,7 @@ const handleConfirmPay = (): void => {
  */
 const handlePayLater = (): void => {
   ElMessage({ type: 'info', message: '订单已保留，可在我的订单继续支付', duration: 1500 })
-  setTimeout(() => router.push('/member/order'), 600)
+  setTimeout(() => router.replace('/member/order'), 600)
 }
 </script>
 
@@ -142,8 +149,14 @@ const handlePayLater = (): void => {
       </div>
 
       <!-- ========== 加载中 ========== -->
-      <div v-else style="padding: 100px; text-align: center; background: #fff; margin-top: 20px">
+      <div v-else-if="!loadError" style="padding: 100px; text-align: center; background: #fff; margin-top: 20px">
         <p style="color: #999">正在加载订单结算信息...</p>
+      </div>
+
+      <!-- ========== 加载失败 ========== -->
+      <div v-else style="padding: 100px; text-align: center; background: #fff; margin-top: 20px">
+        <p style="color: #999; margin-bottom: 20px">订单信息加载失败，请返回重新操作</p>
+        <el-button type="primary" @click="router.replace('/member/order')">返回我的订单</el-button>
       </div>
     </div>
   </div>

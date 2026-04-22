@@ -63,7 +63,7 @@ onMounted(() => {
         <div class="right">
           <span class="state">{{ getOrderStateLabel(orderDetail.orderState) }}</span>
           <el-button v-if="orderDetail.orderState === 1" type="primary" @click="goToPay">去支付</el-button>
-          <el-button @click="router.push('/member/order')">返回订单列表</el-button>
+          <el-button @click="router.back()">返回订单列表</el-button>
         </div>
       </div>
 
