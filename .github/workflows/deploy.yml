@@ -1,72 +1,40 @@
-name: 校园惠 - 自动部署
-
-# 触发条件：只要推送到 main 分支就自动部署
+name: 校园惠自动部署（纯前端稳定版）
 on:
     push:
         branches: [main]
 
 jobs:
-    # 前端部署任务
     deploy-frontend:
         runs-on: ubuntu-latest
         steps:
+            # 1. 拉取GitHub代码
             - uses: actions/checkout@v4
 
-            - name: 设置 Node.js
+            # 2. 安装Node环境
+            - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: '20'
+                  node-version: 20
+                  cache: npm
+                  cache-dependency-path: frontend/package-lock.json
 
-            - name: 安装依赖并打包前端
+            # 3. 安装前端依赖 + 打包
+            - name: 安装依赖并打包
               working-directory: ./frontend
               run: |
                   npm install
                   npm run build
 
-            - name: 部署到服务器 (覆盖 dist)
-              uses: appleboy/ssh-action@master
+            # 4. 自动上传dist到服务器（核心功能）
+            - name: 部署前端到服务器
+              uses: appleboy/scp-action@master
               with:
                   host: ${{ secrets.SERVER_IP }}
-                  username: ${{ secrets.SERVER_USER }}
+                  username: ubuntu
                   key: ${{ secrets.SERVER_SSH_KEY }}
-                  script: |
-                      # 确保前端目录存在
-                      mkdir -p /www/wwwroot/campus-on-sale/frontend/
-
-                      # 删除旧文件，上传新文件
-                      rm -rf /www/wwwroot/campus-on-sale/frontend/dist/*
-                      # 注意：这里使用 scp 来传输文件，上面的 script 只是验证命令
-
-    # 后端部署任务
-    deploy-backend:
-        runs-on: ubuntu-latest
-        needs: deploy-frontend
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: 设置 Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: '20'
-
-            - name: 安装依赖并编译后端
-              working-directory: ./backend
-              run: |
-                  npm install
-                  npm run build
-
-            - name: 部署到服务器 (覆盖后端并重启)
-              uses: appleboy/ssh-action@master
-              with:
-                  host: ${{ secrets.SERVER_IP }}
-                  username: ${{ secrets.SERVER_USER }}
-                  key: ${{ secrets.SERVER_SSH_KEY }}
-                  script: |
-                      # 进入后端目录
-                      cd /www/wwwroot/campus-on-sale/backend
-
-                      # 拉取最新代码（也可以直接覆盖文件）
-                      # 这里我们直接覆盖编译好的目录
-                      rm -rf /www/wwwroot/campus-on-sale/backend/dist/*
-                      # 重启 PM2 服务
-                      pm2 restart campus-api
+                  # 源文件：前端打包后的dist
+                  source: './frontend/dist'
+                  # 目标路径：你的服务器前端目录
+                  target: '/www/wwwroot/campus-on-sale/'
+                  # 覆盖旧文件
+                  rm: true
