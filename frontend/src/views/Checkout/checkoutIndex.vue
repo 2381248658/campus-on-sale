@@ -455,8 +455,12 @@ onMounted(async () => {
               <span>商品总价：</span>
               <span class="val">¥{{ (checkInfo.summary.totalPrice || 0).toFixed(2) }}</span>
             </div>
+            <div class="bill-item" v-if="(checkInfo.summary.discountMoney || 0) > 0">
+              <span>优惠金额：</span>
+              <span class="val discount-text">- ¥{{ (checkInfo.summary.discountMoney || 0).toFixed(2) }}</span>
+            </div>
             <div class="bill-item">
-              <span>基础运费：</span>
+              <span>运费：</span>
               <span class="val">¥{{ (checkInfo.summary.postFee || 0).toFixed(2) }}</span>
             </div>
             <div class="bill-item" v-if="curPayType === 2">
@@ -761,6 +765,10 @@ onMounted(async () => {
 }
 .warning-text {
   color: $priceColor;
+  font-weight: bold;
+}
+.discount-text {
+  color: #67c23a;
   font-weight: bold;
 }
 .submit {
