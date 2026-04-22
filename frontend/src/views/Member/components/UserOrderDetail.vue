@@ -3,7 +3,7 @@ import { getOrderDetailAPI } from '@/apis/order'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { OrderDetail, OrderGoods } from '@/types/api'
+import type { OrderDetail } from '@/types/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -76,6 +76,13 @@ onMounted(() => {
 
       <div class="card">
         <h4>商品信息</h4>
+        <div class="goods-header">
+          <span class="col-img"></span>
+          <span class="col-info">商品</span>
+          <span class="col-price">单价</span>
+          <span class="col-count">数量</span>
+          <span class="col-total">小计</span>
+        </div>
         <div class="goods-item" v-for="item in orderDetail.goods" :key="`${orderDetail.id}-${item.skuId}`">
           <img :src="item.picture" alt="订单商品" />
           <div class="info">
@@ -83,17 +90,33 @@ onMounted(() => {
             <p class="attr">{{ item.attrsText || '默认规格' }}</p>
           </div>
           <div class="price">¥{{ Number(item.price || 0).toFixed(2) }}</div>
-          <div class="count">x{{ item.count }}</div>
-          <div class="total">¥{{ Number((item as OrderGoods).totalPayPrice || item.price * item.count).toFixed(2) }}</div>
+          <div class="count">{{ item.count }}</div>
+          <div class="total">¥{{ Number(item.totalPayPrice || item.price * item.count).toFixed(2) }}</div>
         </div>
       </div>
 
       <div class="card summary">
         <h4>金额汇总</h4>
-        <p>商品总价：¥{{ Number(orderDetail.summary.totalPrice || 0).toFixed(2) }}</p>
-        <p>运费：¥{{ Number(orderDetail.summary.postFee || 0).toFixed(2) }}</p>
-        <p>优惠：-¥{{ Number(orderDetail.summary.discountMoney || 0).toFixed(2) }}</p>
-        <p class="pay-money">实付金额：¥{{ Number(orderDetail.payMoney || 0).toFixed(2) }}</p>
+        <div class="summary-row">
+          <span>商品件数：</span>
+          <span>{{ orderDetail.summary.goodsCount }} 件</span>
+        </div>
+        <div class="summary-row">
+          <span>商品总价：</span>
+          <span>¥{{ Number(orderDetail.summary.totalPrice || 0).toFixed(2) }}</span>
+        </div>
+        <div class="summary-row" v-if="(orderDetail.summary.discountMoney || 0) > 0">
+          <span>优惠金额：</span>
+          <span class="discount">-¥{{ Number(orderDetail.summary.discountMoney || 0).toFixed(2) }}</span>
+        </div>
+        <div class="summary-row">
+          <span>运费：</span>
+          <span>¥{{ Number(orderDetail.summary.postFee || 0).toFixed(2) }}</span>
+        </div>
+        <div class="summary-row pay-money">
+          <span>实付金额：</span>
+          <span>¥{{ Number(orderDetail.payMoney || 0).toFixed(2) }}</span>
+        </div>
       </div>
     </template>
 
@@ -154,6 +177,22 @@ onMounted(() => {
   }
 }
 
+.goods-header {
+  display: grid;
+  grid-template-columns: 64px 1fr 120px 60px 120px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid $borderColor;
+  font-size: 14px;
+  color: $subTextColor;
+  text-align: right;
+
+  .col-info {
+    text-align: left;
+  }
+}
+
 .goods-item {
   display: grid;
   grid-template-columns: 64px 1fr 120px 60px 120px;
@@ -192,11 +231,29 @@ onMounted(() => {
 }
 
 .summary {
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    color: $subTextColor;
+
+    .discount {
+      color: #67c23a;
+    }
+  }
+
   .pay-money {
-    margin-top: 8px;
-    color: $priceColor;
-    font-weight: 600;
-    font-size: 18px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed $borderColor;
+    color: $textColor;
+    font-size: 16px;
+
+    span:last-child {
+      color: $priceColor;
+      font-weight: 600;
+      font-size: 20px;
+    }
   }
 }
 </style>
