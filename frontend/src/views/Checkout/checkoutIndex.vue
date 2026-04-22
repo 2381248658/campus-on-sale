@@ -102,8 +102,8 @@ const totalPostFee = computed<number>(() => {
 })
 
 const totalPayPrice = computed<number>(() => {
-  const totalPrice = checkInfo.value.summary?.totalPrice || 0
-  return totalPrice + totalPostFee.value
+  const totalPay = checkInfo.value.summary?.totalPay || 0
+  return totalPay + totalPostFee.value
 })
 
 const syncSelectedAddress = (): void => {
@@ -402,8 +402,8 @@ onMounted(async () => {
                 </td>
                 <td>&yen;{{ i.price }}</td>
                 <td>{{ i.count }}</td>
-                <td>&yen;{{ (i.price * i.count).toFixed(2) }}</td>
-                <td>&yen;{{ (i.price * i.count).toFixed(2) }}</td>
+                <td>&yen;{{ (i.totalPrice || i.price * i.count).toFixed(2) }}</td>
+                <td>&yen;{{ (i.totalPayPrice || i.price * i.count).toFixed(2) }}</td>
               </tr>
             </tbody>
           </table>
