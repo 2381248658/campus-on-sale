@@ -52,7 +52,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'pay',
         name: 'pay',
-        component: () => import('@/views/Pay/PayIndex.vue'),
+        component: () => import('@/views/Pay/payIndex.vue'),
       },
       {
         path: 'member',
