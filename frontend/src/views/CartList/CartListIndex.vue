@@ -24,10 +24,22 @@ const allCheck = (selected: CheckboxValueType) => {
 /**
  * 去结算
  */
-const goCheckout = () => {
+const flushAllDebounced = async (): Promise<void> => {
+  const promises: Promise<void>[] = []
+  for (const [skuId, timer] of countDebounceTimers) {
+    clearTimeout(timer)
+    const item = cartStore.cartList.find((i) => i.skuId === skuId)
+    if (item) promises.push(cartStore.updateCartItem(skuId, { count: item.count }))
+    countDebounceTimers.delete(skuId)
+  }
+  await Promise.all(promises)
+}
+
+const goCheckout = async () => {
   if (cartStore.selectedCount === 0) {
     return ElMessage.warning('请至少选择一件校内好物再结算哦')
   }
+  await flushAllDebounced()
   router.push('/checkout')
 }
 

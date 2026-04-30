@@ -5,9 +5,10 @@
 <script setup lang="ts">
 import { getCategoryFilterAPI, getSubCategoryAPI } from '@/apis/category'
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import GoodsItem from '../Home/components/GoodsItem.vue'
 import type { SubCategoryFilter, CategoryGoods } from '@/types/api'
+import type { RouteLocationNormalized } from 'vue-router'
 
 /** 筛选数据 */
 const filterData = ref<SubCategoryFilter>({} as SubCategoryFilter)
@@ -16,9 +17,9 @@ const route = useRoute()
 /**
  * 获取分类筛选数据
  */
-const getCategoryData = async (): Promise<void> => {
+const getCategoryData = async (id: string = route.params.id as string): Promise<void> => {
   try {
-    const res = await getCategoryFilterAPI(route.params.id as string)
+    const res = await getCategoryFilterAPI(id)
     filterData.value = res
   } catch (err) {
     console.error('获取校园二级分类数据失败', err)
@@ -58,6 +59,15 @@ const getGoodList = async (): Promise<void> => {
 }
 
 onMounted(() => getGoodList())
+
+onBeforeRouteUpdate((to: RouteLocationNormalized) => {
+  const newId = to.params.id as string
+  reqData.value.categoryId = newId
+  reqData.value.page = 1
+  disabled.value = false
+  getCategoryData(newId)
+  getGoodList()
+})
 
 /**
  * 排序切换

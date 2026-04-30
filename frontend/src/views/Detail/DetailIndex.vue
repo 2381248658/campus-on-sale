@@ -71,24 +71,28 @@ const skuChange = (sku: SkuObj) => {
 /**
  * 加入购物车
  */
-const addCart = () => {
+const addCart = async () => {
   if (!skuObj.value.skuId) {
     return ElMessage.warning('请选择商品规格（如成色/版本）')
   }
 
-  cartStore.addCart({
-    id: goods.value.id,
-    name: goods.value.name,
-    picture: goods.value.mainPictures ? goods.value.mainPictures[0] : '',
-    price: skuObj.value.price || goods.value.price,
-    nowPrice: skuObj.value.price || goods.value.price,
-    count: count.value,
-    skuId: skuObj.value.skuId,
-    attrsText: skuObj.value.specsText || '',
-    selected: true,
-  })
-
-  ElMessage.success('已加入校园购物车')
+  try {
+    await cartStore.addCart({
+      id: goods.value.id,
+      name: goods.value.name,
+      picture: goods.value.mainPictures ? goods.value.mainPictures[0] : '',
+      price: skuObj.value.price || goods.value.price,
+      nowPrice: skuObj.value.price || goods.value.price,
+      count: count.value,
+      skuId: skuObj.value.skuId,
+      attrsText: skuObj.value.specsText || '',
+      selected: true,
+    })
+    ElMessage.success('已加入校园购物车')
+  } catch (err) {
+    console.error('加入购物车失败:', err)
+    ElMessage.error('加入购物车失败，请重试')
+  }
 }
 </script>
 
