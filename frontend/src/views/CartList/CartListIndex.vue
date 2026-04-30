@@ -11,6 +11,8 @@ import type { CheckboxValueType } from 'element-plus'
 const cartStore = useCartStore()
 const router = useRouter()
 
+const countDebounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
+
 /**
  * 全选切换
  * @param selected - 是否全选
@@ -30,12 +32,20 @@ const goCheckout = () => {
 }
 
 /**
- * 数量变更
+ * 数量变更（防抖处理）
  * @param skuId - 商品SKU ID
  * @param count - 新数量
  */
 const countChange = (skuId: string, count: number) => {
-  cartStore.updateCartItem(skuId, { count })
+  const existingTimer = countDebounceTimers.get(skuId)
+  if (existingTimer) clearTimeout(existingTimer)
+
+  const timer = setTimeout(() => {
+    cartStore.updateCartItem(skuId, { count })
+    countDebounceTimers.delete(skuId)
+  }, 300)
+
+  countDebounceTimers.set(skuId, timer)
 }
 
 /**
@@ -44,7 +54,16 @@ const countChange = (skuId: string, count: number) => {
  * @param selected - 是否选中
  */
 const singleCheck = (skuId: string, selected: boolean) => {
-  cartStore.updateCartItem(skuId, { selected })
+  const pendingTimer = countDebounceTimers.get(skuId)
+  if (pendingTimer) {
+    clearTimeout(pendingTimer)
+    countDebounceTimers.delete(skuId)
+    const item = cartStore.cartList.find((i) => i.skuId === skuId)
+    if (item) cartStore.updateCartItem(skuId, { selected, count: item.count })
+    else cartStore.updateCartItem(skuId, { selected })
+  } else {
+    cartStore.updateCartItem(skuId, { selected })
+  }
 }
 </script>
 

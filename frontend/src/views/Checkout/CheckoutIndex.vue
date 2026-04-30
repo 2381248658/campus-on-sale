@@ -278,6 +278,8 @@ const saveAddress = async (): Promise<void> => {
 }
 
 const createOrder = async (): Promise<void> => {
+  if (submitLoading.value) return
+
   if (!isFormValid.value || !currentAddress.value) {
     ElMessage.warning('请先选择有效收货地址')
     return
