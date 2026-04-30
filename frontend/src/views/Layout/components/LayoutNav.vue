@@ -21,7 +21,7 @@ const confirm = (): void => {
         <template v-if="userStore.userInfo.token">
           <li>
             <a href="javascript:;"
-              ><i class="iconfont icon-yonghu"></i>{{ userStore.userInfo.nickname }}</a
+              ><i class="iconfont icon-yonghu"></i>{{ userStore.userInfo.nickname || userStore.userInfo.account || '用户' }}</a
             >
           </li>
           <li>

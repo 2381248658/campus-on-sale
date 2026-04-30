@@ -58,6 +58,8 @@ const handleConfirmPay = (): void => {
     return
   }
 
+  confirming.value = true
+
   const confirmMessage =
     payType.value === 1
       ? `确认支付金额 ¥${payInfo.value.payMoney?.toFixed(2)} 吗？`
@@ -71,7 +73,6 @@ const handleConfirmPay = (): void => {
     type: 'success',
   })
     .then(async () => {
-      confirming.value = true
       const loading = ElLoading.service({
         lock: true,
         text: payType.value === 1 ? '正在确认支付...' : '正在确认订单...',
@@ -94,7 +95,9 @@ const handleConfirmPay = (): void => {
         confirming.value = false
       }
     })
-    .catch(() => {})
+    .catch(() => {
+      confirming.value = false
+    })
 }
 
 /**
@@ -149,7 +152,10 @@ const handlePayLater = (): void => {
       </div>
 
       <!-- ========== 加载中 ========== -->
-      <div v-else-if="!loadError" style="padding: 100px; text-align: center; background: #fff; margin-top: 20px">
+      <div
+        v-else-if="!loadError"
+        style="padding: 100px; text-align: center; background: #fff; margin-top: 20px"
+      >
         <p style="color: #999">正在加载订单结算信息...</p>
       </div>
 
