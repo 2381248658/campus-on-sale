@@ -12,6 +12,7 @@ import { useUserStore } from '@/stores/userStore'
 
 const userStore = useUserStore()
 const formRef = ref<FormInstance>()
+const registerLoading = ref(false)
 
 /** 注册表单数据 */
 interface RegisterForm {
@@ -85,15 +86,19 @@ const rules: FormRules<RegisterForm> = {
  * @description 验证表单后调用注册接口
  */
 const doRegister = () => {
+  if (registerLoading.value) return
   const { account, password, nickname } = form.value
   formRef.value?.validate(async (valid) => {
     if (valid) {
+      registerLoading.value = true
       try {
         await userStore.registerUserInfo({ account, password, nickname: nickname || undefined })
         ElMessage({ type: 'success', message: '注册成功' })
         router.replace({ path: '/' })
       } catch (err) {
         console.log('注册出错啦', err)
+      } finally {
+        registerLoading.value = false
       }
     }
   })
@@ -152,7 +157,9 @@ const doRegister = () => {
                   我已同意隐私条款和服务条款
                 </el-checkbox>
               </el-form-item>
-              <el-button size="large" class="subBtn" @click="doRegister">点击注册</el-button>
+              <el-button size="large" class="subBtn" :loading="registerLoading" @click="doRegister"
+                >点击注册</el-button
+              >
               <div class="to-login">已有账号？<RouterLink to="/login">去登录</RouterLink></div>
             </el-form>
           </div>

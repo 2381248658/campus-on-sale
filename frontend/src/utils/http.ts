@@ -9,12 +9,19 @@ import type { ApiResponse } from '@/types/api'
 
 const TOKEN_KEY = 'user'
 
+let isRedirecting = false
+
 const clearAuthAndRedirect = (): void => {
+  if (isRedirecting) return
+  isRedirecting = true
   localStorage.removeItem(TOKEN_KEY)
   if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
     ElMessage.warning('登录状态已失效，请重新登录')
     window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`
   }
+  setTimeout(() => {
+    isRedirecting = false
+  }, 2000)
 }
 
 const httpInstance: AxiosInstance = axios.create({
@@ -42,7 +49,7 @@ httpInstance.interceptors.request.use((config) => {
 httpInstance.interceptors.response.use(
   (response) => {
     const { code, msg, result } = response.data as ApiResponse<unknown>
-    if (code === '1' || String(code) === '200') {
+    if (String(code) === '1') {
       return result as typeof response.data
     }
     if (code === '401') {

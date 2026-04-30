@@ -16,17 +16,24 @@ const cartStore = useCartStore()
 /** 商品详情数据 */
 const goods = ref<GoodsDetail>({} as GoodsDetail)
 const route = useRoute()
+const detailLoading = ref(true)
+const detailError = ref(false)
 
 /**
  * 获取商品详情
  * @param id - 商品ID
  */
 const getGoods = async (id: string | string[] = route.params.id) => {
+  detailLoading.value = true
+  detailError.value = false
   try {
     const res = await getDetail(id as string)
     goods.value = res
   } catch (err) {
     console.error('获取商品详情失败:', err)
+    detailError.value = true
+  } finally {
+    detailLoading.value = false
   }
 }
 
@@ -87,7 +94,18 @@ const addCart = () => {
 
 <template>
   <div class="campus-goods-page">
-    <div class="container" v-if="goods.id">
+    <!-- 加载状态 -->
+    <div class="container loading-container" v-if="detailLoading">
+      <el-skeleton :rows="12" animated />
+    </div>
+    <!-- 错误状态 -->
+    <div class="container error-container" v-else-if="detailError">
+      <el-empty description="商品详情加载失败，请稍后重试">
+        <el-button type="primary" @click="getGoods()">重新加载</el-button>
+      </el-empty>
+    </div>
+    <!-- 正常内容 -->
+    <div class="container" v-else-if="goods.id">
       <!-- ========== 面包屑导航 ========== -->
       <div class="bread-container">
         <el-breadcrumb separator=">">
@@ -192,6 +210,9 @@ const addCart = () => {
         </div>
       </div>
     </div>
+    <div class="container" v-else>
+      <el-empty description="未找到该商品信息" />
+    </div>
   </div>
 </template>
 
@@ -200,6 +221,19 @@ const addCart = () => {
 
 /* ========== 商品详情页 ========== */
 .campus-goods-page {
+  .loading-container {
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: $borderRadius;
+  }
+
+  .error-container {
+    background: #fff;
+    padding: 80px 20px;
+    border-radius: $borderRadius;
+    text-align: center;
+  }
+
   .goods-info {
     min-height: 600px;
     background: #fff;

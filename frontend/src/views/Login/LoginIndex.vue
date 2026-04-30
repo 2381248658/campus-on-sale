@@ -14,6 +14,7 @@ import { useUserStore } from '@/stores/userStore'
 const userStore = useUserStore()
 const route = useRoute()
 const formRef = ref<FormInstance>()
+const loginLoading = ref(false)
 
 /** 登录表单数据 */
 interface LoginForm {
@@ -53,9 +54,11 @@ const rules: FormRules<LoginForm> = {
  * @description 验证表单后调用登录接口
  */
 const doLogin = () => {
+  if (loginLoading.value) return
   const { account, password } = form.value
   formRef.value?.validate(async (valid) => {
     if (valid) {
+      loginLoading.value = true
       try {
         await userStore.getUserInfo({ account, password })
         ElMessage({ type: 'success', message: '登录成功' })
@@ -63,6 +66,8 @@ const doLogin = () => {
         router.replace(redirect)
       } catch (err) {
         console.log('登录出错啦', err)
+      } finally {
+        loginLoading.value = false
       }
     }
   })
@@ -108,7 +113,9 @@ const doLogin = () => {
                   >我已同意隐私条款和服务条款</el-checkbox
                 >
               </el-form-item>
-              <el-button size="large" class="subBtn" @click="doLogin">点击登录</el-button>
+              <el-button size="large" class="subBtn" :loading="loginLoading" @click="doLogin"
+                >点击登录</el-button
+              >
               <div class="to-register">
                 还没有账号？<RouterLink to="/register">立即注册</RouterLink>
               </div>

@@ -108,12 +108,19 @@ const router = createRouter({
 /** 页面加载Loading实例 */
 let loadingInstance: ReturnType<typeof ElLoading.service> | null = null
 
+/** 关闭并重置Loading实例 */
+const closeLoading = (): void => {
+  loadingInstance?.close()
+  loadingInstance = null
+}
+
 /**
  * 路由前置守卫
  * @description 处理页面加载状态、登录状态校验、权限控制
  */
 router.beforeEach((to, _from, next) => {
-  // 显示页面加载动画
+  closeLoading()
+
   loadingInstance = ElLoading.service({
     lock: true,
     text: '页面加载中...',
@@ -164,8 +171,7 @@ router.beforeEach((to, _from, next) => {
  * @description 关闭页面加载动画
  */
 router.afterEach(() => {
-  loadingInstance?.close()
-  loadingInstance = null
+  closeLoading()
 })
 
 export default router
