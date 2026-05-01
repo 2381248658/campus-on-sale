@@ -6,7 +6,7 @@
  * 3. 用于商品详情页的商品图片展示
  -->
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import { useMouseInElement } from '@vueuse/core'
 
 defineProps<{
@@ -52,7 +52,10 @@ const layerHeight: number = 200
 /** 放大倍数（倍） */
 const zoom: number = 2
 
-watch([elementX, elementY, isOutside], () => {
+/** 待执行的 requestAnimationFrame ID */
+let pendingRaf: number | null = null
+
+const updatePosition = (): void => {
   if (isOutside.value) {
     left.value = 0
     top.value = 0
@@ -63,6 +66,15 @@ watch([elementX, elementY, isOutside], () => {
 
   positionX.value = -left.value * zoom
   positionY.value = -top.value * zoom
+}
+
+watch([elementX, elementY, isOutside], () => {
+  if (pendingRaf !== null) cancelAnimationFrame(pendingRaf)
+  pendingRaf = requestAnimationFrame(updatePosition)
+})
+
+onBeforeUnmount(() => {
+  if (pendingRaf !== null) cancelAnimationFrame(pendingRaf)
 })
 </script>
 

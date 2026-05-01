@@ -62,16 +62,22 @@ onMounted(() => {
         </div>
         <div class="right">
           <span class="state">{{ getOrderStateLabel(orderDetail.orderState) }}</span>
-          <el-button v-if="orderDetail.orderState === 1" type="primary" @click="goToPay">去支付</el-button>
+          <el-button v-if="orderDetail.orderState === 1" type="primary" @click="goToPay"
+            >去支付</el-button
+          >
           <el-button @click="router.back()">返回订单列表</el-button>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" v-if="orderDetail.userAddresses">
         <h4>收货信息</h4>
-        <p>收货人：{{ orderDetail.userAddresses.receiver }}</p>
-        <p>联系电话：{{ orderDetail.userAddresses.contact }}</p>
-        <p>收货地址：{{ orderDetail.userAddresses.fullLocation || orderDetail.userAddresses.address }}</p>
+        <p>收货人：{{ orderDetail.userAddresses.receiver || '--' }}</p>
+        <p>联系电话：{{ orderDetail.userAddresses.contact || '--' }}</p>
+        <p>
+          收货地址：{{
+            orderDetail.userAddresses.fullLocation || orderDetail.userAddresses.address || '--'
+          }}
+        </p>
       </div>
 
       <div class="card">
@@ -83,7 +89,11 @@ onMounted(() => {
           <span class="col-count">数量</span>
           <span class="col-total">小计</span>
         </div>
-        <div class="goods-item" v-for="item in orderDetail.goods" :key="`${orderDetail.id}-${item.skuId}`">
+        <div
+          class="goods-item"
+          v-for="item in orderDetail.goods"
+          :key="`${orderDetail.id}-${item.skuId}`"
+        >
           <img :src="item.picture" alt="订单商品" />
           <div class="info">
             <p class="name">{{ item.name }}</p>
@@ -91,7 +101,9 @@ onMounted(() => {
           </div>
           <div class="price">¥{{ Number(item.price || 0).toFixed(2) }}</div>
           <div class="count">{{ item.count }}</div>
-          <div class="total">¥{{ Number(item.totalPayPrice || item.price * item.count).toFixed(2) }}</div>
+          <div class="total">
+            ¥{{ Number(item.totalPayPrice || item.price * item.count).toFixed(2) }}
+          </div>
         </div>
       </div>
 
@@ -99,19 +111,21 @@ onMounted(() => {
         <h4>金额汇总</h4>
         <div class="summary-row">
           <span>商品件数：</span>
-          <span>{{ orderDetail.summary.goodsCount }} 件</span>
+          <span>{{ orderDetail.summary?.goodsCount ?? 0 }} 件</span>
         </div>
         <div class="summary-row">
           <span>商品总价：</span>
-          <span>¥{{ Number(orderDetail.summary.totalPrice || 0).toFixed(2) }}</span>
+          <span>¥{{ Number(orderDetail.summary?.totalPrice || 0).toFixed(2) }}</span>
         </div>
-        <div class="summary-row" v-if="(orderDetail.summary.discountMoney || 0) > 0">
+        <div class="summary-row" v-if="(orderDetail.summary?.discountMoney || 0) > 0">
           <span>优惠金额：</span>
-          <span class="discount">-¥{{ Number(orderDetail.summary.discountMoney || 0).toFixed(2) }}</span>
+          <span class="discount"
+            >-¥{{ Number(orderDetail.summary.discountMoney || 0).toFixed(2) }}</span
+          >
         </div>
         <div class="summary-row">
           <span>运费：</span>
-          <span>¥{{ Number(orderDetail.summary.postFee || 0).toFixed(2) }}</span>
+          <span>¥{{ Number(orderDetail.summary?.postFee || 0).toFixed(2) }}</span>
         </div>
         <div class="summary-row pay-money">
           <span>实付金额：</span>
