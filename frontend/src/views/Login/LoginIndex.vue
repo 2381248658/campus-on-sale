@@ -3,7 +3,7 @@
   @description 用户登录页面，包含登录表单和表单验证
 -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import 'element-plus/theme-chalk/el-message.css'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -27,6 +27,11 @@ const form = ref<LoginForm>({
   account: '',
   password: '',
   agree: false,
+})
+
+onMounted(() => {
+  form.value = { account: '', password: '', agree: false }
+  formRef.value?.clearValidate()
 })
 
 const rules: FormRules<LoginForm> = {
@@ -78,7 +83,7 @@ const doLogin = () => {
           type="password"
           placeholder="请输入密码"
           show-password
-          autocomplete="off"
+          autocomplete="new-password"
         />
       </el-form-item>
       <el-form-item prop="agree">

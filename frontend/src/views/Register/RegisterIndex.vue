@@ -3,7 +3,7 @@
   @description 用户注册页面，包含注册表单和表单验证
 -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import 'element-plus/theme-chalk/el-message.css'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -29,6 +29,11 @@ const form = ref<RegisterForm>({
   confirmPassword: '',
   nickname: '',
   agree: false,
+})
+
+onMounted(() => {
+  form.value = { account: '', password: '', confirmPassword: '', nickname: '', agree: false }
+  formRef.value?.clearValidate()
 })
 
 const validateConfirmPassword = (
@@ -93,13 +98,23 @@ const doRegister = () => {
   <AuthLayout title="账户注册" section-height="734px">
     <el-form ref="formRef" :model="form" :rules="rules" status-icon label-position="top">
       <el-form-item label="学号" prop="account">
-        <el-input v-model="form.account" placeholder="请输入学号" />
+        <el-input v-model="form.account" placeholder="请输入学号" autocomplete="off" />
       </el-form-item>
       <el-form-item label="昵称" prop="nickname">
-        <el-input v-model="form.nickname" placeholder="请输入昵称（选填，默认使用学号）" />
+        <el-input
+          v-model="form.nickname"
+          placeholder="请输入昵称（选填，默认使用学号）"
+          autocomplete="off"
+        />
       </el-form-item>
       <el-form-item label="密码" prop="password">
-        <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
+        <el-input
+          v-model="form.password"
+          type="password"
+          placeholder="请输入密码"
+          show-password
+          autocomplete="new-password"
+        />
       </el-form-item>
       <el-form-item label="确认密码" prop="confirmPassword">
         <el-input
@@ -107,12 +122,11 @@ const doRegister = () => {
           type="password"
           placeholder="请再次输入密码"
           show-password
+          autocomplete="new-password"
         />
       </el-form-item>
       <el-form-item prop="agree">
-        <el-checkbox size="large" v-model="form.agree">
-          我已同意隐私条款和服务条款
-        </el-checkbox>
+        <el-checkbox size="large" v-model="form.agree"> 我已同意隐私条款和服务条款 </el-checkbox>
       </el-form-item>
       <el-button size="large" class="subBtn" :loading="registerLoading" @click="doRegister"
         >点击注册</el-button
