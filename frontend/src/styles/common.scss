@@ -113,23 +113,6 @@ ul {
   overflow: hidden;
 }
 
-.fl {
-  float: left;
-}
-
-.fr {
-  float: right;
-}
-
-.clearfix:after {
-  content: '.';
-  display: block;
-  visibility: hidden;
-  height: 0;
-  line-height: 0;
-  clear: both;
-}
-
 .el-breadcrumb__inner.is-link {
   font-weight: 400 !important;
   color: var(--el-color-primary) !important;
