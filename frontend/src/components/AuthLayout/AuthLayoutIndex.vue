@@ -3,15 +3,8 @@
   @description 登录/注册页面的公共布局（头部、表单卡片、底部）
 -->
 <script setup lang="ts">
-/**
- * @props title - 表单卡片导航标题（如"账户登录"、"账户注册"）
- * @props sectionHeight - 表单区域高度（默认634px）
- * @slots default - 表单内容区域
- * @slots footer-link - 表单底部链接区域（如"还没有账号？立即注册"）
- */
 defineProps<{
   title: string
-  sectionHeight?: string
 }>()
 </script>
 
@@ -23,14 +16,14 @@ defineProps<{
           <RouterLink to="/">EasyHub</RouterLink>
         </h1>
         <RouterLink class="entry" to="/">
-          进入网站首页>>
+          进入网站首页
           <i class="iconfont icon-angle-right"></i>
           <i class="iconfont icon-angle-right"></i>
         </RouterLink>
       </div>
     </header>
 
-    <section class="auth-section" :style="{ height: sectionHeight || '634px' }">
+    <section class="auth-section">
       <div class="wrapper">
         <nav>
           <a href="javascript:;">{{ title }}</a>
@@ -64,8 +57,9 @@ defineProps<{
 @use 'sass:color';
 
 .auth-page {
-  max-width: 100vw;
-  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .auth-header {
@@ -75,77 +69,67 @@ defineProps<{
 
   .container {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
     width: 1240px;
     margin: 0 auto;
     padding: 0 20px;
+    height: 80px;
   }
 
   .logo {
-    width: 180px;
-
     a {
       display: block;
-      height: 120px;
-      width: 100%;
+      width: 140px;
+      height: 60px;
       text-indent: -9999px;
-      background: url('@/assets/images/logo.png') no-repeat center 20px / contain;
+      background: url('@/assets/images/logo.png') no-repeat center / contain;
       transition: all 0.3s ease;
     }
 
-    &:hover {
-      transform: scale(1.05);
+    &:hover a {
+      transform: scale(1.03);
     }
   }
 
   .entry {
-    width: 120px;
-    margin-bottom: 38px;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 14px;
     color: #666;
     transition: all 0.3s ease;
 
     &:hover {
       color: $campusColor;
-      transform: translateX(5px);
     }
 
     i {
-      font-size: 14px;
+      font-size: 12px;
       color: $campusColor;
-      letter-spacing: -5px;
+      letter-spacing: -4px;
     }
   }
 }
 
 .auth-section {
+  flex: 1;
   background: url('@/assets/images/login-bg.jpg') no-repeat center / cover;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 10%;
+  padding: 40px 10%;
 
   .wrapper {
-    width: 420px;
+    width: 400px;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     border-radius: 12px;
     overflow: hidden;
-    transition: all 0.3s ease;
-
-    &:hover {
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
-      transform: translateY(-2px);
-    }
 
     nav {
-      height: 60px;
+      height: 50px;
       border-bottom: 1px solid #f0f0f0;
       display: flex;
-      padding: 0 40px;
+      padding: 0 30px;
       align-items: center;
       background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
 
@@ -153,7 +137,7 @@ defineProps<{
         flex: 1;
         line-height: 1;
         display: inline-block;
-        font-size: 22px;
+        font-size: 18px;
         font-weight: 600;
         position: relative;
         text-align: center;
@@ -162,10 +146,10 @@ defineProps<{
         &::after {
           content: '';
           position: absolute;
-          bottom: -20px;
+          bottom: -16px;
           left: 50%;
           transform: translateX(-50%);
-          width: 40px;
+          width: 36px;
           height: 3px;
           background: $campusColor;
           border-radius: 2px;
@@ -177,24 +161,20 @@ defineProps<{
 
 .account-box {
   .form {
-    padding: 35px 40px 45px;
+    padding: 28px 30px 32px;
 
     :deep(.el-form) {
       width: 100%;
     }
 
     :deep(.el-form-item) {
-      margin-bottom: 22px;
-
-      &:last-of-type {
-        margin-bottom: 30px;
-      }
+      margin-bottom: 18px;
 
       .el-form-item__label {
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 500;
         color: #333;
-        padding-bottom: 4px;
+        padding-bottom: 2px;
       }
     }
 
@@ -205,7 +185,7 @@ defineProps<{
       --el-input-border-radius: 8px;
 
       .el-input__wrapper {
-        height: 50px;
+        height: 44px;
         border-radius: 8px;
         transition: all 0.3s ease;
 
@@ -216,19 +196,19 @@ defineProps<{
       }
 
       .el-input__inner {
-        height: 50px;
-        line-height: 50px;
-        font-size: 16px;
+        height: 44px;
+        line-height: 44px;
+        font-size: 15px;
       }
     }
 
     :deep(.el-checkbox) {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
 
       .el-checkbox__label {
-        font-size: 14px;
+        font-size: 13px;
         color: #5f6368;
         white-space: normal;
       }
@@ -241,8 +221,8 @@ defineProps<{
         color.adjust($campusColor, $lightness: 10%) 100%
       );
       width: 100%;
-      height: 50px;
-      font-size: 16px;
+      height: 44px;
+      font-size: 15px;
       font-weight: 600;
       color: #fff;
       border: none;
@@ -267,8 +247,8 @@ defineProps<{
 
     :deep(.auth-link) {
       text-align: center;
-      margin-top: 16px;
-      font-size: 14px;
+      margin-top: 14px;
+      font-size: 13px;
       color: #999;
 
       a {
@@ -285,7 +265,7 @@ defineProps<{
 }
 
 .auth-footer {
-  padding: 40px 0 30px;
+  padding: 24px 0;
   background: rgba(255, 255, 255, 0.95);
   border-top: 1px solid rgba(228, 228, 228, 0.5);
 
@@ -298,13 +278,13 @@ defineProps<{
   p {
     text-align: center;
     color: #6b7280;
-    padding-top: 15px;
-    font-size: 14px;
-    line-height: 1.6;
+    padding-top: 10px;
+    font-size: 13px;
+    line-height: 1.5;
 
     a {
       line-height: 1;
-      padding: 0 12px;
+      padding: 0 10px;
       color: #6b7280;
       display: inline-block;
 
@@ -319,8 +299,8 @@ defineProps<{
 
     &:last-of-type {
       color: #9ca3af;
-      font-size: 13px;
-      margin-top: 10px;
+      font-size: 12px;
+      margin-top: 6px;
     }
   }
 }

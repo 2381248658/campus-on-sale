@@ -95,7 +95,7 @@ const doRegister = () => {
 </script>
 
 <template>
-  <AuthLayout title="账户注册" section-height="734px">
+  <AuthLayout title="账户注册">
     <el-form ref="formRef" :model="form" :rules="rules" status-icon label-position="top">
       <el-form-item label="学号" prop="account">
         <el-input v-model="form.account" placeholder="请输入学号" autocomplete="off" />
