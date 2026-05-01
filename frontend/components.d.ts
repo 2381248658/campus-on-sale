@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddressFormIndex: typeof import('./src/components/AddressForm/AddressFormIndex.vue')['default']
+    AuthLayoutIndex: typeof import('./src/components/AuthLayout/AuthLayoutIndex.vue')['default']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
     ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
     ElButton: typeof import('element-plus/es')['ElButton']

@@ -10,19 +10,16 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { useRoute } from 'vue-router'
 import router from '@/router'
 import { useUserStore } from '@/stores/userStore'
+import AuthLayout from '@/components/AuthLayout/AuthLayoutIndex.vue'
 
 const userStore = useUserStore()
 const route = useRoute()
 const formRef = ref<FormInstance>()
 const loginLoading = ref(false)
 
-/** 登录表单数据 */
 interface LoginForm {
-  /** 学号 */
   account: string
-  /** 密码 */
   password: string
-  /** 是否同意协议 */
   agree: boolean
 }
 
@@ -32,7 +29,6 @@ const form = ref<LoginForm>({
   agree: false,
 })
 
-/** 表单验证规则 */
 const rules: FormRules<LoginForm> = {
   account: [{ required: true, message: '学号不能为空', trigger: 'blur' }],
   password: [
@@ -49,10 +45,6 @@ const rules: FormRules<LoginForm> = {
   ],
 }
 
-/**
- * 执行登录
- * @description 验证表单后调用登录接口
- */
 const doLogin = () => {
   if (loginLoading.value) return
   const { account, password } = form.value
@@ -75,317 +67,23 @@ const doLogin = () => {
 </script>
 
 <template>
-  <div class="login-page">
-    <!-- ========== 头部区域 ========== -->
-    <header class="login-header">
-      <div class="container">
-        <h1 class="logo">
-          <RouterLink to="/">EasyHub</RouterLink>
-        </h1>
-        <RouterLink class="entry" to="/">
-          进入网站首页>>
-          <i class="iconfont icon-angle-right"></i>
-          <i class="iconfont icon-angle-right"></i>
-        </RouterLink>
+  <AuthLayout title="账户登录">
+    <el-form ref="formRef" :model="form" :rules="rules" status-icon label-position="top">
+      <el-form-item label="学号" prop="account">
+        <el-input v-model="form.account" placeholder="请输入学号" />
+      </el-form-item>
+      <el-form-item label="密码" prop="password">
+        <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
+      </el-form-item>
+      <el-form-item prop="agree">
+        <el-checkbox size="large" v-model="form.agree">我已同意隐私条款和服务条款</el-checkbox>
+      </el-form-item>
+      <el-button size="large" class="subBtn" :loading="loginLoading" @click="doLogin"
+        >点击登录</el-button
+      >
+      <div class="auth-link">
+        还没有账号？<RouterLink to="/register">立即注册</RouterLink>
       </div>
-    </header>
-
-    <!-- ========== 登录表单区域 ========== -->
-    <section class="login-section">
-      <div class="wrapper">
-        <nav><a href="javascript:;">账户登录</a></nav>
-        <div class="account-box">
-          <div class="form">
-            <el-form ref="formRef" :model="form" :rules="rules" status-icon label-position="top">
-              <el-form-item label="学号" prop="account">
-                <el-input v-model="form.account" placeholder="请输入学号" />
-              </el-form-item>
-              <el-form-item label="密码" prop="password">
-                <el-input
-                  v-model="form.password"
-                  type="password"
-                  placeholder="请输入密码"
-                  show-password
-                />
-              </el-form-item>
-              <el-form-item prop="agree">
-                <el-checkbox size="large" v-model="form.agree"
-                  >我已同意隐私条款和服务条款</el-checkbox
-                >
-              </el-form-item>
-              <el-button size="large" class="subBtn" :loading="loginLoading" @click="doLogin"
-                >点击登录</el-button
-              >
-              <div class="to-register">
-                还没有账号？<RouterLink to="/register">立即注册</RouterLink>
-              </div>
-            </el-form>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== 底部区域 ========== -->
-    <footer class="login-footer">
-      <div class="container">
-        <p>
-          <a href="javascript:;">关于我们</a>
-          <a href="javascript:;">帮助中心</a>
-          <a href="javascript:;">售后服务</a>
-          <a href="javascript:;">配送与验收</a>
-          <a href="javascript:;">商务合作</a>
-          <a href="javascript:;">搜索推荐</a>
-          <a href="javascript:;">友情链接</a>
-        </p>
-        <p>CopyRight &copy; compus on sale</p>
-      </div>
-    </footer>
-  </div>
+    </el-form>
+  </AuthLayout>
 </template>
-
-<style scoped lang="scss">
-@use 'sass:color';
-
-/* ========== 页面容器 ========== */
-.login-page {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-/* ========== 头部区域 ========== */
-.login-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(228, 228, 228, 0.5);
-
-  .container {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    width: 1240px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-
-  .logo {
-    width: 180px;
-    a {
-      display: block;
-      height: 120px;
-      width: 100%;
-      text-indent: -9999px;
-      background: url('@/assets/images/logo.png') no-repeat center 20px / contain;
-      transition: all 0.3s ease;
-    }
-    &:hover {
-      transform: scale(1.05);
-    }
-  }
-
-  .entry {
-    width: 120px;
-    margin-bottom: 38px;
-    font-size: 16px;
-    font-weight: 500;
-    color: #666;
-    transition: all 0.3s ease;
-    &:hover {
-      color: $campusColor;
-      transform: translateX(5px);
-    }
-    i {
-      font-size: 14px;
-      color: $campusColor;
-      letter-spacing: -5px;
-    }
-  }
-}
-
-/* ========== 登录表单区域 ========== */
-.login-section {
-  background: url('@/assets/images/login-bg.jpg') no-repeat center / cover;
-  height: 634px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 10%;
-
-  .wrapper {
-    width: 420px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    &:hover {
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
-      transform: translateY(-2px);
-    }
-
-    nav {
-      height: 60px;
-      border-bottom: 1px solid #f0f0f0;
-      display: flex;
-      padding: 0 40px;
-      align-items: center;
-      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-      a {
-        flex: 1;
-        line-height: 1;
-        display: inline-block;
-        font-size: 22px;
-        font-weight: 600;
-        position: relative;
-        text-align: center;
-        color: #333;
-        &::after {
-          content: '';
-          position: absolute;
-          bottom: -20px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 40px;
-          height: 3px;
-          background: $campusColor;
-          border-radius: 2px;
-        }
-      }
-    }
-  }
-}
-
-/* ========== 表单样式 ========== */
-.account-box {
-  .form {
-    padding: 35px 40px 45px;
-    :deep(.el-form) {
-      width: 100%;
-    }
-    :deep(.el-form-item) {
-      margin-bottom: 22px;
-      &:last-of-type {
-        margin-bottom: 30px;
-      }
-      .el-form-item__label {
-        font-size: 15px;
-        font-weight: 500;
-        color: #333;
-        padding-bottom: 4px;
-      }
-    }
-    :deep(.el-input) {
-      --el-input-border-color: #e8eaed;
-      --el-input-hover-border-color: $campusColor;
-      --el-input-focus-border-color: $campusColor;
-      --el-input-border-radius: 8px;
-      .el-input__wrapper {
-        height: 50px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        &:focus-within {
-          box-shadow: 0 0 0 3px rgba($campusColor, 0.1);
-          border-color: $campusColor;
-        }
-      }
-      .el-input__inner {
-        height: 50px;
-        line-height: 50px;
-        font-size: 16px;
-      }
-    }
-    :deep(.el-checkbox) {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      .el-checkbox__label {
-        font-size: 14px;
-        color: #5f6368;
-        white-space: normal;
-      }
-    }
-  }
-}
-
-/* ========== 登录按钮 ========== */
-.subBtn {
-  background: linear-gradient(
-    135deg,
-    $campusColor 0%,
-    color.adjust($campusColor, $lightness: 10%) 100%
-  );
-  width: 100%;
-  height: 50px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba($campusColor, 0.3);
-  &:hover {
-    background: linear-gradient(
-      135deg,
-      color.adjust($campusColor, $lightness: -5%) 0%,
-      $campusColor 100%
-    );
-    box-shadow: 0 6px 16px rgba($campusColor, 0.4);
-    transform: translateY(-1px);
-  }
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-/* ========== 注册链接 ========== */
-.to-register {
-  text-align: center;
-  margin-top: 16px;
-  font-size: 14px;
-  color: #999;
-  a {
-    color: $campusColor;
-    font-weight: 500;
-    transition: all 0.2s;
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-
-/* ========== 底部区域 ========== */
-.login-footer {
-  padding: 40px 0 30px;
-  background: rgba(255, 255, 255, 0.95);
-  border-top: 1px solid rgba(228, 228, 228, 0.5);
-  .container {
-    width: 1240px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-  p {
-    text-align: center;
-    color: #6b7280;
-    padding-top: 15px;
-    font-size: 14px;
-    line-height: 1.6;
-    a {
-      line-height: 1;
-      padding: 0 12px;
-      color: #6b7280;
-      display: inline-block;
-      &:hover {
-        color: $campusColor;
-      }
-      ~ a {
-        border-left: 1px solid #e5e7eb;
-      }
-    }
-    &:last-of-type {
-      color: #9ca3af;
-      font-size: 13px;
-      margin-top: 10px;
-    }
-  }
-}
-</style>
