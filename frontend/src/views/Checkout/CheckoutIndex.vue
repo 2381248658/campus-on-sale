@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getCheckoutInfoAPI, createOrderAPI } from '@/apis/checkout'
+import { getCheckoutInfoAPI, createOrderAPI } from '@/apis/order'
 import { onMounted, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'

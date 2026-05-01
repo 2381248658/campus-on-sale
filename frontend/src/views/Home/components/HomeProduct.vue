@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import HomePanel from './HomePanel.vue'
-import { getGoodsAPI } from '@/apis/home'
+import { getHomeGoodsAPI } from '@/apis/home'
 import { onMounted, ref } from 'vue'
 import GoodsItem from './GoodsItem.vue'
 import type { HomeProduct } from '@/types/api'
@@ -17,7 +17,7 @@ const goodsList = ref<HomeProduct[]>([])
 
 const getGoods = async (): Promise<void> => {
   try {
-    const res = await getGoodsAPI()
+    const res = await getHomeGoodsAPI()
     goodsList.value = res || []
   } catch (err) {
     console.error('获取校园业务板块失败', err)

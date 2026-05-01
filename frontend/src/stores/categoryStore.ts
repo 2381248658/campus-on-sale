@@ -4,7 +4,7 @@
  */
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getCategoryAPI } from '@/apis/layout'
+import { getCategoryHeadAPI } from '@/apis/home'
 import type { CategoryHead } from '@/types/api'
 
 export const useCategoryStore = defineStore('category', () => {
@@ -17,7 +17,7 @@ export const useCategoryStore = defineStore('category', () => {
    */
   const getCategory = async (): Promise<void> => {
     try {
-      const res = await getCategoryAPI()
+      const res = await getCategoryHeadAPI()
       categoryList.value = res || []
     } catch (error) {
       categoryList.value = []

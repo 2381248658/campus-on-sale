@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import HomePanel from './HomePanel.vue'
-import { findHotAPI } from '@/apis/home'
+import { getHotRecommendAPI } from '@/apis/home'
 import type { HotRecommend } from '@/types/api'
 
 // ============================================
@@ -19,7 +19,7 @@ const getFindHot = async (): Promise<void> => {
   if (hotList.value.length > 0) return
 
   try {
-    const res = await findHotAPI()
+    const res = await getHotRecommendAPI()
     // 拦截器已处理解构
     hotList.value = res || []
   } catch (err) {

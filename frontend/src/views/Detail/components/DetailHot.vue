@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { fetchHotGoodsAPI } from '@/apis/detail'
+import { getHotGoodsAPI } from '@/apis/detail'
 import { useRoute } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
 import type { CategoryGoods } from '@/types/api'
@@ -22,7 +22,7 @@ const title = computed(() => TYPEMAP[props.hotType])
 // 2. 获取热榜数据
 const getHotList = async () => {
   try {
-    const res = await fetchHotGoodsAPI({
+    const res = await getHotGoodsAPI({
       id: route.params.id as string,
       type: props.hotType,
     })

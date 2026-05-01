@@ -3,7 +3,7 @@
   @description 订单支付确认页面，支持在线支付和货到付款
 -->
 <script setup lang="ts">
-import { confirmOrderPayAPI, getOrderAPI } from '@/apis/pay'
+import { confirmOrderPayAPI, getOrderDetailAPI } from '@/apis/order'
 import { onMounted, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
@@ -38,7 +38,7 @@ const getOrder = async (): Promise<void> => {
     return
   }
   try {
-    const res = await getOrderAPI(orderId.value)
+    const res = await getOrderDetailAPI(orderId.value)
     payInfo.value = res
   } catch (err) {
     console.log('支付页基础数据获取失败', err)

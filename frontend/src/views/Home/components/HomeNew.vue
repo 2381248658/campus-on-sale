@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import HomePanel from './HomePanel.vue'
-import { findNewAPI } from '@/apis/home'
+import { getFreshGoodsAPI } from '@/apis/home'
 import type { FreshGoods } from '@/types/api'
 
 // ============================================
@@ -19,7 +19,7 @@ const getFindNew = async (): Promise<void> => {
   if (newList.value.length > 0) return
 
   try {
-    const res = await findNewAPI()
+    const res = await getFreshGoodsAPI()
     newList.value = res || []
   } catch (err) {
     console.error('获取新鲜好物失败', err)

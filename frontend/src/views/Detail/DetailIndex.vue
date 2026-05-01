@@ -3,7 +3,7 @@
   @description 展示商品详情信息，支持规格选择、加入购物车
 -->
 <script setup lang="ts">
-import { getDetail } from '@/apis/detail'
+import { getGoodsDetailAPI } from '@/apis/detail'
 import { onMounted, ref } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import DetailHot from './components/DetailHot.vue'
@@ -27,7 +27,7 @@ const getGoods = async (id: string | string[] = route.params.id) => {
   detailLoading.value = true
   detailError.value = false
   try {
-    const res = await getDetail(id as string)
+    const res = await getGoodsDetailAPI(id as string)
     goods.value = res
   } catch (err) {
     console.error('获取商品详情失败:', err)
