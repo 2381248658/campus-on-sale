@@ -6,19 +6,25 @@ import axios, { AxiosError, type AxiosInstance } from 'axios'
 import 'element-plus/theme-chalk/el-message.css'
 import { ElMessage } from 'element-plus'
 import type { ApiResponse } from '@/types/api'
-
-const TOKEN_KEY = 'user'
+import { useUserStore } from '@/stores/userStore'
+import router from '@/router'
 
 let isRedirecting = false
 
-const clearAuthAndRedirect = (): void => {
+const handleUnauthorized = (): void => {
   if (isRedirecting) return
   isRedirecting = true
-  localStorage.removeItem(TOKEN_KEY)
-  if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+
+  const userStore = useUserStore()
+  const currentPath = window.location.pathname + window.location.search
+
+  userStore.clearUserInfo()
+
+  if (currentPath !== '/login' && currentPath !== '/register') {
     ElMessage.warning('登录状态已失效，请重新登录')
-    window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`
+    router.push({ path: '/login', query: { redirect: currentPath } })
   }
+
   setTimeout(() => {
     isRedirecting = false
   }, 2000)
@@ -30,18 +36,11 @@ const httpInstance: AxiosInstance = axios.create({
 })
 
 httpInstance.interceptors.request.use((config) => {
-  try {
-    const persistedUser = localStorage.getItem(TOKEN_KEY)
-    if (persistedUser) {
-      const parsed = JSON.parse(persistedUser) as { userInfo?: { token?: string } }
-      const token = parsed?.userInfo?.token
-      if (token) {
-        config.headers = config.headers || {}
-        config.headers.Authorization = `Bearer ${token}`
-      }
-    }
-  } catch {
-    // ignore parsing errors
+  const userStore = useUserStore()
+  const token = userStore.userInfo?.token
+  if (token) {
+    config.headers = config.headers || {}
+    config.headers.Authorization = `Bearer ${token}`
   }
   return config
 })
@@ -53,7 +52,7 @@ httpInstance.interceptors.response.use(
       return result as typeof response.data
     }
     if (code === '401') {
-      clearAuthAndRedirect()
+      handleUnauthorized()
       return Promise.reject(new Error(msg || '未授权'))
     }
     ElMessage.error(msg || '服务暂不可用')
@@ -62,7 +61,7 @@ httpInstance.interceptors.response.use(
   (error: unknown) => {
     const axiosError = error as AxiosError<{ message?: string; msg?: string; code?: string }>
     if (axiosError.response?.status === 401) {
-      clearAuthAndRedirect()
+      handleUnauthorized()
       return Promise.reject(error)
     }
     const errorMessage =

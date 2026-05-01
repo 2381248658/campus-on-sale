@@ -10,6 +10,7 @@ import {
 } from 'vue-router'
 import { ElLoading } from 'element-plus'
 import { PROTECTED_PATHS } from '@/constants'
+import { useUserStore } from '@/stores/userStore'
 
 import Layout from '@/views/Layout/LayoutIndex.vue'
 import Login from '@/views/Login/LoginIndex.vue'
@@ -130,18 +131,9 @@ router.beforeEach((to, _from, next) => {
 
   const requiresAuth = PROTECTED_PATHS.some((path) => to.path.startsWith(path))
 
-  // 获取token
-  const persistedUser = localStorage.getItem('user')
-  let token = ''
-  if (persistedUser) {
-    try {
-      token = JSON.parse(persistedUser)?.userInfo?.token || ''
-    } catch {
-      token = ''
-    }
-  }
+  const userStore = useUserStore()
+  const token = userStore.userInfo?.token
 
-  // 已登录用户访问登录/注册页，重定向到首页
   if (to.name === 'login' || to.name === 'register') {
     if (token) {
       next({ path: '/' })
@@ -151,13 +143,11 @@ router.beforeEach((to, _from, next) => {
     return
   }
 
-  // 不需要权限的页面直接放行
   if (!requiresAuth) {
     next()
     return
   }
 
-  // 需要权限的页面检查token
   if (token) {
     next()
   } else {
