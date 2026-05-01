@@ -1,6 +1,6 @@
 <!--
   @file 首页
-  @description 校园惠商城首页，包含分类导航、轮播图、新鲜好物、人气推荐、商品板块
+  @description Campus on Sale 商城首页，包含分类导航、轮播图、新鲜好物、人气推荐、商品板块
 -->
 <script setup lang="ts">
 import HomeBanner from './components/HomeBanner.vue'

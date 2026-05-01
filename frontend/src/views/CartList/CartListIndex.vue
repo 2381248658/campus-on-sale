@@ -38,7 +38,7 @@ const flushAllDebounced = async (): Promise<void> => {
 
 const goCheckout = async () => {
   if (cartStore.selectedCount === 0) {
-    return ElMessage.warning('请至少选择一件校内好物再结算哦')
+    return ElMessage.warning('请至少选择一件商品再结算')
   }
   await flushAllDebounced()
   router.push('/checkout')
@@ -145,7 +145,7 @@ const singleCheck = (skuId: string, selected: boolean) => {
               <td colspan="6">
                 <div class="cart-none">
                   <el-empty description="你的购物车还是空的哦">
-                    <el-button type="primary" @click="$router.push('/')">去校内馆逛逛</el-button>
+                    <el-button type="primary" @click="$router.push('/')">去首页逛逛</el-button>
                   </el-empty>
                 </div>
               </td>

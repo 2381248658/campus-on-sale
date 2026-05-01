@@ -135,7 +135,7 @@ const load = async (): Promise<void> => {
       </div>
 
       <!-- ========== 加载完毕提示 ========== -->
-      <div v-if="disabled" class="no-more">—— 已经到底啦，去看看其他校内好物吧 ——</div>
+      <div v-if="disabled" class="no-more">—— 已经到底啦，去看看其他校园好物吧 ——</div>
     </div>
   </div>
 </template>

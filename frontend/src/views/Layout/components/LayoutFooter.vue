@@ -22,7 +22,7 @@
             <dd class="qrcode"><i class="iconfont icon-erweima"></i></dd>
             <dd class="download">
               <span>扫描二维码</span>
-              <span>立马下载校园惠APP</span>
+              <span>立马下载 Campus on Sale APP</span>
               <a href="javascript:;">前往下载</a>
             </dd>
           </div>
@@ -64,7 +64,7 @@
             <a href="javascript:;">校园动态</a>
             <a href="javascript:;">友情链接</a>
           </p>
-          <p>CopyRight © 2025 校园惠-校内综合服务平台 EasyHub</p>
+          <p>CopyRight © 2026 Campus on Sale - 校园二手交易平台</p>
         </div>
       </div>
     </div>

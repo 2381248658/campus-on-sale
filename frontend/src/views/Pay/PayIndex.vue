@@ -129,7 +129,7 @@ const handlePayLater = (): void => {
       <div class="pay-action-card" v-if="payInfo.payMoney">
         <div class="header"><p>结算确认</p></div>
         <div class="content">
-          <p class="notice">您正在进行校园惠快速结算，点击下方按钮即可完成支付。</p>
+          <p class="notice">您正在进行校园交易结算，点击下方按钮即可完成支付。</p>
           <div class="pay-actions">
             <el-button
               type="primary"
@@ -147,7 +147,7 @@ const handlePayLater = (): void => {
           <p v-if="payInfo.orderState !== 1" class="safe-tip">
             当前订单状态不可支付，请前往我的订单查看
           </p>
-          <p class="safe-tip">支付保障：校园惠安全支付系统</p>
+          <p class="safe-tip">支付保障：校园交易安全支付系统</p>
         </div>
       </div>
 

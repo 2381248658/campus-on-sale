@@ -13,7 +13,7 @@ defineProps<{
     <header class="auth-header">
       <div class="container">
         <h1 class="logo">
-          <RouterLink to="/">EasyHub</RouterLink>
+          <RouterLink to="/">Campus on Sale</RouterLink>
         </h1>
         <RouterLink class="entry" to="/">
           进入网站首页
@@ -47,7 +47,7 @@ defineProps<{
           <a href="javascript:;">搜索推荐</a>
           <a href="javascript:;">友情链接</a>
         </p>
-        <p>CopyRight &copy; compus on sale</p>
+        <p>CopyRight © 2026 Campus on Sale</p>
       </div>
     </footer>
   </div>

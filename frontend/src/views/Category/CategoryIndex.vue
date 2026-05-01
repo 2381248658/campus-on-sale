@@ -4,7 +4,7 @@
 -->
 <script setup lang="ts">
 /**
- * CategoryIndex.vue - 校园惠一级分类详情页
+ * CategoryIndex.vue - Campus on Sale 一级分类详情页
  * 核心逻辑：
  * 1. 采用逻辑抽离模式 (Composables) 获取 banner 与分类数据
  * 2. 自动监听路由 ID 变化并驱动视图刷新

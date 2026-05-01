@@ -88,7 +88,7 @@ const addCart = async () => {
       attrsText: skuObj.value.specsText || '',
       selected: true,
     })
-    ElMessage.success('已加入校园购物车')
+    ElMessage.success('已加入购物车')
   } catch (err) {
     console.error('加入购物车失败:', err)
     ElMessage.error('加入购物车失败，请重试')
@@ -167,7 +167,7 @@ const addCart = async () => {
             <div class="g-service">
               <dl>
                 <dt>配送</dt>
-                <dd>校园惠专享：下单立享本校【送货上寝】或【指定地点自提】</dd>
+                <dd>校园交易专享：下单立享本校【送货上寝】或【指定地点自提】</dd>
               </dl>
               <dl>
                 <dt>保障</dt>

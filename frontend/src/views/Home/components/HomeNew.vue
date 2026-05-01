@@ -38,7 +38,7 @@ onMounted(() => getFindNew())
     <ul class="goods-list">
       <li v-for="item in newList" :key="item.id">
         <RouterLink :to="`/detail/${item.id}`">
-          <img v-img-lazy="item.picture" alt="校园惠商品" />
+          <img v-img-lazy="item.picture" alt="校园二手好物" />
           <p class="name">{{ item.name }}</p>
           <p class="price">&yen;{{ item.price }}</p>
         </RouterLink>
