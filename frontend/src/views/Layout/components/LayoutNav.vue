@@ -5,11 +5,8 @@ import { useRouter } from 'vue-router'
 const userStore = useUserStore()
 const router = useRouter()
 
-const confirm = (): void => {
-  // console.log('用户要退出登录了');
-  // 清除用户信息
-  userStore.clearUserInfo()
-  // 跳转登录页
+const confirm = async (): Promise<void> => {
+  await userStore.clearUserInfo()
   router.replace('/login')
 }
 </script>
@@ -21,7 +18,8 @@ const confirm = (): void => {
         <template v-if="userStore.userInfo.token">
           <li>
             <a href="javascript:;"
-              ><i class="iconfont icon-yonghu"></i>{{ userStore.userInfo.nickname || userStore.userInfo.account || '用户' }}</a
+              ><i class="iconfont icon-yonghu"></i
+              >{{ userStore.userInfo.nickname || userStore.userInfo.account || '用户' }}</a
             >
           </li>
           <li>

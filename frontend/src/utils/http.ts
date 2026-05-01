@@ -11,18 +11,18 @@ import router from '@/router'
 
 let isRedirecting = false
 
-const handleUnauthorized = (): void => {
+const handleUnauthorized = async (): Promise<void> => {
   if (isRedirecting) return
   isRedirecting = true
 
   const userStore = useUserStore()
   const currentPath = window.location.pathname + window.location.search
 
-  userStore.clearUserInfo()
+  await userStore.clearUserInfo()
 
   if (currentPath !== '/login' && currentPath !== '/register') {
     ElMessage.warning('登录状态已失效，请重新登录')
-    router.push({ path: '/login', query: { redirect: currentPath } })
+    router.replace({ path: '/login', query: { redirect: currentPath } })
   }
 
   setTimeout(() => {

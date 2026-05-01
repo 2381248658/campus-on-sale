@@ -3,7 +3,7 @@
  * @description 管理用户登录状态、用户信息、注册、登出等功能
  */
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { loginAPI, registerAPI } from '@/apis/user'
 import { useCartStore } from './cartStore'
 import type { LoginResult, LoginParams, RegisterParams } from '@/types/api'
@@ -54,11 +54,14 @@ export const useUserStore = defineStore(
       }
     }
 
-    /** 用户登出（清除用户信息并清空购物车） */
-    const clearUserInfo = (): void => {
+    /**
+     * 用户登出（清除用户信息并清空购物车）
+     */
+    const clearUserInfo = async (): Promise<void> => {
       userInfo.value = {} as LoginResult
       const cartStore = useCartStore()
       cartStore.clearCart()
+      await nextTick()
       localStorage.removeItem('user')
       localStorage.removeItem('cart')
     }

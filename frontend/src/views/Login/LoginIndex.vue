@@ -70,10 +70,16 @@ const doLogin = () => {
   <AuthLayout title="账户登录">
     <el-form ref="formRef" :model="form" :rules="rules" status-icon label-position="top">
       <el-form-item label="学号" prop="account">
-        <el-input v-model="form.account" placeholder="请输入学号" />
+        <el-input v-model="form.account" placeholder="请输入学号" autocomplete="off" />
       </el-form-item>
       <el-form-item label="密码" prop="password">
-        <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
+        <el-input
+          v-model="form.password"
+          type="password"
+          placeholder="请输入密码"
+          show-password
+          autocomplete="off"
+        />
       </el-form-item>
       <el-form-item prop="agree">
         <el-checkbox size="large" v-model="form.agree">我已同意隐私条款和服务条款</el-checkbox>
@@ -81,9 +87,7 @@ const doLogin = () => {
       <el-button size="large" class="subBtn" :loading="loginLoading" @click="doLogin"
         >点击登录</el-button
       >
-      <div class="auth-link">
-        还没有账号？<RouterLink to="/register">立即注册</RouterLink>
-      </div>
+      <div class="auth-link">还没有账号？<RouterLink to="/register">立即注册</RouterLink></div>
     </el-form>
   </AuthLayout>
 </template>
