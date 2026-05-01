@@ -34,8 +34,8 @@ declare module 'vue' {
     ElTag: typeof import('element-plus/es')['ElTag']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SkuIndex: typeof import('./src/components/XyhSku/SkuIndex.vue')['default']
-    ViewIndex: typeof import('./src/components/imageView/ViewIndex.vue')['default']
+    SkuIndex: typeof import('./src/components/GoodsSku/SkuIndex.vue')['default']
+    ViewIndex: typeof import('./src/components/ImageView/ViewIndex.vue')['default']
   }
   export interface GlobalDirectives {
     vInfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']
