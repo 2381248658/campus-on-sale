@@ -11,6 +11,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore'
 import { User, Iphone, Location } from '@element-plus/icons-vue'
+import { CAMPUS_LOCATIONS } from '@/constants'
 import type {
   CheckoutInfo,
   OrderGoods,
@@ -34,23 +35,14 @@ const saveAddressLoading = ref<boolean>(false)
 const addressList = ref<Address[]>([])
 const selectedAddressId = ref<string>('')
 
-const campusLocationOptions = [
-  '一号宿舍楼代收点',
-  '二号宿舍楼代收点',
-  '三号宿舍楼代收点',
-  '四号宿舍楼代收点',
-  '五号宿舍楼代收点',
-  '六号宿舍楼代收点',
-]
-
 const addressForm = ref<AddressFormData>({
   receiver: '',
   contact: '',
   provinceCode: '',
   cityCode: '',
   countyCode: '',
-  address: campusLocationOptions[0],
-  fullLocation: `校园代收点 ${campusLocationOptions[0]}`,
+  address: CAMPUS_LOCATIONS[0],
+  fullLocation: `校园代收点 ${CAMPUS_LOCATIONS[0]}`,
   isDefault: 0,
 })
 const fullLocationTouched = ref<boolean>(false)
@@ -175,8 +167,8 @@ const openAddDialog = (): void => {
     provinceCode: '',
     cityCode: '',
     countyCode: '',
-    address: campusLocationOptions[0],
-    fullLocation: `校园代收点 ${campusLocationOptions[0]}`,
+    address: CAMPUS_LOCATIONS[0],
+    fullLocation: `校园代收点 ${CAMPUS_LOCATIONS[0]}`,
     isDefault: addressList.value.length === 0 ? 1 : 0,
   }
   addDialogVisible.value = true
@@ -471,7 +463,9 @@ onMounted(async () => {
             </div>
             <div class="bill-item" v-if="(checkInfo.summary.discountMoney || 0) > 0">
               <span>优惠金额：</span>
-              <span class="val discount-text">- ¥{{ (checkInfo.summary.discountMoney || 0).toFixed(2) }}</span>
+              <span class="val discount-text"
+                >- ¥{{ (checkInfo.summary.discountMoney || 0).toFixed(2) }}</span
+              >
             </div>
             <div class="bill-item">
               <span>运费：</span>
@@ -569,7 +563,7 @@ onMounted(async () => {
             <button
               type="button"
               class="quick-btn"
-              v-for="item in campusLocationOptions"
+              v-for="item in CAMPUS_LOCATIONS"
               :key="`quick-${item}`"
               :class="{ active: addressForm.address === item }"
               @click="selectQuickLocation(item)"

@@ -9,6 +9,7 @@ import {
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Iphone, Location, User } from '@element-plus/icons-vue'
 import { computed, onMounted, ref, watch } from 'vue'
+import { CAMPUS_LOCATIONS } from '@/constants'
 import type { Address, AddressApiItem, AddressFormData } from '@/types/api'
 
 const loading = ref<boolean>(false)
@@ -20,23 +21,14 @@ const fullLocationTouched = ref<boolean>(false)
 
 const addressList = ref<Address[]>([])
 
-const campusLocationOptions = [
-  '一号宿舍楼代收点',
-  '二号宿舍楼代收点',
-  '三号宿舍楼代收点',
-  '四号宿舍楼代收点',
-  '五号宿舍楼代收点',
-  '六号宿舍楼代收点',
-]
-
 const addressForm = ref<AddressFormData>({
   receiver: '',
   contact: '',
   provinceCode: '',
   cityCode: '',
   countyCode: '',
-  address: campusLocationOptions[0],
-  fullLocation: `校园代收点 ${campusLocationOptions[0]}`,
+  address: CAMPUS_LOCATIONS[0],
+  fullLocation: `校园代收点 ${CAMPUS_LOCATIONS[0]}`,
   isDefault: 0,
 })
 
@@ -93,8 +85,8 @@ const resetForm = (): void => {
     provinceCode: '',
     cityCode: '',
     countyCode: '',
-    address: campusLocationOptions[0],
-    fullLocation: `校园代收点 ${campusLocationOptions[0]}`,
+    address: CAMPUS_LOCATIONS[0],
+    fullLocation: `校园代收点 ${CAMPUS_LOCATIONS[0]}`,
     isDefault: addressList.value.length === 0 ? 1 : 0,
   }
 }
@@ -224,7 +216,12 @@ onMounted(() => {
 
         <div class="ops">
           <el-button link type="primary" @click="openEditDialog(item)">编辑</el-button>
-          <el-button link type="primary" @click="handleSetDefault(item.id)" :disabled="item.isDefault === 1">
+          <el-button
+            link
+            type="primary"
+            @click="handleSetDefault(item.id)"
+            :disabled="item.isDefault === 1"
+          >
             设为默认
           </el-button>
           <el-button link type="danger" @click="handleDelete(item.id)">删除</el-button>
@@ -239,7 +236,11 @@ onMounted(() => {
     <el-dialog v-model="dialogVisible" :title="isEditMode ? '编辑地址' : '新增地址'" width="520px">
       <el-form label-width="88px">
         <el-form-item label="收货人">
-          <el-input v-model="addressForm.receiver" placeholder="请输入收货人姓名" :prefix-icon="User" />
+          <el-input
+            v-model="addressForm.receiver"
+            placeholder="请输入收货人姓名"
+            :prefix-icon="User"
+          />
         </el-form-item>
         <el-form-item label="手机号">
           <el-input
@@ -254,7 +255,7 @@ onMounted(() => {
             <button
               type="button"
               class="quick-btn"
-              v-for="location in campusLocationOptions"
+              v-for="location in CAMPUS_LOCATIONS"
               :key="location"
               :class="{ active: addressForm.address === location }"
               @click="addressForm.address = location"

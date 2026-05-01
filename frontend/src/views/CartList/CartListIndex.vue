@@ -6,6 +6,7 @@
 import { useCartStore } from '@/stores/cartStore'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { DEBOUNCE_DELAY } from '@/constants'
 import type { CheckboxValueType } from 'element-plus'
 
 const cartStore = useCartStore()
@@ -55,7 +56,7 @@ const countChange = (skuId: string, count: number) => {
   const timer = setTimeout(() => {
     cartStore.updateCartItem(skuId, { count })
     countDebounceTimers.delete(skuId)
-  }, 300)
+  }, DEBOUNCE_DELAY.CART_COUNT)
 
   countDebounceTimers.set(skuId, timer)
 }

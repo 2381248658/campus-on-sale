@@ -9,6 +9,7 @@ import {
   type RouterScrollBehavior,
 } from 'vue-router'
 import { ElLoading } from 'element-plus'
+import { PROTECTED_PATHS } from '@/constants'
 
 import Layout from '@/views/Layout/LayoutIndex.vue'
 import Login from '@/views/Login/LoginIndex.vue'
@@ -127,9 +128,7 @@ router.beforeEach((to, _from, next) => {
     background: 'rgba(255, 255, 255, 0.7)',
   })
 
-  // 需要登录权限的路径
-  const protectedPaths = ['/checkout', '/pay', '/member']
-  const requiresAuth = protectedPaths.some((path) => to.path.startsWith(path))
+  const requiresAuth = PROTECTED_PATHS.some((path) => to.path.startsWith(path))
 
   // 获取token
   const persistedUser = localStorage.getItem('user')
