@@ -131,7 +131,9 @@ const load = async (): Promise<void> => {
 
       <!-- ========== 商品列表 ========== -->
       <div class="body" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
-        <GoodsItem v-for="good in goodList" :good="good" :key="good.id" />
+        <div class="goods-wrapper" v-for="good in goodList" :key="good.id">
+          <GoodsItem :good="good" />
+        </div>
       </div>
 
       <!-- ========== 加载完毕提示 ========== -->
@@ -157,9 +159,32 @@ const load = async (): Promise<void> => {
   .body {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 33px;
+    justify-content: space-between;
+    gap: 20px;
     padding: 20px 0;
+
+    .goods-wrapper {
+      flex: 0 0 calc((100% - 60px) / 4);
+      max-width: calc((100% - 60px) / 4);
+      background: #fff;
+      border-radius: $borderRadius;
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: $cardShadowHover;
+      }
+
+      :deep(.goods-item) {
+        width: 100%;
+        background: transparent;
+
+        &:hover {
+          transform: none;
+          box-shadow: none;
+        }
+      }
+    }
   }
 
   /* ========== 加载完毕 ========== */
