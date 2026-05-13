@@ -74,7 +74,7 @@ const categoryStore = useCategoryStore()
   opacity: 0;
 
   &.show {
-    transition: all 0.3s linear;
+    transition: all 0.3s ease-in-out;
     transform: none;
     opacity: 1;
   }

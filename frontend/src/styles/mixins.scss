@@ -14,7 +14,7 @@
  *   }
  */
 @mixin goods-hover-effect($offset: v.$goodsHoverOffset) {
-  transition: all v.$transitionDuration ease-in-out;
+  transition: all v.$transitionDuration v.$transitionEasing;
 
   &:hover {
     transform: translateY(-$offset);
@@ -51,7 +51,7 @@
  *   }
  */
 @mixin image-zoom-hover($scale: 1.05) {
-  transition: transform v.$transitionDuration ease-in-out;
+  transition: transform v.$transitionDurationSlow v.$transitionEasing;
 
   &:hover {
     transform: scale($scale);

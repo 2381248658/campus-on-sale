@@ -6,7 +6,7 @@
 // --- 1. 品牌核心色 (Brand Colors) ---
 $campusColor: #005bac; // 主色：学术蓝
 $campusColorLight: #e6eff7; // 主色极浅：激活态/背景
-$campusColorHover: #00498a; // 主色悬停：比主色深，用于反馈
+$campusColorHover: #003d73; // 主色悬停：比主色深15%，提升交互辨识度
 
 $warnColor: #ff8c00; // 辅助色：能量橙
 $succColor: #1dc779; // 成功色：清新绿
@@ -22,15 +22,18 @@ $black: #000000;
 
 $textColor: #333333; // 标题与主要内容
 $subTextColor: #666666; // 次要描述
-$insTextColor: #999999; // 辅助/占位文字
+$insTextColor: #767676; // 辅助/占位文字
 
 $bgColor: #f1f3f7; // 页面底色
 $borderColor: #e4e7ed; // 标准边框
 $lineColor: #f2f2f2; // 细分割线
 
 // --- 3. 布局与尺寸规范 (Layout & Sizing) ---
-$borderRadius: 10px; // 全局大圆角
-$borderRadiusSmall: 6px; // 小组件圆角
+$borderRadiusXs: 2px; // 极小圆角（装饰线条）
+$borderRadiusSmall: 6px; // 小组件圆角（标签、小按钮）
+$borderRadius: 10px; // 全局标准圆角（卡片、面板）
+$borderRadiusLarge: 12px; // 大圆角（特殊容器）
+$borderRadiusFull: 50%; // 圆形（头像、图标）
 
 $containerWidth: 1240px; // 版心宽度 (PC端)
 
@@ -38,7 +41,11 @@ $containerWidth: 1240px; // 版心宽度 (PC端)
 $cardShadow: 0 4px 20px rgba(0, 91, 172, 0.08); // 基础卡片阴影
 $cardShadowHover: 0 10px 35px rgba(0, 91, 172, 0.22); // 悬浮增强阴影
 
-$transitionDuration: 0.3s; // 统一过渡时长
+$transitionDurationFast: 0.2s; // 快速反馈（链接悬停）
+$transitionDuration: 0.3s; // 标准过渡（按钮、卡片）
+$transitionDurationSlow: 0.5s; // 慢速过渡（图片缩放）
+
+$transitionEasing: ease-in-out; // 统一缓动曲线
 
 // --- 5. 层级管理 (Z-index) ---
 $zIndexBack: -1;

@@ -155,7 +155,7 @@ const load = async (): Promise<void> => {
 .sub-container {
   padding: 20px 40px;
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: $borderRadius;
 
   /* ========== 商品列表 ========== */
   .body {

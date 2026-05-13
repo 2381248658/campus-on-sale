@@ -122,7 +122,7 @@ defineProps<{
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    border-radius: 12px;
+    border-radius: $borderRadiusLarge;
     overflow: hidden;
 
     nav {
@@ -182,11 +182,11 @@ defineProps<{
       --el-input-border-color: $borderColor;
       --el-input-hover-border-color: $campusColor;
       --el-input-focus-border-color: $campusColor;
-      --el-input-border-radius: 8px;
+      --el-input-border-radius: $borderRadius;
 
       .el-input__wrapper {
         height: 44px;
-        border-radius: 8px;
+        border-radius: $borderRadius;
         transition: all 0.3s ease;
 
         &:focus-within {
@@ -226,7 +226,7 @@ defineProps<{
       font-weight: 600;
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: $borderRadius;
       transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba($campusColor, 0.3);
 
