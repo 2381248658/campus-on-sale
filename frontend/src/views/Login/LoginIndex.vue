@@ -35,14 +35,14 @@ onMounted(() => {
 })
 
 const rules: FormRules<LoginForm> = {
-  account: [{ required: true, message: '学号不能为空', trigger: 'blur' }],
+  account: [{ required: true, message: '学号不能为空', trigger: ['blur', 'change'] }],
   password: [
-    { required: true, message: '密码不能为空', trigger: 'blur' },
-    { min: 6, max: 14, message: '密码应该在6~14位之间', trigger: 'blur' },
+    { required: true, message: '密码不能为空', trigger: ['blur', 'change'] },
+    { min: 6, max: 14, message: '密码应该在6~14位之间', trigger: ['blur', 'change'] },
   ],
   agree: [
     {
-      validator: (rule, value, callback) => {
+      validator: (_rule, value, callback) => {
         if (value) callback()
         else callback(new Error('请勾选用户协议'))
       },
@@ -52,6 +52,10 @@ const rules: FormRules<LoginForm> = {
 
 const doLogin = () => {
   if (loginLoading.value) return
+  if (!form.value.agree) {
+    ElMessage.warning('请先勾选用户协议')
+    return
+  }
   const { account, password } = form.value
   formRef.value?.validate(async (valid) => {
     if (valid) {
@@ -62,7 +66,8 @@ const doLogin = () => {
         const redirect = (route.query.redirect as string) || '/'
         router.replace(redirect)
       } catch (err) {
-        console.log('登录出错啦', err)
+        console.error('登录失败:', err)
+        ElMessage.error('登录失败，请检查学号和密码是否正确')
       } finally {
         loginLoading.value = false
       }

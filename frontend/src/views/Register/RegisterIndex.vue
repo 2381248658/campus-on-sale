@@ -50,16 +50,16 @@ const validateConfirmPassword = (
 
 const rules: FormRules<RegisterForm> = {
   account: [
-    { required: true, message: '学号不能为空', trigger: 'blur' },
-    { min: 4, max: 20, message: '学号长度应在4~20位之间', trigger: 'blur' },
+    { required: true, message: '学号不能为空', trigger: ['blur', 'change'] },
+    { min: 4, max: 20, message: '学号长度应在4~20位之间', trigger: ['blur', 'change'] },
   ],
   password: [
-    { required: true, message: '密码不能为空', trigger: 'blur' },
-    { min: 6, max: 14, message: '密码应该在6~14位之间', trigger: 'blur' },
+    { required: true, message: '密码不能为空', trigger: ['blur', 'change'] },
+    { min: 6, max: 14, message: '密码应该在6~14位之间', trigger: ['blur', 'change'] },
   ],
   confirmPassword: [
-    { required: true, message: '请确认密码', trigger: 'blur' },
-    { validator: validateConfirmPassword, trigger: 'blur' },
+    { required: true, message: '请确认密码', trigger: ['blur', 'change'] },
+    { validator: validateConfirmPassword, trigger: ['blur', 'change'] },
   ],
   agree: [
     {
@@ -76,6 +76,10 @@ const rules: FormRules<RegisterForm> = {
 
 const doRegister = () => {
   if (registerLoading.value) return
+  if (!form.value.agree) {
+    ElMessage.warning('请先勾选用户协议')
+    return
+  }
   const { account, password, nickname } = form.value
   formRef.value?.validate(async (valid) => {
     if (valid) {
@@ -85,7 +89,8 @@ const doRegister = () => {
         ElMessage({ type: 'success', message: '注册成功' })
         router.replace({ path: '/' })
       } catch (err) {
-        console.log('注册出错啦', err)
+        console.error('注册失败:', err)
+        ElMessage.error('注册失败，请稍后重试')
       } finally {
         registerLoading.value = false
       }

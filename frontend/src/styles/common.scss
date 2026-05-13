@@ -1,4 +1,4 @@
-@use './var.scss' as *;
+@use './var.scss' as v;
 
 :root {
   --el-color-primary: #005bac;
@@ -11,8 +11,8 @@
 }
 
 .campus-common-card {
-  border-radius: $borderRadius;
-  box-shadow: $cardShadow;
+  border-radius: v.$borderRadius;
+  box-shadow: v.$cardShadow;
 }
 
 * {
@@ -56,8 +56,17 @@ dd {
 
 a {
   text-decoration: none;
-  color: $helpColor;
-  outline: none;
+  color: v.$helpColor;
+
+  &:focus-visible {
+    outline: 2px solid v.$campusColor;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
 }
 
 i {
@@ -71,9 +80,11 @@ input[type='checkbox'] {
   padding: 0;
   outline: none;
   border: none;
+  appearance: none;
   -webkit-appearance: none;
+
   &::placeholder {
-    color: #ccc;
+    color: v.$insTextColor;
   }
 }
 
@@ -88,7 +99,7 @@ ul {
 }
 
 #app {
-  background: $bgColor;
+  background: v.$bgColor;
   user-select: none;
 }
 
@@ -109,7 +120,9 @@ ul {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
 }
 

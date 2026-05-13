@@ -127,11 +127,11 @@ defineProps<{
 
     nav {
       height: 50px;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid $lineColor;
       display: flex;
       padding: 0 30px;
       align-items: center;
-      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      background: linear-gradient(135deg, $bgColor 0%, #ffffff 100%);
 
       a {
         flex: 1;
@@ -179,7 +179,7 @@ defineProps<{
     }
 
     :deep(.el-input) {
-      --el-input-border-color: #e8eaed;
+      --el-input-border-color: $borderColor;
       --el-input-hover-border-color: $campusColor;
       --el-input-focus-border-color: $campusColor;
       --el-input-border-radius: 8px;
@@ -209,7 +209,7 @@ defineProps<{
 
       .el-checkbox__label {
         font-size: 13px;
-        color: #5f6368;
+        color: $subTextColor;
         white-space: normal;
       }
     }
@@ -249,7 +249,7 @@ defineProps<{
       text-align: center;
       margin-top: 14px;
       font-size: 13px;
-      color: #999;
+      color: $subTextColor;
 
       a {
         color: $campusColor;
@@ -277,7 +277,7 @@ defineProps<{
 
   p {
     text-align: center;
-    color: #6b7280;
+    color: $subTextColor;
     padding-top: 10px;
     font-size: 13px;
     line-height: 1.5;
@@ -285,7 +285,7 @@ defineProps<{
     a {
       line-height: 1;
       padding: 0 10px;
-      color: #6b7280;
+      color: $subTextColor;
       display: inline-block;
 
       &:hover {
@@ -298,7 +298,7 @@ defineProps<{
     }
 
     &:last-of-type {
-      color: #9ca3af;
+      color: $insTextColor;
       font-size: 12px;
       margin-top: 6px;
     }
