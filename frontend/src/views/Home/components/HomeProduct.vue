@@ -35,7 +35,7 @@ onMounted(() => {
 
 <template>
   <div class="home-product">
-    <HomePanel :title="cate.name" v-for="cate in goodsList" :key="cate.id">
+    <HomePanel :title="cate.name" v-for="cate in goodsList.slice(0, 3)" :key="cate.id">
       <div class="box">
         <RouterLink class="cover" :to="`/category/${cate.id}`">
           <img v-img-lazy="cate.picture" />
