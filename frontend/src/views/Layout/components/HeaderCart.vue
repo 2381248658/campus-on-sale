@@ -15,11 +15,7 @@ const cartStore = useCartStore()
       <div class="list">
         <div class="item" v-for="i in cartStore.cartList" :key="i.skuId">
           <RouterLink :to="i.goodsId ? `/detail/${i.goodsId}` : '#'">
-            <img
-              v-img-lazy="i.picture"
-              alt="校园好物"
-              onerror="this.src='https://picsum.photos/80/80?random=default'"
-            />
+            <img v-img-lazy="i.picture" alt="校园好物" />
             <div class="center">
               <p class="name ellipsis-2">
                 {{ i.name }}
