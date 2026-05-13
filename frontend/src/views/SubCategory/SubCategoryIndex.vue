@@ -143,6 +143,8 @@ const load = async (): Promise<void> => {
 </template>
 
 <style lang="scss" scoped>
+@use '@/styles/mixins.scss' as *;
+
 /* ========== 面包屑 ========== */
 .bread-container {
   padding: 25px 0;
@@ -168,12 +170,7 @@ const load = async (): Promise<void> => {
       max-width: calc((100% - 60px) / 4);
       background: #fff;
       border-radius: $borderRadius;
-      transition: all 0.3s ease-in-out;
-
-      &:hover {
-        transform: translateY(-5px);
-        box-shadow: $cardShadowHover;
-      }
+      @include goods-hover-effect();
 
       :deep(.goods-item) {
         width: 100%;

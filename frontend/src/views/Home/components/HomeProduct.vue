@@ -55,6 +55,8 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
+@use '@/styles/mixins.scss' as *;
+
 .home-product {
   background: #f7f9fc;
   margin-top: 0;
@@ -74,11 +76,7 @@ onMounted(() => {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.5s;
-
-        &:hover {
-          transform: scale(1.05);
-        }
+        @include image-zoom-hover();
       }
 
       .label {
@@ -124,12 +122,6 @@ onMounted(() => {
         margin-bottom: 10px;
         background: #fff;
         border-radius: $borderRadius;
-        transition: all 0.3s;
-
-        &:hover {
-          transform: translateY(-5px);
-          box-shadow: $cardShadowHover;
-        }
 
         &:nth-last-child(-n + 4) {
           margin-bottom: 0;

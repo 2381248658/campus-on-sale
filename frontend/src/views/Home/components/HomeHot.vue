@@ -49,10 +49,11 @@ onMounted(() => getFindHot())
 </template>
 
 <style scoped lang="scss">
+@use '@/styles/mixins.scss' as *;
+
 .goods-list {
   display: flex;
   justify-content: space-between;
-
   height: 426px;
   min-height: 426px;
 
@@ -61,14 +62,9 @@ onMounted(() => getFindHot())
     height: 406px;
     background: #fff;
     border: 1px solid #f2f5f8;
-    transition: all 0.5s;
     border-radius: $borderRadius;
     overflow: hidden;
-
-    &:hover {
-      transform: translate3d(0, -6px, 0);
-      box-shadow: $cardShadowHover;
-    }
+    @include goods-hover-effect();
 
     img {
       width: 306px;

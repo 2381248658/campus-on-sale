@@ -48,10 +48,11 @@ onMounted(() => getFindNew())
 </template>
 
 <style scoped lang="scss">
+@use '@/styles/mixins.scss' as *;
+
 .goods-list {
   display: flex;
   justify-content: space-between;
-  // 锁定高度
   height: 406px;
   min-height: 406px;
   background-color: transparent;
@@ -60,14 +61,9 @@ onMounted(() => getFindNew())
     width: 306px;
     height: 406px;
     background: #f4f8fb;
-    transition: all 0.5s;
     border-radius: $borderRadius;
     overflow: hidden;
-
-    &:hover {
-      transform: translate3d(0, -6px, 0);
-      box-shadow: $cardShadowHover;
-    }
+    @include goods-hover-effect();
 
     img {
       width: 306px;

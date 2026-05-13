@@ -1,0 +1,59 @@
+/**
+ * 校园惠 (Campus-Hui) 全局 Mixins
+ * 提供可复用的样式混合器
+ */
+
+@use './var.scss' as v;
+
+/**
+ * 商品悬浮效果
+ * @param {Number} $offset - 悬浮上移距离，默认 5px
+ * @example
+ *   .goods-card {
+ *     @include goods-hover-effect();
+ *   }
+ */
+@mixin goods-hover-effect($offset: v.$goodsHoverOffset) {
+  transition: all v.$transitionDuration ease-in-out;
+
+  &:hover {
+    transform: translateY(-$offset);
+    box-shadow: v.$cardShadowHover;
+  }
+}
+
+/**
+ * 商品悬浮效果（带颜色变化）
+ * 用于商品名称等需要颜色变化的场景
+ * @param {Number} $offset - 悬浮上移距离，默认 5px
+ * @example
+ *   .goods-item {
+ *     @include goods-hover-with-color();
+ *   }
+ */
+@mixin goods-hover-with-color($offset: v.$goodsHoverOffset) {
+  @include goods-hover-effect($offset);
+
+  &:hover {
+    .name {
+      color: v.$campusColor;
+    }
+  }
+}
+
+/**
+ * 图片缩放悬浮效果
+ * 用于封面图等需要缩放效果的场景
+ * @param {Number} $scale - 缩放比例，默认 1.05
+ * @example
+ *   .cover-image {
+ *     @include image-zoom-hover();
+ *   }
+ */
+@mixin image-zoom-hover($scale: 1.05) {
+  transition: transform v.$transitionDuration ease-in-out;
+
+  &:hover {
+    transform: scale($scale);
+  }
+}

@@ -27,22 +27,19 @@ defineProps<Props>()
 </template>
 
 <style lang="scss" scoped>
+@use '@/styles/mixins.scss' as *;
+
 .goods-item {
   display: block;
   width: 220px;
   padding: 20px;
   text-align: center;
-  transition: all 0.3s ease-in-out;
   background: #fff;
   border-radius: $borderRadius;
+  @include goods-hover-effect();
 
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: $cardShadowHover;
-
-    .name {
-      color: $campusColor;
-    }
+  &:hover .name {
+    color: $campusColor;
   }
 
   .image-box {
@@ -80,7 +77,7 @@ defineProps<Props>()
     .price {
       color: $priceColor;
       font-size: 18px;
-      font-weight: 600; // 加粗价格
+      font-weight: 600;
       margin-top: 8px;
 
       .unit {
