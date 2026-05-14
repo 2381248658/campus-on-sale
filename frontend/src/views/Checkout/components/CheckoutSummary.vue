@@ -22,16 +22,14 @@ interface Props {
 
 const props = defineProps<Props>()
 
-/** 总运费（货到付款需额外加5元） */
+/** 总运费 */
 const totalPostFee = computed<number>(() => {
-  const basePostFee = props.summary?.postFee || 0
-  return props.payType === 2 ? basePostFee + 5 : basePostFee
+  return props.summary?.postFee || 0
 })
 
 /** 应付总金额 */
 const totalPayPrice = computed<number>(() => {
-  const totalPay = props.summary?.totalPay || 0
-  return totalPay + totalPostFee.value
+  return props.summary?.totalPay || 0
 })
 </script>
 
@@ -52,11 +50,7 @@ const totalPayPrice = computed<number>(() => {
       </div>
       <div class="bill-item">
         <span>运费：</span>
-        <span class="val">¥{{ (summary.postFee || 0).toFixed(2) }}</span>
-      </div>
-      <div class="bill-item" v-if="payType === 2">
-        <span>货到付款手续费：</span>
-        <span class="val warning-text">＋ ¥5.00</span>
+        <span class="val">¥{{ totalPostFee.toFixed(2) }}</span>
       </div>
       <div class="bill-item total-line">
         <span class="total-label">应付总额：</span>

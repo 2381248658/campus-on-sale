@@ -71,7 +71,7 @@ const selectPayType = (type: number): void => {
         type="button"
       >
         <p>货到付款</p>
-        <span>需支付手续费 ¥5.00</span>
+        <span>验货后付款</span>
       </button>
     </div>
   </div>

@@ -165,7 +165,7 @@ const closeAddDialog = (): void => {
             :class="{ active: item.id === selectedAddressId }"
           >
             <label class="pick">
-              <input type="radio" :value="item.id" v-model="localSelectedAddressId" />
+              <el-radio :value="item.id" v-model="localSelectedAddressId" />
               <div class="content">
                 <p class="line1">
                   <span>收货点：{{ getPickupPointText(item) }}</span>
@@ -298,10 +298,6 @@ const closeAddDialog = (): void => {
     gap: 12px;
     flex: 1;
     cursor: pointer;
-
-    input {
-      margin-top: 5px;
-    }
 
     .content {
       .line1 {
