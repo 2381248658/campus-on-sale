@@ -94,6 +94,11 @@ const routes: RouteRecordRaw[] = [
     name: 'register',
     component: () => import('@/views/Register/RegisterIndex.vue'),
   },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'notFound',
+    component: () => import('@/views/NotFound/NotFoundIndex.vue'),
+  },
 ]
 
 /** 页面滚动行为：跳转后回到顶部 */
