@@ -6,6 +6,7 @@
 import { getCategoryFilterAPI, getSubCategoryAPI } from '@/apis/category'
 import { onMounted, ref } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import GoodsItem from '../Home/components/GoodsItem.vue'
 import type { SubCategoryFilter, CategoryGoods } from '@/types/api'
 import type { RouteLocationNormalized } from 'vue-router'
@@ -23,6 +24,7 @@ const getCategoryData = async (id: string = route.params.id as string): Promise<
     filterData.value = res
   } catch (err) {
     console.error('获取校园二级分类数据失败', err)
+    ElMessage.error('分类数据加载失败，请稍后重试')
   }
 }
 
@@ -55,6 +57,8 @@ const getGoodList = async (): Promise<void> => {
     goodList.value = res.items || []
   } catch (err) {
     console.error('校内商品数据请求失败', err)
+    ElMessage.error('商品数据加载失败，请稍后重试')
+    goodList.value = []
   }
 }
 
@@ -64,6 +68,7 @@ onBeforeRouteUpdate((to: RouteLocationNormalized) => {
   const newId = to.params.id as string
   reqData.value.categoryId = newId
   reqData.value.page = 1
+  reqData.value.sortField = 'publishTime'
   disabled.value = false
   getCategoryData(newId)
   getGoodList()
@@ -72,10 +77,18 @@ onBeforeRouteUpdate((to: RouteLocationNormalized) => {
 /**
  * 排序切换
  */
-const tabChange = (): void => {
+const tabChange = async (): Promise<void> => {
+  if (loading.value) return
+  loading.value = true
+
   reqData.value.page = 1
   disabled.value = false
-  getGoodList()
+
+  try {
+    await getGoodList()
+  } finally {
+    loading.value = false
+  }
 }
 
 /** 无限加载禁用状态 */
@@ -101,6 +114,7 @@ const load = async (): Promise<void> => {
     }
   } catch (err) {
     console.error('加载更多好物失败', err)
+    ElMessage.error('加载更多商品失败，请稍后重试')
   } finally {
     loading.value = false
   }
@@ -123,7 +137,7 @@ const load = async (): Promise<void> => {
     <!-- ========== 商品列表区域 ========== -->
     <div class="sub-container">
       <!-- ========== 排序标签 ========== -->
-      <el-tabs v-model="reqData.sortField" @tab-change="tabChange">
+      <el-tabs v-model="reqData.sortField" @tab-change="tabChange" :loading="loading">
         <el-tab-pane label="最新发布" name="publishTime"></el-tab-pane>
         <el-tab-pane label="校园热度" name="orderNum"></el-tab-pane>
         <el-tab-pane label="学生好评" name="evaluateNum"></el-tab-pane>
@@ -131,7 +145,13 @@ const load = async (): Promise<void> => {
 
       <!-- ========== 商品列表 ========== -->
       <div class="body" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
-        <div class="goods-wrapper" v-for="good in goodList" :key="good.id">
+        <!-- Loading状态 -->
+        <div v-if="loading && goodList.length === 0" class="loading-container">
+          <el-skeleton :rows="3" animated />
+        </div>
+
+        <!-- 正常商品列表 -->
+        <div v-else class="goods-wrapper" v-for="good in goodList" :key="good.id">
           <GoodsItem :good="good" />
         </div>
       </div>
@@ -164,6 +184,14 @@ const load = async (): Promise<void> => {
     justify-content: space-between;
     gap: 20px;
     padding: 20px 0;
+
+    /* ========== Loading状态 ========== */
+    .loading-container {
+      width: 100%;
+      padding: 40px 20px;
+      background: #fff;
+      border-radius: $borderRadius;
+    }
 
     .goods-wrapper {
       flex: 0 0 calc((100% - 60px) / 4);
