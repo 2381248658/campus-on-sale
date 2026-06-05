@@ -2,7 +2,7 @@
  * @file Axios请求封装
  * @description 封装axios实例，配置请求/响应拦截器，处理token注入和错误提示
  */
-import axios, { AxiosError, type AxiosInstance } from 'axios'
+import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig } from 'axios'
 import 'element-plus/theme-chalk/el-message.css'
 import { ElMessage } from 'element-plus'
 import type { ApiResponse } from '@/types/api'
@@ -72,3 +72,12 @@ httpInstance.interceptors.response.use(
 )
 
 export default httpInstance
+
+/**
+ * 泛型请求方法
+ * @description 将响应拦截器解包后的数据通过泛型 T 精确标注类型，
+ *              使 API 层调用时无需手动断言，由 request<T> 统一处理类型转换
+ */
+export function request<T>(config: AxiosRequestConfig): Promise<T> {
+  return httpInstance(config) as unknown as Promise<T>
+}
