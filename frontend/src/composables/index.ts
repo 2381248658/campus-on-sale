@@ -1,2 +1,4 @@
 export * from './useRequest'
 export * from './useAddress'
+export * from './useGoodsDetail'
+export * from './useSkuSelect'

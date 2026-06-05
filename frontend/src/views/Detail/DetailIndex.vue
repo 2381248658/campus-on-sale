@@ -3,76 +3,26 @@
   @description 展示商品详情信息，支持规格选择、加入购物车
 -->
 <script setup lang="ts">
-import { getGoodsDetailAPI } from '@/apis/detail'
-import { onMounted, ref } from 'vue'
-import { useRoute, onBeforeRouteUpdate } from 'vue-router'
-import DetailHot from './components/DetailHot.vue'
-import ViewIndex from '@/components/ImageView/ViewIndex.vue'
+import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore'
-import type { GoodsDetail } from '@/types/api'
+import { useGoodsDetail } from '@/composables/useGoodsDetail'
+import { useSkuSelect } from '@/composables/useSkuSelect'
+import DetailHot from './components/DetailHot.vue'
+import ViewIndex from '@/components/ImageView/ViewIndex.vue'
 
 const cartStore = useCartStore()
-/** 商品详情数据 */
-const goods = ref<GoodsDetail>({} as GoodsDetail)
-const route = useRoute()
-const detailLoading = ref(true)
-const detailError = ref(false)
-
-/**
- * 获取商品详情
- * @param id - 商品ID
- */
-const getGoods = async (id: string | string[] = route.params.id) => {
-  detailLoading.value = true
-  detailError.value = false
-  try {
-    const res = await getGoodsDetailAPI(id as string)
-    goods.value = res
-  } catch (err) {
-    console.error('获取商品详情失败:', err)
-    detailError.value = true
-  } finally {
-    detailLoading.value = false
-  }
-}
-
-onMounted(() => getGoods())
-
-onBeforeRouteUpdate((to) => {
-  getGoods(to.params.id)
-})
+const { goods, loading: detailLoading, error: detailError, getGoods } = useGoodsDetail()
+const { skuObj, displayPrice, displayOldPrice, skuChange, isSkuSelected } = useSkuSelect(goods)
 
 /** 购买数量 */
 const count = ref<number>(1)
-
-/** SKU选择结果 */
-interface SkuObj {
-  skuId?: string
-  price?: number
-  oldPrice?: number
-  specsText?: string
-}
-
-const skuObj = ref<SkuObj>({})
-
-/**
- * SKU变更回调
- * @param sku - 选中的SKU信息
- */
-const skuChange = (sku: SkuObj) => {
-  skuObj.value = sku
-  if (sku.skuId) {
-    goods.value.price = sku.price || goods.value.price
-    goods.value.oldPrice = sku.oldPrice || goods.value.oldPrice
-  }
-}
 
 /**
  * 加入购物车
  */
 const addCart = async () => {
-  if (!skuObj.value.skuId) {
+  if (!isSkuSelected()) {
     return ElMessage.warning('请选择商品规格（如成色/版本）')
   }
 
@@ -81,10 +31,10 @@ const addCart = async () => {
       id: goods.value.id,
       name: goods.value.name,
       picture: goods.value.mainPictures ? goods.value.mainPictures[0] : '',
-      price: skuObj.value.price || goods.value.price,
-      nowPrice: skuObj.value.price || goods.value.price,
+      price: displayPrice.value,
+      nowPrice: displayPrice.value,
       count: count.value,
-      skuId: skuObj.value.skuId,
+      skuId: skuObj.value.skuId!,
       attrsText: skuObj.value.specsText || '',
       selected: true,
     })
@@ -160,8 +110,8 @@ const addCart = async () => {
             <p class="g-name">{{ goods.name }}</p>
             <p class="g-desc">{{ goods.desc }}</p>
             <p class="g-price">
-              <span>{{ goods.price }}</span>
-              <span v-if="goods.oldPrice">{{ goods.oldPrice }}</span>
+              <span>{{ displayPrice }}</span>
+              <span v-if="displayOldPrice">{{ displayOldPrice }}</span>
             </p>
 
             <div class="g-service">
