@@ -19,6 +19,7 @@ Thumbs.db
 # 忽略 .vscode 目录（安全第一！）
 .vscode/
 !.vscode/extensions.json  # 仅保留团队扩展推荐
+.trae/
 
 # 忽略 IDE 配置
 .idea/
