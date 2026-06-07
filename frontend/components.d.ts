@@ -12,6 +12,9 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddressFormIndex: typeof import('./src/components/AddressForm/AddressFormIndex.vue')['default']
+    AiChatInput: typeof import('./src/components/AiChat/AiChatInput.vue')['default']
+    AiChatMessage: typeof import('./src/components/AiChat/AiChatMessage.vue')['default']
+    AiChatPanel: typeof import('./src/components/AiChat/AiChatPanel.vue')['default']
     AuthLayoutIndex: typeof import('./src/components/AuthLayout/AuthLayoutIndex.vue')['default']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
     ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']

@@ -8,6 +8,7 @@
 import type { App } from 'vue'
 import ViewIndex from './ImageView/ViewIndex.vue'
 import GoodsSku from './GoodsSku/SkuIndex.vue'
+import AiChatPanel from './AiChat/AiChatPanel.vue'
 
 /** 组件插件管理器 */
 export const PluginManager = {
@@ -18,5 +19,6 @@ export const PluginManager = {
   install(app: App) {
     app.component('ViewIndex', ViewIndex)
     app.component('SkuIndex', GoodsSku)
+    app.component('AiChatPanel', AiChatPanel)
   },
 }
