@@ -4,9 +4,12 @@
  */
 import { ref, readonly, type Ref, type DeepReadonly } from 'vue'
 import { sseRequest } from '@/utils/sse'
+import { useUserStore } from '@/stores/userStore'
 
 /** 聊天消息 */
 export interface ChatMessage {
+  /** 唯一标识 */
+  id: string
   /** 角色：用户 / 助手 */
   role: 'user' | 'assistant'
   /** 消息内容 */
@@ -25,6 +28,18 @@ export interface GoodsContext {
   desc?: string
   /** 商品分类 */
   category?: string
+  /** 规格选项 */
+  specs?: Array<{
+    name: string
+    values: Array<{ name: string }>
+  }>
+  /** SKU 列表 */
+  skus?: Array<{
+    price: number
+    oldPrice?: number
+    inventory: number
+    specsText: string
+  }>
 }
 
 /** useStreamChat 配置选项 */
@@ -53,6 +68,13 @@ export function useStreamChat(options: UseStreamChatOptions) {
   const normalizedBaseUrl = baseUrl.replace(/\/$/, '')
   const chatUrl = `${normalizedBaseUrl}/ai/chat`
 
+  /** 历史消息最大条数（防止 token 溢出） */
+  const MAX_HISTORY = 10
+  let messageId = 0
+
+  /** 生成唯一消息 ID */
+  const generateId = () => `msg_${Date.now()}_${++messageId}`
+
   /**
    * 发送消息
    * @param text - 用户输入的文本
@@ -61,10 +83,10 @@ export function useStreamChat(options: UseStreamChatOptions) {
     if (!text.trim() || isStreaming.value) return
 
     // 添加用户消息
-    messages.value.push({ role: 'user', content: text })
+    messages.value.push({ id: generateId(), role: 'user', content: text })
 
     // 准备 AI 消息占位
-    messages.value.push({ role: 'assistant', content: '' })
+    messages.value.push({ id: generateId(), role: 'assistant', content: '' })
     const aiMessageIndex = messages.value.length - 1
 
     // 重置流式状态
@@ -75,9 +97,17 @@ export function useStreamChat(options: UseStreamChatOptions) {
     await sseRequest({
       url: chatUrl,
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${useUserStore().userInfo?.token || ''}`,
+      },
       body: {
         message: text,
         context: context.value,
+        // 发送历史对话（排除刚添加的用户消息和 AI 占位消息，截断最近 N 条）
+        history: messages.value
+          .slice(0, -2)
+          .slice(-MAX_HISTORY)
+          .map(({ role, content }) => ({ role, content })),
       },
       signal: abortController.signal,
       onToken: (token) => {
@@ -114,9 +144,9 @@ export function useStreamChat(options: UseStreamChatOptions) {
    * 清空对话历史
    */
   const clearHistory = () => {
+    stopStreaming()
     messages.value = []
     streamingText.value = ''
-    stopStreaming()
   }
 
   return {

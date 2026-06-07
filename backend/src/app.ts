@@ -6,6 +6,7 @@ import userRouter from './routes/user.js';
 import homeRouter from './routes/home.js';
 import categoryRouter from './routes/category.js';
 import goodsRouter from './routes/goods.js';
+import aiRouter from './routes/ai.js';
 import { auth } from './middleware/auth.js';
 import cartRouter from './routes/member/cart.js';
 import orderRouter from './routes/member/order.js';
@@ -26,6 +27,7 @@ app.use(userRouter);
 app.use(homeRouter);
 app.use(categoryRouter);
 app.use(goodsRouter);
+app.use('/ai', auth, aiRouter);
 
 // 认证接口
 app.use('/member/cart', auth, cartRouter);

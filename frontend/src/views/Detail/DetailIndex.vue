@@ -3,17 +3,41 @@
   @description 展示商品详情信息，支持规格选择、加入购物车
 -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore'
 import { useGoodsDetail } from '@/composables/useGoodsDetail'
 import { useSkuSelect } from '@/composables/useSkuSelect'
+import type { GoodsContext } from '@/composables/useStreamChat'
 import DetailHot from './components/DetailHot.vue'
 import ViewIndex from '@/components/ImageView/ViewIndex.vue'
+import AiChatPanel from '@/components/AiChat/AiChatPanel.vue'
 
 const cartStore = useCartStore()
 const { goods, loading: detailLoading, error: detailError, getGoods } = useGoodsDetail()
 const { skuObj, displayPrice, displayOldPrice, skuChange, isSkuSelected } = useSkuSelect(goods)
+
+/** AI 导购助手商品上下文 */
+const aiContext = computed<GoodsContext | null>(() => {
+  if (!goods.value.id) return null
+  return {
+    name: goods.value.name,
+    price: goods.value.price,
+    oldPrice: goods.value.oldPrice,
+    desc: goods.value.desc,
+    category: goods.value.categories?.map((c) => c.name).join('/'),
+    specs: goods.value.specs?.map((s) => ({
+      name: s.name,
+      values: s.values.map((v) => ({ name: v.name })),
+    })),
+    skus: goods.value.skus?.map((s) => ({
+      price: s.price,
+      oldPrice: s.oldPrice,
+      inventory: s.inventory,
+      specsText: s.specs.map((sp) => `${sp.name}：${sp.valueName}`).join('，'),
+    })),
+  }
+})
 
 /** 购买数量 */
 const count = ref<number>(1)
@@ -167,6 +191,9 @@ const addCart = async () => {
     <div class="container" v-else>
       <el-empty description="未找到该商品信息" />
     </div>
+
+    <!-- AI 商品导购助手 -->
+    <AiChatPanel v-if="goods.id" :goods-context="aiContext" />
   </div>
 </template>
 

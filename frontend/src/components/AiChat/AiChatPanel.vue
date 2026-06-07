@@ -3,14 +3,14 @@
   @description 可折叠浮窗，集成对话历史、流式输出、快捷提问
 -->
 <script setup lang="ts">
-import { ref, nextTick, watch, computed, type Ref } from 'vue'
+import { ref, nextTick, watch, computed } from 'vue'
 import { useStreamChat, type GoodsContext } from '@/composables/useStreamChat'
 import AiChatMessage from './AiChatMessage.vue'
 import AiChatInput from './AiChatInput.vue'
 
 interface Props {
   /** 商品上下文 */
-  goodsContext: Ref<GoodsContext | null>
+  goodsContext: GoodsContext | null
 }
 
 const props = defineProps<Props>()
@@ -18,16 +18,33 @@ const props = defineProps<Props>()
 /** 面板展开/收起 */
 const isOpen = ref(false)
 
+/** 确认弹窗状态 */
+const showClearConfirm = ref(false)
+
 /** 对话容器引用 */
 const chatContainer = ref<HTMLElement | null>(null)
 
+/** 将 prop 转为 ref 传给 useStreamChat */
+const contextRef = computed(() => props.goodsContext)
+
+/** 记录上一个商品名称，用于检测商品切换 */
+let lastGoodsName = props.goodsContext?.name || ''
+
+/** 商品切换时自动清空对话 */
+watch(
+  () => props.goodsContext?.name,
+  (newName) => {
+    if (newName && newName !== lastGoodsName && messages.value.length > 0) {
+      clearHistory()
+    }
+    lastGoodsName = newName || ''
+  },
+)
+
 /** useStreamChat 实例 */
 const { messages, isStreaming, sendMessage, stopStreaming, clearHistory } = useStreamChat({
-  context: props.goodsContext,
+  context: contextRef,
 })
-
-/** 当前流式输出的最后一条消息索引 */
-const lastMessageIndex = computed(() => messages.value.length - 1)
 
 /** 切换面板 */
 const togglePanel = () => {
@@ -37,6 +54,17 @@ const togglePanel = () => {
 /** 发送消息 */
 const handleSend = (text: string) => {
   sendMessage(text)
+}
+
+/** 确认清空对话 */
+const handleClearConfirm = () => {
+  clearHistory()
+  showClearConfirm.value = false
+}
+
+/** 取消清空 */
+const handleClearCancel = () => {
+  showClearConfirm.value = false
 }
 
 /** 滚动到底部 */
@@ -99,12 +127,12 @@ watch(
             <span class="ai-badge">AI</span>
             <div>
               <h4 class="header-title">商品导购助手</h4>
-              <p class="header-sub" v-if="goodsContext?.value?.name">
-                {{ goodsContext.value.name }}
+              <p class="header-sub" v-if="goodsContext?.name">
+                {{ goodsContext.name }}
               </p>
             </div>
           </div>
-          <button class="clear-btn" @click="clearHistory" title="清空对话">
+          <button class="clear-btn" @click="showClearConfirm = true" title="清空对话">
             <svg
               width="16"
               height="16"
@@ -145,16 +173,31 @@ watch(
           </div>
 
           <!-- 消息列表 -->
-          <template v-for="(msg, index) in messages" :key="index">
+          <template v-for="msg in messages" :key="msg.id">
             <AiChatMessage
               :message="msg"
-              :is-streaming="isStreaming && index === lastMessageIndex"
+              :is-streaming="isStreaming && msg.id === messages[messages.length - 1]?.id"
             />
           </template>
         </div>
 
         <!-- 输入区域 -->
         <AiChatInput :is-streaming="isStreaming" @send="handleSend" @stop="stopStreaming" />
+
+        <!-- 清空确认弹窗 -->
+        <Teleport to="body">
+          <Transition name="fade">
+            <div v-if="showClearConfirm" class="confirm-overlay" @click.self="handleClearCancel">
+              <div class="confirm-dialog">
+                <p class="confirm-text">确定要清空所有对话记录吗？</p>
+                <div class="confirm-actions">
+                  <button class="confirm-btn cancel" @click="handleClearCancel">取消</button>
+                  <button class="confirm-btn danger" @click="handleClearConfirm">确认清空</button>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </Teleport>
       </div>
     </Transition>
   </div>
@@ -339,5 +382,74 @@ watch(
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+/* ========== 确认弹窗 ========== */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $zIndexFixed + 10;
+}
+
+.confirm-dialog {
+  background: #fff;
+  border-radius: $borderRadius;
+  padding: 24px;
+  width: 280px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.confirm-text {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: $textColor;
+  text-align: center;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.confirm-btn {
+  padding: 8px 20px;
+  border-radius: $borderRadiusSmall;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all $transitionDurationFast;
+
+  &.cancel {
+    background: #f0f0f0;
+    color: $subTextColor;
+
+    &:hover {
+      background: #e0e0e0;
+    }
+  }
+
+  &.danger {
+    background: $priceColor;
+    color: #fff;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
