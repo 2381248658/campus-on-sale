@@ -1,6 +1,6 @@
 /**
  * AI 聊天路由
- * @description 接收前端消息，转发到阿里云 GLM-5，返回 SSE 流式响应
+ * @description 接收前端消息，转发到智谱 GLM，返回 SSE 流式响应
  */
 import { Router, Request, Response, NextFunction } from 'express';
 import { OpenAI } from 'openai';
@@ -52,11 +52,18 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
 let _client: InstanceType<typeof OpenAI> | null = null;
 const getClient = () => {
 	if (!_client) {
+		const apiKey = process.env.GLM_API_KEY;
+		const baseURL = process.env.GLM_BASE_URL;
+
+		if (!apiKey || !baseURL) {
+			throw new Error(
+				'缺少 GLM_API_KEY 或 GLM_BASE_URL 环境变量，请检查 .env 文件',
+			);
+		}
+
 		_client = new OpenAI({
-			apiKey: process.env.GLM_API_KEY,
-			baseURL:
-				process.env.GLM_BASE_URL ||
-				'https://dashscope.aliyuncs.com/compatible-mode/v1',
+			apiKey,
+			baseURL,
 		});
 	}
 	return _client;
