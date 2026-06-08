@@ -28,70 +28,99 @@ defineProps<Props>()
 
 <style lang="scss" scoped>
 @use '@/styles/mixins.scss' as *;
-@use '@/styles/var.scss' as *;
+@use '@/styles/var.scss' as v;
 
 .goods-item {
   display: block;
   width: 220px;
-  padding: 20px;
+  padding: v.$spacing2xl;
   text-align: center;
-  background: $white;
-  border-radius: $borderRadius;
+  background: v.$white;
+  border-radius: v.$borderRadius;
   @include goods-hover-effect();
+  position: relative;
+  overflow: hidden;
 
-  &:hover .name {
-    color: $campusColor;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: v.$gradientPrimary;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform v.$transitionDuration v.$transitionEasing;
+  }
+
+  &:hover {
+    .name {
+      color: v.$campusColor;
+    }
+
+    &::before {
+      transform: scaleX(1);
+    }
+
+    .image-box img {
+      transform: scale(1.08);
+    }
   }
 
   .image-box {
     width: 160px;
     height: 160px;
     margin: 0 auto;
+    overflow: hidden;
+    border-radius: v.$borderRadiusSmall;
 
     img {
       width: 100%;
       height: 100%;
       object-fit: contain;
+      transition: transform v.$transitionDurationSlow v.$transitionEasing;
     }
   }
 
   .info-box {
-    padding-top: 15px;
+    padding-top: v.$spacingLg;
 
     p {
-      line-height: 1.5;
+      line-height: v.$lineHeightNormal;
     }
 
     .name {
-      font-size: 15px;
-      color: $textColor;
-      transition: color $transitionDuration $transitionEasing;
+      font-size: v.$fontSizeMd;
+      color: v.$textColor;
+      font-weight: v.$fontWeightMedium;
+      transition: color v.$transitionDuration v.$transitionEasing;
+      @include text-ellipsis();
     }
 
     .desc {
-      color: $insTextColor;
-      font-size: 13px;
+      color: v.$insTextColor;
+      font-size: v.$fontSizeSm;
       height: 24px;
-      margin-top: 4px;
+      margin-top: v.$spacingXs;
+      @include text-ellipsis();
     }
 
     .price {
-      color: $priceColor;
-      font-size: 18px;
-      font-weight: 600;
-      margin-top: 8px;
+      color: v.$priceColor;
+      font-size: v.$fontSizeXl;
+      font-weight: v.$fontWeightBold;
+      margin-top: v.$spacingSm;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 2px;
 
       .unit {
-        font-size: 12px;
-        margin-right: 2px;
+        font-size: v.$fontSizeXs;
+        font-weight: v.$fontWeightNormal;
       }
     }
   }
-}
-
-.ellipsis {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 </style>

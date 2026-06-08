@@ -37,15 +37,19 @@ const route = useRoute()
 </template>
 
 <style scoped lang="scss">
+@use '@/styles/var.scss' as v;
+@use '@/styles/mixins.scss' as *;
+
 .app-header {
-  background: #fff;
-  border-bottom: 1px solid #f2f2f2;
+  background: v.$white;
+  border-bottom: v.$borderWidthThin solid v.$lineColor;
+  box-shadow: v.$shadowSm;
 
   .container {
     display: flex;
     align-items: center;
     margin: 0 auto;
-    width: 1240px;
+    width: v.$containerWidth;
   }
 
   .logo {
@@ -59,40 +63,46 @@ const route = useRoute()
       text-decoration: none;
       background: url('@/assets/images/logo.png') no-repeat center 10px / contain;
       transform: scale(1);
+      transition: transform v.$transitionDurationFast v.$transitionEasing;
+
+      &:hover {
+        transform: scale(1.02);
+      }
     }
   }
 
   .app-header-nav {
     flex: 1;
     display: flex;
-    padding-left: 30px;
+    padding-left: v.$spacing3xl;
     position: relative;
-    z-index: 998;
+    z-index: v.$zIndexNav;
 
     li {
-      margin-right: 10px;
+      margin-right: v.$spacingSm;
       min-width: 80px;
       text-align: center;
 
       a {
-        font-size: 16px;
+        font-size: v.$fontSizeMd;
         line-height: 32px;
         height: 32px;
         display: inline-block;
-        color: #333;
-        transition: all 0.2s;
+        color: v.$textColor;
+        transition: all v.$transitionDurationFast v.$transitionEasing;
         border-bottom: 2px solid transparent;
+        @include focus-ring();
 
         &:hover {
-          color: $campusColor;
-          border-bottom: 2px solid $campusColor;
+          color: v.$campusColor;
+          border-bottom: 2px solid v.$campusColor;
         }
       }
 
       .active {
-        color: $campusColor;
-        border-bottom: 2px solid $campusColor;
-        font-weight: bold;
+        color: v.$campusColor;
+        border-bottom: 2px solid v.$campusColor;
+        font-weight: v.$fontWeightBold;
       }
     }
   }
@@ -101,39 +111,46 @@ const route = useRoute()
     width: 220px;
     height: 34px;
     position: relative;
-    border: 1px solid #e7e7e7;
+    border: v.$borderWidthThin solid v.$borderColorLight;
     border-radius: 17px;
     line-height: 32px;
-    padding: 0 15px;
-    margin-right: 20px;
-    background: #f8f8f8;
-    transition: all 0.3s;
+    padding: 0 v.$spacingLg;
+    margin-right: v.$spacing2xl;
+    background: v.$bgColor;
+    transition: all v.$transitionDuration v.$transitionEasing;
     display: flex;
     align-items: center;
+    @include input-focus-state();
 
     &:hover,
     &:focus-within {
-      border-color: $campusColor;
-      background: #fff;
-      box-shadow: 0 0 5px rgba($campusColor, 0.1);
+      border-color: v.$campusColor;
+      background: v.$white;
+      box-shadow: 0 0 0 3px v.$campusColorAlpha10;
     }
 
     .icon-sousuo {
-      font-size: 16px;
-      color: #999;
+      font-size: v.$fontSizeMd;
+      color: v.$insTextColor;
+      transition: color v.$transitionDurationFast v.$transitionEasing;
     }
 
     input {
       flex: 1;
-      padding-left: 8px;
-      color: #666;
+      padding-left: v.$spacingSm;
+      color: v.$subTextColor;
       background: transparent;
       outline: none;
       border: none;
-      font-size: 13px;
+      font-size: v.$fontSizeSm;
 
       &::placeholder {
-        color: #ccc;
+        color: v.$insTextColor;
+      }
+
+      &:focus + .icon-sousuo,
+      &:hover + .icon-sousuo {
+        color: v.$campusColor;
       }
     }
   }

@@ -30,26 +30,29 @@ import HomeProduct from './components/HomeProduct.vue'
 </template>
 
 <style scoped lang="scss">
+@use '@/styles/var.scss' as v;
+@use '@/styles/mixins.scss' as *;
+
 /* ========== 首页容器 ========== */
 .home-container {
-  animation: fadeIn 0.5s ease-in;
+  animation: v.$animationFadeIn;
 }
 
 /* ========== 顶部入口区域 ========== */
 .home-entry {
   display: flex;
   position: relative;
-  background-color: #fff;
-  margin-bottom: 20px;
+  background-color: v.$white;
+  margin-bottom: v.$spacing2xl;
 }
 
 /* ========== 楼层区域 ========== */
 .home-floor {
-  background-color: #f5f5f5;
-  padding-bottom: 40px;
+  background-color: v.$bgColor;
+  padding-bottom: v.$spacing4xl;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: v.$spacing2xl;
 }
 
 /* ========== 淡入动画 ========== */

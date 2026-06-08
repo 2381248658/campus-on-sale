@@ -198,43 +198,54 @@ const addCart = async () => {
 </template>
 
 <style scoped lang="scss">
+@use '@/styles/var.scss' as v;
+@use '@/styles/mixins.scss' as *;
 @use 'sass:color';
 
 /* ========== 商品详情页 ========== */
 .campus-goods-page {
+  animation: v.$animationFadeIn;
+
   .loading-container {
-    background: #fff;
-    padding: 40px 30px;
-    border-radius: $borderRadius;
+    background: v.$white;
+    padding: v.$spacing4xl v.$spacing3xl;
+    border-radius: v.$borderRadius;
+    @include card-base(false);
   }
 
   .error-container {
-    background: #fff;
-    padding: 80px 20px;
-    border-radius: $borderRadius;
+    background: v.$white;
+    padding: 80px v.$spacing2xl;
+    border-radius: v.$borderRadius;
     text-align: center;
+    @include card-base(false);
   }
 
   .goods-info {
     min-height: 600px;
-    background: #fff;
+    background: v.$white;
     display: flex;
+    border-radius: v.$borderRadius;
+    box-shadow: v.$cardShadow;
+    animation: v.$animationSlideInUp;
+
     .media {
       width: 580px;
-      padding: 30px 50px;
+      padding: v.$spacing3xl v.$spacing4xl;
     }
     .spec {
       flex: 1;
-      padding: 30px 30px 30px 0;
+      padding: v.$spacing3xl v.$spacing3xl v.$spacing3xl 0;
     }
   }
 
   .goods-footer {
     display: flex;
-    margin-top: 20px;
+    margin-top: v.$spacing2xl;
+
     .goods-article {
       width: 940px;
-      margin-right: 20px;
+      margin-right: v.$spacing2xl;
     }
     .goods-aside {
       width: 280px;
@@ -243,24 +254,39 @@ const addCart = async () => {
 
   /* ========== 商品标签页 ========== */
   .goods-tabs {
-    background: #fff;
+    background: v.$white;
+    border-radius: v.$borderRadius;
+    box-shadow: v.$cardShadow;
+    overflow: hidden;
+
     nav {
       height: 70px;
       line-height: 70px;
       display: flex;
-      border-bottom: 1px solid #f5f5f5;
+      border-bottom: v.$borderWidthThin solid v.$lineColor;
+      background: v.$gradientGlass;
+
       a {
-        padding: 0 40px;
-        font-size: 18px;
+        padding: 0 v.$spacing4xl;
+        font-size: v.$fontSizeXl;
         position: relative;
+        color: v.$textColor;
+        font-weight: v.$fontWeightSemibold;
+        transition: color v.$transitionDurationFast v.$transitionEasing;
+
+        &:hover {
+          color: v.$campusColor;
+        }
+
         &::after {
           content: '';
           position: absolute;
-          left: 40px;
+          left: v.$spacing4xl;
           bottom: -1px;
           width: 72px;
-          height: 2px;
-          background: $campusColor;
+          height: 3px;
+          background: v.$gradientPrimary;
+          border-radius: 2px 2px 0 0;
         }
       }
     }
@@ -270,69 +296,113 @@ const addCart = async () => {
   .number-box {
     display: flex;
     align-items: center;
-    margin: 20px 0;
+    margin: v.$spacing2xl 0;
+
     .label {
       width: 60px;
-      color: #999;
-      padding-left: 10px;
+      color: v.$insTextColor;
+      padding-left: v.$spacingSm;
+      font-size: v.$fontSizeBase;
+    }
+
+    :deep(.el-input-number) {
+      .el-input__wrapper {
+        border-radius: v.$borderRadiusSmall;
+        transition: all v.$transitionDuration v.$transitionEasing;
+
+        &:hover,
+        &:focus-within {
+          border-color: v.$campusColor;
+          box-shadow: 0 0 0 3px v.$campusColorAlpha10;
+        }
+      }
     }
   }
 
   .g-name {
-    font-size: 22px;
+    font-size: v.$fontSize2xl;
+    color: v.$textColor;
+    font-weight: v.$fontWeightBold;
+    line-height: v.$lineHeightTight;
   }
+
   .g-desc {
-    color: #999;
-    margin-top: 10px;
+    color: v.$insTextColor;
+    margin-top: v.$spacingSm;
+    font-size: v.$fontSizeBase;
+    line-height: v.$lineHeightNormal;
   }
 
   /* ========== 价格样式 ========== */
   .g-price {
-    margin-top: 10px;
+    margin-top: v.$spacingSm;
+    display: flex;
+    align-items: baseline;
+    gap: v.$spacingSm;
+
     span {
       &::before {
         content: '¥';
-        font-size: 14px;
+        font-size: v.$fontSizeBase;
       }
+
       &:first-child {
-        color: $priceColor;
-        margin-right: 10px;
-        font-size: 22px;
+        color: v.$priceColor;
+        font-size: v.$fontSize2xl;
+        font-weight: v.$fontWeightBold;
       }
+
       &:last-child {
-        color: #999;
+        color: v.$insTextColor;
         text-decoration: line-through;
-        font-size: 16px;
+        font-size: v.$fontSizeMd;
       }
     }
   }
 
   /* ========== 服务保障 ========== */
   .g-service {
-    background: #f5f5f5;
+    background: v.$campusColorAlpha10;
     width: 500px;
-    padding: 20px 10px 0 10px;
-    margin-top: 10px;
+    padding: v.$spacing2xl v.$spacingSm 0 v.$spacingSm;
+    margin-top: v.$spacingSm;
+    border-radius: v.$borderRadiusSmall;
+
     dl {
-      padding-bottom: 20px;
+      padding-bottom: v.$spacing2xl;
       display: flex;
       align-items: center;
+
       dt {
         width: 50px;
-        color: #999;
+        color: v.$insTextColor;
+        font-size: v.$fontSizeBase;
       }
+
       dd {
-        color: #666;
+        color: v.$subTextColor;
+        font-size: v.$fontSizeSm;
+
         span {
-          margin-right: 10px;
+          margin-right: v.$spacingSm;
+          display: inline-block;
+
           &::before {
             content: '•';
-            color: $campusColor;
-            margin-right: 2px;
+            color: v.$campusColor;
+            margin-right: v.$spacingXs;
+            font-weight: v.$fontWeightBold;
           }
         }
+
         a {
-          color: $campusColor;
+          color: v.$campusColor;
+          transition: color v.$transitionDurationFast v.$transitionEasing;
+
+          &:hover {
+            color: v.$campusColorHover;
+            text-decoration: underline;
+          }
         }
       }
     }
@@ -345,35 +415,54 @@ const addCart = async () => {
     align-items: center;
     text-align: center;
     height: 140px;
+    margin-top: v.$spacingLg;
+
     li {
       flex: 1;
       position: relative;
+      transition: all v.$transitionDuration v.$transitionEasing;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
       ~ li::after {
         position: absolute;
         top: 10px;
         left: 0;
         height: 60px;
-        border-left: 1px solid #e4e4e4;
+        border-left: v.$borderWidthThin solid v.$borderColor;
         content: '';
       }
+
       p {
         &:first-child {
-          color: #999;
+          color: v.$insTextColor;
+          font-size: v.$fontSizeSm;
         }
+
         &:nth-child(2) {
-          color: $priceColor;
-          margin-top: 10px;
+          color: v.$priceColor;
+          margin-top: v.$spacingSm;
+          font-size: v.$fontSizeMd;
+          font-weight: v.$fontWeightBold;
         }
+
         &:last-child {
-          color: #666;
-          margin-top: 10px;
+          color: v.$subTextColor;
+          margin-top: v.$spacingSm;
+          font-size: v.$fontSizeSm;
+          cursor: pointer;
+          transition: color v.$transitionDurationFast v.$transitionEasing;
+
           i {
-            color: $campusColor;
-            font-size: 14px;
+            color: v.$campusColor;
+            font-size: v.$fontSizeBase;
+            margin-right: v.$spacingXs;
           }
+
           &:hover {
-            color: $campusColor;
-            cursor: pointer;
+            color: v.$campusColor;
           }
         }
       }
@@ -383,42 +472,77 @@ const addCart = async () => {
 
 /* ========== 商品详情内容 ========== */
 .goods-detail {
-  padding: 40px;
+  padding: v.$spacing4xl;
+
   .attrs {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 30px;
+    margin-bottom: v.$spacing3xl;
+    gap: v.$spacingSm;
+
     li {
       display: flex;
-      margin-bottom: 10px;
-      width: 50%;
+      width: calc(50% - v.$spacingXs);
+      padding: v.$spacingSm;
+      background: v.$bgColor;
+      border-radius: v.$borderRadiusSmall;
+      transition: all v.$transitionDuration v.$transitionEasing;
+
+      &:hover {
+        background: v.$campusColorAlpha10;
+        transform: translateX(2px);
+      }
+
       .dt {
         width: 100px;
-        color: #999;
+        color: v.$insTextColor;
+        font-size: v.$fontSizeSm;
       }
+
       .dd {
         flex: 1;
-        color: #666;
+        color: v.$subTextColor;
+        font-size: v.$fontSizeSm;
       }
     }
   }
+
   > img {
     width: 100%;
+    border-radius: v.$borderRadius;
+    transition: transform v.$transitionDurationSlow v.$transitionEasing;
+
+    &:hover {
+      transform: scale(1.02);
+    }
   }
 }
 
 /* ========== 加入购物车按钮 ========== */
 .btn {
-  margin-top: 20px;
-  background-color: $campusColor;
-  color: #fff;
+  margin-top: v.$spacing2xl;
+  background: v.$gradientPrimary;
+  color: v.$white;
   border: none;
+  border-radius: v.$borderRadius;
+  font-weight: v.$fontWeightSemibold;
+  transition: all v.$transitionDuration v.$transitionEasing;
+  box-shadow: v.$shadowPrimary;
+  @include ripple-effect();
+
   &:hover {
-    background-color: color.adjust($campusColor, $lightness: -5%);
+    background: v.$gradientPrimary;
+    box-shadow: v.$shadowPrimaryHover;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
 .bread-container {
-  padding: 25px 0;
+  padding: v.$spacing2xl 0;
+  animation: v.$animationSlideInDown;
 }
 </style>

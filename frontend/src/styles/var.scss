@@ -7,11 +7,24 @@
 $campusColor: #005bac; // 主色：学术蓝
 $campusColorLight: #e6eff7; // 主色极浅：激活态/背景
 $campusColorHover: #003d73; // 主色悬停：比主色深15%，提升交互辨识度
+$campusColorDark: #003d73; // 主色深色变体
+
+// 主色透明变体（用于背景、边框等）
+$campusColorAlpha10: rgba(0, 91, 172, 0.1);
+$campusColorAlpha20: rgba(0, 91, 172, 0.2);
+$campusColorAlpha30: rgba(0, 91, 172, 0.3);
 
 $warnColor: #ff8c00; // 辅助色：能量橙
+$warnColorLight: rgba(255, 140, 0, 0.1);
+
 $succColor: #1dc779; // 成功色：清新绿
+$succColorLight: rgba(29, 199, 121, 0.1);
+
 $priceColor: #e62117; // 价格/错误色：胭脂红
+$priceColorLight: rgba(230, 33, 23, 0.1);
+
 $helpColor: #337ab7; // 链接色：信息蓝
+$helpColorLight: rgba(51, 122, 183, 0.1);
 
 // 别名兼容
 $sucColor: $succColor;
@@ -70,3 +83,73 @@ $zIndexModal: 2000;
 
 // --- 6. 商品悬浮效果参数 ---
 $goodsHoverOffset: 5px; // 商品悬浮上移距离
+
+// --- 7. 间距系统 (Spacing System) ---
+$spacingXs: 4px;
+$spacingSm: 8px;
+$spacingMd: 12px;
+$spacingLg: 16px;
+$spacingXl: 20px;
+$spacing2xl: 24px;
+$spacing3xl: 32px;
+$spacing4xl: 40px;
+
+// --- 8. 渐变系统 (Gradients) ---
+$gradientPrimary: linear-gradient(135deg, $campusColor 0%, #0077cc 100%);
+$gradientSecondary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$gradientAccent: linear-gradient(135deg, $warnColor 0%, #ff6b35 100%);
+$gradientSuccess: linear-gradient(135deg, $succColor 0%, #17a2b8 100%);
+$gradientGlass: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+
+// --- 9. 阴影变体 (Shadow Variants) ---
+$shadowSm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadowMd: 0 4px 6px rgba(0, 0, 0, 0.07);
+$shadowLg: 0 10px 15px rgba(0, 0, 0, 0.1);
+$shadowXl: 0 20px 25px rgba(0, 0, 0, 0.15);
+$shadowCard: $cardShadow;
+$shadowCardHover: $cardShadowHover;
+$shadowPrimary: 0 4px 14px rgba(0, 91, 172, 0.25);
+$shadowPrimaryHover: 0 6px 20px rgba(0, 91, 172, 0.35);
+
+// --- 10. 动画关键帧 (Animation Keyframes) ---
+$animationFadeIn: fadeIn 0.5s ease-in;
+$animationSlideInUp: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+$animationSlideInDown: slideInDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+$animationSlideInLeft: slideInLeft 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+$animationSlideInRight: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+$animationZoomIn: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+$animationPulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+// --- 11. 字体大小系统 (Font Size System) ---
+$fontSizeXs: 12px;
+$fontSizeSm: 13px;
+$fontSizeBase: 14px;
+$fontSizeMd: 16px;
+$fontSizeLg: 18px;
+$fontSizeXl: 20px;
+$fontSize2xl: 24px;
+$fontSize3xl: 30px;
+$fontSize4xl: 36px;
+
+// --- 12. 行高系统 (Line Height System) ---
+$lineHeightTight: 1.25;
+$lineHeightNormal: 1.5;
+$lineHeightRelaxed: 1.75;
+$lineHeightLoose: 2;
+
+// --- 13. 字重系统 (Font Weight System) ---
+$fontWeightLight: 300;
+$fontWeightNormal: 400;
+$fontWeightMedium: 500;
+$fontWeightSemibold: 600;
+$fontWeightBold: 700;
+
+// --- 14. 边框样式 (Border Styles) ---
+$borderWidthThin: 1px;
+$borderWidthMedium: 2px;
+$borderWidthThick: 3px;
+$borderStyleSolid: solid;
+$borderStyleDashed: dashed;
+$borderColorLight: rgba(0, 0, 0, 0.06);
+$borderColorMedium: rgba(0, 0, 0, 0.12);
+$borderColorDark: rgba(0, 0, 0, 0.24);

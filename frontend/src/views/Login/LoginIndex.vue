@@ -101,3 +101,60 @@ const doLogin = () => {
     </el-form>
   </AuthLayout>
 </template>
+
+<style scoped lang="scss">
+@use '@/styles/var.scss' as v;
+@use '@/styles/mixins.scss' as *;
+
+/* 登录表单增强样式 */
+:deep(.el-form) {
+  animation: v.$animationSlideInUp;
+}
+
+:deep(.el-form-item) {
+  &:hover {
+    :deep(.el-input__wrapper) {
+      border-color: v.$campusColor;
+    }
+  }
+}
+
+/* 输入框焦点增强 */
+:deep(.el-input__wrapper) {
+  @include input-focus-state();
+}
+
+/* 按钮加载状态 */
+:deep(.subBtn.is-loading) {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* 复选框样式优化 */
+:deep(.el-checkbox__input.is-checked) {
+  .el-checkbox__inner {
+    background-color: v.$campusColor;
+    border-color: v.$campusColor;
+  }
+}
+
+/* 表单验证错误提示优化 */
+:deep(.el-form-item__error) {
+  color: v.$priceColor;
+  font-size: v.$fontSizeXs;
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+</style>

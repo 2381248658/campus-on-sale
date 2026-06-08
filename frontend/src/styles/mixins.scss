@@ -4,6 +4,7 @@
  */
 
 @use './var.scss' as v;
+@use 'sass:color';
 
 /**
  * 商品悬浮效果
@@ -55,5 +56,279 @@
 
   &:hover {
     transform: scale($scale);
+  }
+}
+
+/**
+ * 卡片基础样式
+ * 提供统一的卡片外观，包括圆角、阴影、背景
+ * @param {Boolean} $hover - 是否启用悬浮效果，默认 true
+ * @example
+ *   .my-card {
+ *     @include card-base();
+ *   }
+ */
+@mixin card-base($hover: true) {
+  background: v.$white;
+  border-radius: v.$borderRadius;
+  box-shadow: v.$cardShadow;
+  transition: all v.$transitionDuration v.$transitionEasing;
+
+  @if $hover {
+    &:hover {
+      box-shadow: v.$cardShadowHover;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+/**
+ * 玻璃拟态效果
+ * 用于创建毛玻璃风格的组件
+ * @param {Color} $bg - 背景色，默认使用变量
+ * @param {Number} $blur - 模糊度，默认 16px
+ * @example
+ *   .glass-panel {
+ *     @include glass-morphism();
+ *   }
+ */
+@mixin glass-morphism($bg: v.$glassBg, $blur: v.$glassBlur) {
+  background: $bg;
+  backdrop-filter: $blur;
+  -webkit-backdrop-filter: $blur;
+  border: v.$glassBorder;
+}
+
+/**
+ * 按钮基础样式
+ * 提供统一的按钮外观和交互
+ * @param {Color} $bg-color - 背景色，默认主色
+ * @param {Color} $text-color - 文字色，默认白色
+ * @example
+ *   .custom-btn {
+ *     @include button-base();
+ *   }
+ */
+@mixin button-base($bg-color: v.$campusColor, $text-color: v.$white) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacingSm v.$spacingLg;
+  background: $bg-color;
+  color: $text-color;
+  border: none;
+  border-radius: v.$borderRadiusSmall;
+  font-weight: v.$fontWeightMedium;
+  cursor: pointer;
+  transition: all v.$transitionDurationFast v.$transitionEasing;
+
+  &:hover {
+    background: color.adjust($bg-color, $lightness: -8%);
+    box-shadow: v.$shadowPrimary;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $bg-color;
+    outline-offset: 2px;
+  }
+}
+
+/**
+ * 输入框焦点状态
+ * 提供统一的输入框焦点样式
+ * @param {Color} $focus-color - 焦点色，默认主色
+ * @example
+ *   .my-input {
+ *     @include input-focus-state();
+ *   }
+ */
+@mixin input-focus-state($focus-color: v.$campusColor) {
+  &:focus {
+    border-color: $focus-color;
+    box-shadow: 0 0 0 3px rgba($focus-color, 0.1);
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $focus-color;
+    outline-offset: 2px;
+  }
+}
+
+/**
+ * 文本截断（单行）
+ * @example
+ *   .text-ellipsis {
+ *     @include text-ellipsis();
+ *   }
+ */
+@mixin text-ellipsis() {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/**
+ * 文本截断（多行）
+ * @param {Number} $lines - 行数，默认 2
+ * @example
+ *   .text-clamp {
+ *     @include text-clamp(3);
+ *   }
+ */
+@mixin text-clamp($lines: 2) {
+  word-break: break-all;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  line-clamp: $lines;
+  overflow: hidden;
+}
+
+/**
+ * 绝对定位居中
+ * @example
+ *   .centered {
+ *     @include absolute-center();
+ *   }
+ */
+@mixin absolute-center() {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/**
+ * Flex 居中
+ * @example
+ *   .flex-centered {
+ *     @include flex-center();
+ *   }
+ */
+@mixin flex-center() {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/**
+ * 渐变文字
+ * @param {String} $gradient - 渐变值，默认主色渐变
+ * @example
+ *   .gradient-text {
+ *     @include gradient-text();
+ *   }
+ */
+@mixin gradient-text($gradient: v.$gradientPrimary) {
+  background: $gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/**
+ * 骨架屏动画
+ * @example
+ *   .skeleton {
+ *     @include skeleton-loading();
+ *   }
+ */
+@mixin skeleton-loading() {
+  background: linear-gradient(
+    90deg,
+    v.$bgColor 25%,
+    color.adjust(v.$bgColor, $lightness: 5%) 50%,
+    v.$bgColor 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+/**
+ * 响应式断点
+ * @param {String} $breakpoint - 断点名称 (mobile, tablet, desktop)
+ * @example
+ *   .container {
+ *     @include respond-to('mobile') {
+ *       padding: 10px;
+ *     }
+ *   }
+ */
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == 'mobile' {
+    @media (max-width: 767px) {
+      @content;
+    }
+  } @else if $breakpoint == 'tablet' {
+    @media (min-width: 768px) and (max-width: 1023px) {
+      @content;
+    }
+  } @else if $breakpoint == 'desktop' {
+    @media (min-width: 1024px) {
+      @content;
+    }
+  }
+}
+
+/**
+ * 可访问性焦点环
+ * 用于键盘导航时的焦点样式
+ * @param {Color} $color - 焦点色，默认主色
+ * @example
+ *   .focusable {
+ *     @include focus-ring();
+ *   }
+ */
+@mixin focus-ring($color: v.$campusColor) {
+  &:focus-visible {
+    outline: 2px solid $color;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/**
+ * 涟漪效果（点击波纹）
+ * 用于按钮等可点击元素的点击反馈
+ * @param {Color} $color - 涟漪色，默认主色
+ * @example
+ *   .ripple-btn {
+ *     @include ripple-effect();
+ *   }
+ */
+@mixin ripple-effect($color: v.$campusColor) {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba($color, 0.3);
+    transform: translate(-50%, -50%);
+    transition:
+      width 0.6s v.$transitionEasing,
+      height 0.6s v.$transitionEasing;
+  }
+
+  &:active::after {
+    width: 200%;
+    height: 200%;
   }
 }
