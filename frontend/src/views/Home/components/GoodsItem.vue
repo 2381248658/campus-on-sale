@@ -28,13 +28,14 @@ defineProps<Props>()
 
 <style lang="scss" scoped>
 @use '@/styles/mixins.scss' as *;
+@use '@/styles/var.scss' as *;
 
 .goods-item {
   display: block;
   width: 220px;
   padding: 20px;
   text-align: center;
-  background: #fff;
+  background: $white;
   border-radius: $borderRadius;
   @include goods-hover-effect();
 
@@ -64,7 +65,7 @@ defineProps<Props>()
     .name {
       font-size: 15px;
       color: $textColor;
-      transition: color 0.3s;
+      transition: color $transitionDuration $transitionEasing;
     }
 
     .desc {

@@ -1,4 +1,5 @@
 @use './var.scss' as v;
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
 
 :root {
   --el-color-primary: #005bac;
@@ -26,20 +27,23 @@ html {
 
 body {
   height: 100%;
-  color: #333;
-  min-width: 1240px;
-  font:
-    1em/1.4 'Microsoft Yahei',
-    'PingFang SC',
-    'Avenir',
-    'Segoe UI',
-    'Hiragino Sans GB',
-    'STHeiti',
-    'Microsoft Sans Serif',
-    'WenQuanYi Micro Hei',
-    sans-serif;
+  color: v.$textColor;
+  min-width: v.$containerWidth;
+  font-family: v.$fontFamilyBase;
+  line-height: 1.5;
+  background-color: v.$white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  background-color: #ffffff;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: v.$fontFamilyDisplay;
+  font-weight: 600;
 }
 
 body,

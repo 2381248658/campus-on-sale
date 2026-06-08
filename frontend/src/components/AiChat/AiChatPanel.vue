@@ -93,7 +93,14 @@ watch(
 <template>
   <div class="ai-chat-panel">
     <!-- 悬浮触发按钮 -->
-    <button class="trigger-btn" :class="{ active: isOpen }" @click="togglePanel">
+    <button
+      class="trigger-btn"
+      :class="{ active: isOpen }"
+      @click="togglePanel"
+      aria-haspopup="dialog"
+      :aria-expanded="isOpen"
+      aria-label="切换AI导购助手"
+    >
       <svg
         v-if="!isOpen"
         width="24"
@@ -132,7 +139,12 @@ watch(
               </p>
             </div>
           </div>
-          <button class="clear-btn" @click="showClearConfirm = true" title="清空对话">
+          <button
+            class="clear-btn"
+            @click="showClearConfirm = true"
+            title="清空对话"
+            aria-label="清空对话"
+          >
             <svg
               width="16"
               height="16"
@@ -217,22 +229,25 @@ watch(
   height: 52px;
   border-radius: $borderRadiusFull;
   border: none;
-  background: linear-gradient(135deg, $campusColor, #3399d4);
-  color: #fff;
+  background: linear-gradient(135deg, $campusColor, $campusColorHover);
+  color: $white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(0, 91, 172, 0.35);
+  box-shadow: $cardShadow;
   transition: all $transitionDuration $transitionEasing;
 
   &:hover {
-    transform: scale(1.08);
-    box-shadow: 0 6px 24px rgba(0, 91, 172, 0.45);
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: $cardShadowHover;
   }
 
   &.active {
-    background: #fff;
+    background: $glassBg;
+    backdrop-filter: $glassBlur;
+    -webkit-backdrop-filter: $glassBlur;
+    border: $glassBorder;
     color: $campusColor;
     box-shadow: $cardShadow;
   }
@@ -247,10 +262,14 @@ watch(
   height: 520px;
   display: flex;
   flex-direction: column;
-  background: #fff;
-  border-radius: $borderRadius;
-  box-shadow: 0 8px 40px rgba(0, 91, 172, 0.15);
+  background: $glassBg;
+  backdrop-filter: $glassBlur;
+  -webkit-backdrop-filter: $glassBlur;
+  border: $glassBorder;
+  border-radius: $borderRadiusLarge;
+  box-shadow: $cardShadowHover;
   overflow: hidden;
+  will-change: transform, opacity;
 }
 
 /* ========== 面板头部 ========== */
@@ -259,8 +278,11 @@ watch(
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: linear-gradient(135deg, $campusColor, #1a7ab5);
-  color: #fff;
+  background: linear-gradient(135deg, rgba($campusColor, 0.9), rgba($campusColorHover, 0.9));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: $white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .header-info {
@@ -365,11 +387,11 @@ watch(
 
 /* ========== 面板过渡动画 ========== */
 .panel-enter-active {
-  animation: panel-in 0.3s $transitionEasing;
+  animation: panel-in $transitionDuration $transitionEasing;
 }
 
 .panel-leave-active {
-  animation: panel-in 0.25s $transitionEasing reverse;
+  animation: panel-in $transitionDurationFast $transitionEasing reverse;
 }
 
 @keyframes panel-in {

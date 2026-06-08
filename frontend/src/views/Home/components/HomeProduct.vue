@@ -56,9 +56,10 @@ onMounted(() => {
 
 <style scoped lang="scss">
 @use '@/styles/mixins.scss' as *;
+@use '@/styles/var.scss' as *;
 
 .home-product {
-  background: #f7f9fc;
+  background: $bgColor;
   margin-top: 0;
 
   .box {
@@ -84,7 +85,7 @@ onMounted(() => {
         height: 66px;
         display: flex;
         font-size: 18px;
-        color: #fff;
+        color: $white;
         line-height: 66px;
         font-weight: 600;
         position: absolute;
@@ -98,11 +99,15 @@ onMounted(() => {
           &:first-child {
             width: 90px;
             background: rgba($campusColor, 0.9);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
           }
 
           &:last-child {
             flex: 1;
             background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             font-size: 14px;
             letter-spacing: 1px;
           }
@@ -120,7 +125,7 @@ onMounted(() => {
         height: 300px;
         margin-right: 10px;
         margin-bottom: 10px;
-        background: #fff;
+        background: $white;
         border-radius: $borderRadius;
 
         &:nth-last-child(-n + 4) {

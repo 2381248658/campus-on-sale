@@ -16,7 +16,12 @@ $helpColor: #337ab7; // 链接色：信息蓝
 // 别名兼容
 $sucColor: $succColor;
 
-// --- 2. 中性色规范 (Neutral Colors) ---
+// --- 2. 排版与中性色规范 (Typography & Neutral Colors) ---
+$fontFamilyDisplay:
+  'Outfit', 'Clash Display', 'PingFang SC', 'Microsoft Yahei', sans-serif; // 现代展示字体
+$fontFamilyBase:
+  'HarmonyOS Sans', 'Inter', 'PingFang SC', 'Microsoft Yahei', sans-serif; // 高清阅读字体
+
 $white: #ffffff;
 $black: #000000;
 
@@ -38,16 +43,25 @@ $borderRadiusFull: 50%; // 圆形（头像、图标）
 $containerWidth: 1240px; // 版心宽度 (PC端)
 
 // --- 4. 交互反馈 (Interactions) ---
-$cardShadow: 0 4px 20px rgba(0, 91, 172, 0.08); // 基础卡片阴影
-$cardShadowHover: 0 10px 35px rgba(0, 91, 172, 0.22); // 悬浮增强阴影
+$cardShadow:
+  0 2px 8px rgba(0, 91, 172, 0.04),
+  0 12px 32px rgba(0, 91, 172, 0.08); // 基础多层平滑阴影
+$cardShadowHover:
+  0 4px 16px rgba(0, 91, 172, 0.08),
+  0 24px 64px rgba(0, 91, 172, 0.16); // 悬浮增强多层阴影
 
-$transitionDurationFast: 0.2s; // 快速反馈（链接悬停）
-$transitionDuration: 0.3s; // 标准过渡（按钮、卡片）
-$transitionDurationSlow: 0.5s; // 慢速过渡（图片缩放）
+$transitionDurationFast: 0.25s; // 快速反馈（链接悬停）
+$transitionDuration: 0.4s; // 标准过渡（按钮、卡片）
+$transitionDurationSlow: 0.6s; // 慢速过渡（图片缩放）
 
-$transitionEasing: ease-in-out; // 统一缓动曲线
+$transitionEasing: cubic-bezier(0.34, 1.56, 0.64, 1); // 统一缓动曲线：现代弹簧物理回弹模型
 
-// --- 5. 层级管理 (Z-index) ---
+// --- 5. 现代视觉材质 (Modern Visual Materials) ---
+$glassBg: rgba(255, 255, 255, 0.85); // 毛玻璃背景
+$glassBorder: 1px solid rgba(255, 255, 255, 0.4); // 毛玻璃高光边框
+$glassBlur: blur(16px); // 毛玻璃模糊度
+
+// --- 6. 层级管理 (Z-index) ---
 $zIndexBack: -1;
 $zIndexBase: 1;
 $zIndexNav: 100;
