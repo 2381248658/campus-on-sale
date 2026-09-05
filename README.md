@@ -32,7 +32,7 @@
 
 > **校园惠** 是一套前后端分离的校园二手电商应用。前端以 **Vue 3 + TypeScript + Vite** 构建，覆盖商品浏览、购物车与订单闭环；后端以 Express + MongoDB 提供 RESTful API。
 
-> 🔥 **在线预览**：[点击访问校园惠 Demo](https://emoa.tech)
+> 🔥 **在线预览**：[点击访问校园惠 Demo](https://shop.emoa.tech)
 
 ---
 
